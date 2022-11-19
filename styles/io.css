@@ -1,0 +1,32 @@
+.board-input,
+.board-output {
+    position: absolute;
+
+    display: grid;
+    place-items: center;
+
+    font-family: serif;
+    font-weight: 900;
+    font-size: 16px;
+
+    height: 24px;
+    width: 24px;
+
+    padding: 0;
+
+    border: 1px solid #aaaaaa;
+    border-radius: 50%;
+
+    box-shadow: 1px 1px 4px #aaaaaa;
+}
+
+.activated {
+    background-color: #ff2626;
+
+    color: white;
+}
+
+.board-input:hover,
+.board-output:hover {
+    cursor: grab;
+}

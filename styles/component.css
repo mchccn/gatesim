@@ -1,0 +1,75 @@
+.component {
+    position: absolute;
+
+    display: grid;
+    place-items: center;
+    grid-template-columns: 6px auto 6px;
+
+    height: fit-content;
+    width: fit-content;
+
+    min-height: 40px;
+    min-width: 120px;
+
+    background-color: white;
+
+    border: 1px solid #efefef;
+    border-radius: 4px;
+
+    box-shadow: 1px 1px 4px #aaaaaa;
+}
+
+.component:hover {
+    cursor: grab;
+}
+
+.component-inputs,
+.component-outputs {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    height: 100%;
+
+    gap: 4px;
+}
+
+.component-input-button,
+.component-output-button {
+    height: 16px;
+    width: 16px;
+
+    padding: 0;
+
+    border: 1px solid #aaaaaa;
+    border-radius: 50%;
+}
+
+.component-input-button:hover,
+.component-output-button:hover {
+    cursor: pointer;
+
+    background: #dfdfdf;
+}
+
+.component-input-button {
+    margin-left: -6px;
+}
+
+.component-output-button {
+    margin-right: -6px;
+}
+
+.component-name {
+    height: 100%;
+    width: 100%;
+
+    display: grid;
+    place-items: center;
+
+    font-family: sans-serif;
+    font-weight: 900;
+    font-size: 1.5rem;
+
+    user-select: none;
+}

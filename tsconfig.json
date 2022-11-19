@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "sourceMap": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitAny": true,
+        "alwaysStrict": true,
+        "noImplicitReturns": true,
+        "skipLibCheck": true,
+        "exactOptionalPropertyTypes": true
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules"]
+}
