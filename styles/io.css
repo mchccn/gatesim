@@ -2,8 +2,12 @@
 .board-output {
     position: absolute;
 
+    z-index: 20;
+
     display: grid;
     place-items: center;
+
+    color: #333333;
 
     font-family: serif;
     font-weight: 900;
@@ -12,21 +16,27 @@
     height: 24px;
     width: 24px;
 
+    user-select: none;
+
     padding: 0;
 
-    border: 1px solid #aaaaaa;
-    border-radius: 50%;
+    border: 1px solid #dedede;
+}
 
-    box-shadow: 1px 1px 4px #aaaaaa;
+.board-input {
+    border-radius: 50%;
+}
+
+.board-output {
+    border-radius: 4px;
+}
+
+.board-input:hover {
+    cursor: pointer;
 }
 
 .activated {
     background-color: #ff2626;
 
-    color: white;
-}
-
-.board-input:hover,
-.board-output:hover {
-    cursor: grab;
+    color: #eeeeee;
 }

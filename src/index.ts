@@ -1,28 +1,33 @@
 import { AndGate } from "./chips";
 import { Component } from "./Component";
-import { Reified } from "./dom";
 import { DraggingManager } from "./DraggingManager";
 import { Input } from "./Input";
 import { Output } from "./Output";
-import { ZoomingManager } from "./ZoomingManager";
+import { Wiring, WiringManager } from "./WiringManager";
 
-const active = new Set([
-    new Input({ x: 100, y: 100 }),
-    new Input({ x: 100, y: 200 }),
-    new Component(new AndGate(), { x: 300, y: 150 }),
-    new Output({ x: 500, y: 150 }),
-]);
+const a = new Input({ x: 100, y: 100 });
+const b = new Input({ x: 100, y: 200 });
+const c = new Component(new AndGate(), { x: 300, y: 150 });
+const d = new Output({ x: 500, y: 150 });
+
+const active = new Set([a, b, c, d]);
 
 DraggingManager.listen();
 
 active.forEach((c) => {
     c.attach();
 
-    if (c instanceof Component)
-        DraggingManager.watch(c.element, c.element.querySelector(".component-name") as HTMLElement);
-    else DraggingManager.watch(c.element);
+    if (c instanceof Component) {
+        DraggingManager.watch(c.element, c.element.querySelector<HTMLElement>(".component-name")!);
+    }
 });
 
-DraggingManager.watch(Reified.root);
+WiringManager.wires.push(new Wiring(a.element, c.inputs[0]));
+WiringManager.wires.push(new Wiring(b.element, c.inputs[1]));
+WiringManager.wires.push(new Wiring(c.outputs[0], d.element));
 
-ZoomingManager.observe(Reified.root);
+(function loop() {
+    WiringManager.render();
+
+    requestAnimationFrame(loop);
+})();

@@ -1,5 +1,3 @@
-import { ZoomingManager } from "./ZoomingManager";
-
 export class DraggingManager {
     static #dragged = undefined as HTMLElement | undefined;
 
@@ -65,19 +63,8 @@ export class DraggingManager {
         this.#mouse.y = e.clientY;
 
         if (this.#dragged) {
-            if (this.#dragged === ZoomingManager.target) {
-                this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
-                this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
-            } else {
-                this.#dragged.style.left =
-                    (this.#mouse.x - this.#mouse.ox) *
-                        (1 / +(ZoomingManager.target?.style.scale ?? 1)) +
-                    "px";
-                this.#dragged.style.top =
-                    (this.#mouse.y - this.#mouse.oy) *
-                        (1 / +(ZoomingManager.target?.style.scale ?? 1)) +
-                    "px";
-            }
+            this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
+            this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
         }
     }
 

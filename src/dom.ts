@@ -4,9 +4,7 @@ export function html(...args: [string] | [TemplateStringsArray, ...unknown[]]) {
     const [template, ...values] = args;
 
     const html =
-        typeof template === "string"
-            ? template
-            : template.reduce((html, text, i) => html + text + values[i] ?? "", "");
+        typeof template === "string" ? template : template.reduce((html, text, i) => html + text + values[i] ?? "", "");
 
     return new DOMParser().parseFromString(html, "text/html").body.childNodes[0];
 }

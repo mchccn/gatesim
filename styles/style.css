@@ -23,20 +23,16 @@ body {
 
     position: absolute;
 
-    cursor: grab;
-
-    border: 1px solid #efefef;
+    border: 1px solid #dedede;
     border-radius: 4px;
-
-    box-shadow: 1px 1px 4px #aaaaaa;
 }
 
-canvas.debug {
+canvas {
     position: absolute;
 
     pointer-events: none;
 
-    z-index: 100;
+    z-index: 0;
 
     width: 100vw;
     height: 100vh;

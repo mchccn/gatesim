@@ -13,6 +13,10 @@ export abstract class Chip<I extends number, O extends number> {
     }
 
     abstract output(inputs: BooleanTuple<I>): BooleanTuple<O>;
+
+    evaluate(inputs: boolean[]) {
+        return this.output(inputs as BooleanTuple<I, []>) as boolean[];
+    }
 }
 
 export class AndGate extends Chip<2, 1> {

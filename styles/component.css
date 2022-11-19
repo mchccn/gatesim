@@ -1,6 +1,8 @@
 .component {
     position: absolute;
 
+    z-index: 10;
+
     display: grid;
     place-items: center;
     grid-template-columns: 6px auto 6px;
@@ -13,10 +15,8 @@
 
     background-color: white;
 
-    border: 1px solid #efefef;
+    border: 1px solid #dedede;
     border-radius: 4px;
-
-    box-shadow: 1px 1px 4px #aaaaaa;
 }
 
 .component:hover {
@@ -36,28 +36,37 @@
 
 .component-input-button,
 .component-output-button {
+    display: grid;
+    place-items: center;
+
+    font-family: serif;
+    font-weight: 900;
+    font-size: 12px;
+
+    color: #cccccc;
+
     height: 16px;
     width: 16px;
 
     padding: 0;
 
-    border: 1px solid #aaaaaa;
-    border-radius: 50%;
-}
-
-.component-input-button:hover,
-.component-output-button:hover {
-    cursor: pointer;
-
-    background: #dfdfdf;
+    border: 1px solid #dedede;
 }
 
 .component-input-button {
     margin-left: -6px;
+
+    border-radius: 50%;
 }
 
 .component-output-button {
     margin-right: -6px;
+
+    border-radius: 2px;
+}
+
+.component-input-button.activated {
+    color: #ff7777;
 }
 
 .component-name {
@@ -70,6 +79,8 @@
     font-family: sans-serif;
     font-weight: 900;
     font-size: 1.5rem;
+
+    color: #333333;
 
     user-select: none;
 }
