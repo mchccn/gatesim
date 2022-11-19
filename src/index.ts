@@ -4,6 +4,7 @@ import { Reified } from "./dom";
 import { DraggingManager } from "./DraggingManager";
 import { Input } from "./Input";
 import { Output } from "./Output";
+import { ZoomingManager } from "./ZoomingManager";
 
 const active = new Set([
     new Input({ x: 100, y: 100 }),
@@ -24,4 +25,4 @@ active.forEach((c) => {
 
 DraggingManager.watch(Reified.root);
 
-// ZoomingManager.observe(Reified.root);
+ZoomingManager.observe(Reified.root);

@@ -13,12 +13,6 @@ export class DraggingManager {
 
     static #watched = new Map();
 
-    static {
-        this.mousemove = this.mousemove.bind(this);
-        this.mousedown = this.mousedown.bind(this);
-        this.mouseup = this.mouseup.bind(this);
-    }
-
     static watch(element: HTMLElement, target = element) {
         element.dataset.watched = "true";
 
@@ -109,5 +103,11 @@ export class DraggingManager {
         this.#mouse.oy = -1;
 
         this.#dragged = undefined;
+    }
+
+    static {
+        this.mousemove = this.mousemove.bind(this);
+        this.mousedown = this.mousedown.bind(this);
+        this.mouseup = this.mouseup.bind(this);
     }
 }
