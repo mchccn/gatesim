@@ -1,5 +1,5 @@
 import { Chip } from "./chips";
-import { html, Reified } from "./dom";
+import { html, Reified } from "./Reified";
 
 export class Component<I extends number, O extends number> extends Reified {
     readonly element;

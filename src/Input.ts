@@ -1,4 +1,4 @@
-import { html, Reified } from "./dom";
+import { html, Reified } from "./Reified";
 
 export class Input extends Reified {
     readonly element;
@@ -15,10 +15,17 @@ export class Input extends Reified {
         this.element.classList.toggle("activated");
     };
 
+    contextmenu = (e: MouseEvent) => {
+        e.preventDefault();
+
+        this.element.classList.toggle("activated");
+    };
+
     attach() {
         super.attach();
 
         this.element.addEventListener("click", this.click);
+        this.element.addEventListener("contextmenu", this.contextmenu);
     }
 
     detach() {

@@ -50,6 +50,8 @@
 
     padding: 0;
 
+    user-select: none;
+
     border: 1px solid #dedede;
 }
 

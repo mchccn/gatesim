@@ -1,22 +1,15 @@
-/** @format */
-
 const path = require("path");
 
+/** @type {import("webpack").Configuration} */
 module.exports = {
     entry: "./src/index.ts",
     devtool: "inline-source-map",
     mode: "development",
     module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: "ts-loader",
-                exclude: /node_modules/,
-            },
-        ],
+        rules: [{ test: /\.ts$/, use: "ts-loader", exclude: [path.resolve(__dirname, "node_modules")] }],
     },
     resolve: {
-        extensions: [".tsx", ".ts", ".js"],
+        extensions: [".ts"],
     },
     output: {
         filename: "index.js",

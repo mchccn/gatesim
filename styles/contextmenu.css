@@ -1,0 +1,47 @@
+.contextmenu {
+    position: absolute;
+
+    z-index: 100;
+
+    display: flex;
+    flex-direction: column;
+
+    width: 175px;
+
+    border: 1px solid #dedede;
+    border-radius: 4px;
+
+    background-color: #fefefe;
+
+    user-select: none;
+
+    box-shadow: 1px 1px 4px #dedede;
+}
+
+.contextmenu > .br {
+    display: block;
+
+    width: 100%;
+
+    border-bottom: 1px solid #dedede;
+}
+
+.contextmenu > button {
+    text-align: left;
+
+    background: transparent;
+
+    border: none;
+
+    padding: 8px 8px;
+
+    color: #999999;
+}
+
+.contextmenu > button:hover {
+    cursor: pointer;
+
+    color: #333333;
+
+    background: #f0f0f0;
+}

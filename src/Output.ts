@@ -1,4 +1,4 @@
-import { html, Reified } from "./dom";
+import { html, Reified } from "./Reified";
 
 export class Output extends Reified {
     readonly element;
