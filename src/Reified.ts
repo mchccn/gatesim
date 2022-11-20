@@ -9,8 +9,12 @@ export function html(...args: [string] | [TemplateStringsArray, ...unknown[]]) {
     return new DOMParser().parseFromString(html, "text/html").body.childNodes[0];
 }
 
+export function preventDefault(e: Event) {
+    e.preventDefault();
+}
+
 export abstract class Reified {
-    static readonly root = document.querySelector(".reified-root") as HTMLElement;
+    static readonly root = document.querySelector<HTMLElement>(".reified-root")!;
 
     abstract readonly element: HTMLElement;
 

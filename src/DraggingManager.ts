@@ -1,5 +1,5 @@
 export class DraggingManager {
-    static #dragged = undefined as HTMLElement | undefined;
+    static #dragged: HTMLElement | undefined;
 
     static readonly #mouse = {
         x: -1,

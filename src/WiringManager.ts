@@ -1,7 +1,7 @@
 import { useCanvas } from "./canvas";
 
 export class Wiring {
-    constructor(readonly from: HTMLElement, readonly to: HTMLElement) {
+    constructor(readonly from: Element, readonly to: Element) {
         new MutationObserver(() => {
             to.classList.toggle("activated", from.classList.contains("activated"));
         }).observe(from, { attributeFilter: ["class"], attributes: true });
@@ -9,7 +9,7 @@ export class Wiring {
 }
 
 export class WiringManager {
-    static wires = [] as Wiring[];
+    static wires = new Array<Wiring>();
 
     static render() {
         const ctx = useCanvas();

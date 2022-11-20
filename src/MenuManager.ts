@@ -13,7 +13,10 @@ export type MenuManagerContext = {
 export class MenuManager {
     static readonly #elements = new Map<HTMLElement, MenuManagerContext>();
 
-    static use(element: HTMLElement, actions: Record<string, { label: string; callback: () => void }>[]) {
+    static use(
+        element: HTMLElement,
+        actions: Array<Record<string, { label: string; callback: (e: MouseEvent) => void }>>
+    ) {
         const menu = html`
             <div class="contextmenu">
                 ${actions
@@ -30,11 +33,10 @@ export class MenuManager {
 
         actions.forEach((record) => {
             Object.keys(record).forEach((key) => {
-                const click = () => {
-                    record[key].callback.call(undefined);
-                };
+                const click = record[key].callback.bind(undefined);
 
                 menu.querySelector<HTMLElement>("." + key)!.addEventListener("click", click);
+                menu.querySelector<HTMLElement>("." + key)!.addEventListener("contextmenu", click);
 
                 clicks.set(key, clicks);
             });
@@ -60,7 +62,9 @@ export class MenuManager {
             menu.style.top = e.clientY + "px";
         };
 
-        const click = () => {
+        const click = (e: MouseEvent) => {
+            e.preventDefault();
+
             menu.style.left = "0px";
             menu.style.top = "0px";
             menu.style.display = "none";
@@ -69,6 +73,7 @@ export class MenuManager {
         element.addEventListener("mousedown", mousedown);
         element.addEventListener("contextmenu", contextmenu);
         menu.addEventListener("click", click);
+        menu.addEventListener("contextmenu", click);
 
         this.#elements.set(element, { menu, clicks, listeners: { mousedown, contextmenu, click } });
     }
@@ -81,10 +86,12 @@ export class MenuManager {
         element.removeEventListener("mousedown", listeners.mousedown);
         element.removeEventListener("contextmenu", listeners.contextmenu);
         menu.removeEventListener("click", listeners.click);
+        menu.removeEventListener("contextmenu", listeners.click);
 
-        Array.from(clicks).forEach(([key, listener]) =>
-            menu.querySelector("." + key)!.removeEventListener("click", listener)
-        );
+        Array.from(clicks).forEach(([key, listener]) => {
+            menu.querySelector("." + key)!.removeEventListener("click", listener);
+            menu.querySelector("." + key)!.removeEventListener("contextmenu", listener);
+        });
 
         menu.remove();
     }

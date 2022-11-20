@@ -5,8 +5,8 @@ import { WiringManager } from "./WiringManager";
 export class Component<I extends number, O extends number> extends Reified {
     readonly element;
 
-    readonly inputs = [] as HTMLButtonElement[];
-    readonly outputs = [] as HTMLButtonElement[];
+    readonly inputs;
+    readonly outputs;
 
     readonly #observers = new Map();
     readonly #contextmenus = new Map();
