@@ -1,4 +1,6 @@
+import { queueNewContext } from "./contextmenu";
 import { html, Reified } from "./Reified";
+import { WiringManager } from "./WiringManager";
 
 export class Input extends Reified {
     readonly element;
@@ -15,10 +17,24 @@ export class Input extends Reified {
         this.element.classList.toggle("activated");
     };
 
-    readonly #contextmenu = (e: MouseEvent) => {
-        e.preventDefault();
-
-        this.element.classList.toggle("activated");
+    readonly #contextmenu = () => {
+        queueNewContext((prev) => [
+            {
+                "delete-input": {
+                    label: "Delete input",
+                    callback: () => {
+                        this.detach();
+                    },
+                },
+                "delete-connections": {
+                    label: "Delete connections",
+                    callback: () => {
+                        WiringManager.wires = WiringManager.wires.filter((wire) => wire.from !== this.element);
+                    },
+                },
+            },
+            ...prev,
+        ]);
     };
 
     attach() {
@@ -33,5 +49,7 @@ export class Input extends Reified {
 
         this.element.removeEventListener("click", this.#click);
         this.element.removeEventListener("contextmenu", this.#contextmenu);
+
+        WiringManager.wires = WiringManager.wires.filter((wire) => wire.from !== this.element);
     }
 }

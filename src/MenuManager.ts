@@ -10,13 +10,12 @@ export type MenuManagerContext = {
     };
 };
 
+export type MenuManagerActions = Array<Record<string, { label: string; callback: (e: MouseEvent) => void }>>;
+
 export class MenuManager {
     static readonly #elements = new Map<HTMLElement, MenuManagerContext>();
 
-    static use(
-        element: HTMLElement,
-        actions: Array<Record<string, { label: string; callback: (e: MouseEvent) => void }>>
-    ) {
+    static use(element: HTMLElement, actions: MenuManagerActions) {
         const menu = html`
             <div class="contextmenu">
                 ${actions
@@ -31,16 +30,44 @@ export class MenuManager {
 
         const clicks = new Map();
 
-        actions.forEach((record) => {
-            Object.keys(record).forEach((key) => {
-                const click = record[key].callback.bind(undefined);
+        const setup = (actions: MenuManagerActions) => {
+            clicks.clear();
 
-                menu.querySelector<HTMLElement>("." + key)!.addEventListener("click", click);
-                menu.querySelector<HTMLElement>("." + key)!.addEventListener("contextmenu", click);
+            menu.innerHTML = actions
+                .map((record) =>
+                    Object.entries(record)
+                        .map(([name, { label }]) => `<button class="${name}">${label}</button>`)
+                        .join("")
+                )
+                .join('<div class="br"></div>');
 
-                clicks.set(key, clicks);
+            actions.forEach((record) => {
+                Object.keys(record).forEach((key) => {
+                    const click = record[key].callback.bind(undefined);
+
+                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("click", click);
+                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("contextmenu", click);
+
+                    clicks.set(key, clicks);
+                });
             });
-        });
+        };
+
+        let context: MenuManagerActions | undefined;
+
+        const getActions = () => {
+            if (context) {
+                const actions = context;
+
+                context = undefined;
+
+                return actions;
+            }
+
+            return actions;
+        };
+
+        setup(getActions());
 
         menu.style.left = "0px";
         menu.style.top = "0px";
@@ -49,6 +76,8 @@ export class MenuManager {
         document.body.appendChild(menu);
 
         const mousedown = () => {
+            setup(getActions());
+
             menu.style.left = "0px";
             menu.style.top = "0px";
             menu.style.display = "none";
@@ -57,6 +86,8 @@ export class MenuManager {
         const contextmenu = (e: MouseEvent) => {
             e.preventDefault();
 
+            setup(getActions());
+
             menu.style.display = "";
             menu.style.left = e.clientX + "px";
             menu.style.top = e.clientY + "px";
@@ -64,6 +95,8 @@ export class MenuManager {
 
         const click = (e: MouseEvent) => {
             e.preventDefault();
+
+            setup(getActions());
 
             menu.style.left = "0px";
             menu.style.top = "0px";
@@ -76,6 +109,12 @@ export class MenuManager {
         menu.addEventListener("contextmenu", click);
 
         this.#elements.set(element, { menu, clicks, listeners: { mousedown, contextmenu, click } });
+
+        return [
+            (newContext: (prev: MenuManagerActions) => MenuManagerActions) => {
+                context = newContext.call(undefined, [...actions]);
+            },
+        ];
     }
 
     static remove(element: HTMLElement) {

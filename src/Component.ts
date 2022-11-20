@@ -1,4 +1,5 @@
 import { Chip } from "./chips";
+import { queueNewContext } from "./contextmenu";
 import { html, Reified } from "./Reified";
 import { WiringManager } from "./WiringManager";
 
@@ -30,6 +31,8 @@ export class Component<I extends number, O extends number> extends Reified {
             </div>
         `;
 
+        // add custom context menu on component-name
+
         this.inputs = Array.from(this.element.querySelectorAll(".component-input-button"));
         this.outputs = Array.from(this.element.querySelectorAll(".component-output-button"));
 
@@ -45,14 +48,34 @@ export class Component<I extends number, O extends number> extends Reified {
                 })
             );
 
-            this.#contextmenus.set(input, (e: MouseEvent) => {
-                e.preventDefault();
+            this.#contextmenus.set(input, () => {
+                queueNewContext((prev) => [
+                    {
+                        "delete-connection": {
+                            label: "Delete connection",
+                            callback: () => {
+                                WiringManager.wires = WiringManager.wires.filter((wire) => wire.to !== input);
+                            },
+                        },
+                    },
+                    ...prev,
+                ]);
+            });
+        });
 
-                e.stopImmediatePropagation();
-
-                const index = WiringManager.wires.findIndex((w) => w.to === input);
-
-                if (index >= 0) WiringManager.wires.splice(index, 1);
+        this.outputs.forEach((output) => {
+            this.#contextmenus.set(output, () => {
+                queueNewContext((prev) => [
+                    {
+                        "delete-connections": {
+                            label: "Delete connections",
+                            callback: () => {
+                                WiringManager.wires = WiringManager.wires.filter((wire) => wire.from !== output);
+                            },
+                        },
+                    },
+                    ...prev,
+                ]);
             });
         });
 
@@ -70,6 +93,10 @@ export class Component<I extends number, O extends number> extends Reified {
 
             input.addEventListener("contextmenu", this.#contextmenus.get(input));
         });
+
+        this.outputs.forEach((output) => {
+            output.addEventListener("contextmenu", this.#contextmenus.get(output));
+        });
     }
 
     detach() {
@@ -77,6 +104,6 @@ export class Component<I extends number, O extends number> extends Reified {
 
         this.#observers.forEach((o) => o.disconnect());
 
-        this.#contextmenus.forEach((l, input) => input.removeEventListener("contextmenu", l));
+        this.#contextmenus.forEach((listener, element) => element.removeEventListener("contextmenu", listener));
     }
 }
