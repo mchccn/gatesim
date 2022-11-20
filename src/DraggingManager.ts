@@ -1,7 +1,7 @@
 export class DraggingManager {
     static #dragged = undefined as HTMLElement | undefined;
 
-    static #mouse = {
+    static readonly #mouse = {
         x: -1,
         y: -1,
         ox: -1,
@@ -9,7 +9,7 @@ export class DraggingManager {
         down: false,
     };
 
-    static #watched = new Map();
+    static readonly #watched = new Map();
 
     static watch(element: HTMLElement, target = element) {
         element.dataset.watched = "true";
@@ -47,18 +47,18 @@ export class DraggingManager {
     }
 
     static listen() {
-        document.body.addEventListener("mousemove", this.mousemove);
-        window.addEventListener("mousedown", this.mousedown);
-        window.addEventListener("mouseup", this.mouseup);
+        document.body.addEventListener("mousemove", this.#mousemove);
+        window.addEventListener("mousedown", this.#mousedown);
+        window.addEventListener("mouseup", this.#mouseup);
     }
 
     static deafen() {
-        document.body.removeEventListener("mousemove", this.mousemove);
-        window.removeEventListener("mousedown", this.mousedown);
-        window.removeEventListener("mouseup", this.mouseup);
+        document.body.removeEventListener("mousemove", this.#mousemove);
+        window.removeEventListener("mousedown", this.#mousedown);
+        window.removeEventListener("mouseup", this.#mouseup);
     }
 
-    static mousemove(e: MouseEvent) {
+    static readonly #mousemove = (e: MouseEvent) => {
         this.#mouse.x = e.clientX;
         this.#mouse.y = e.clientY;
 
@@ -66,13 +66,13 @@ export class DraggingManager {
             this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
             this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
         }
-    }
+    };
 
-    static mousedown(e: MouseEvent) {
+    static readonly #mousedown = (e: MouseEvent) => {
         this.#mouse.down = true;
-    }
+    };
 
-    static mouseup() {
+    static readonly #mouseup = () => {
         if (this.#dragged) {
             document.querySelectorAll<HTMLElement>('[data-dragged="true"]').forEach((e) => {
                 delete e.dataset.dragged;
@@ -90,11 +90,5 @@ export class DraggingManager {
         this.#mouse.oy = -1;
 
         this.#dragged = undefined;
-    }
-
-    static {
-        this.mousemove = this.mousemove.bind(this);
-        this.mousedown = this.mousedown.bind(this);
-        this.mouseup = this.mouseup.bind(this);
-    }
+    };
 }

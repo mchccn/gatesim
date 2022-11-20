@@ -1,5 +1,6 @@
 import { Chip } from "./chips";
 import { html, Reified } from "./Reified";
+import { WiringManager } from "./WiringManager";
 
 export class Component<I extends number, O extends number> extends Reified {
     readonly element;
@@ -7,7 +8,8 @@ export class Component<I extends number, O extends number> extends Reified {
     readonly inputs = [] as HTMLButtonElement[];
     readonly outputs = [] as HTMLButtonElement[];
 
-    readonly observers = new Map();
+    readonly #observers = new Map();
+    readonly #contextmenus = new Map();
 
     readonly chip: Chip<I, O>;
 
@@ -31,8 +33,8 @@ export class Component<I extends number, O extends number> extends Reified {
         this.inputs = Array.from(this.element.querySelectorAll(".component-input-button"));
         this.outputs = Array.from(this.element.querySelectorAll(".component-output-button"));
 
-        this.inputs.forEach((input) =>
-            this.observers.set(
+        this.inputs.forEach((input) => {
+            this.#observers.set(
                 input,
                 new MutationObserver(() => {
                     const out = this.chip.evaluate(this.inputs.map((i) => i.classList.contains("activated")));
@@ -41,8 +43,18 @@ export class Component<I extends number, O extends number> extends Reified {
                         output.classList.toggle("activated", out[i]);
                     });
                 })
-            )
-        );
+            );
+
+            this.#contextmenus.set(input, (e: MouseEvent) => {
+                e.preventDefault();
+
+                e.stopImmediatePropagation();
+
+                const index = WiringManager.wires.findIndex((w) => w.to === input);
+
+                if (index >= 0) WiringManager.wires.splice(index, 1);
+            });
+        });
 
         this.move(x, y);
     }
@@ -51,16 +63,20 @@ export class Component<I extends number, O extends number> extends Reified {
         super.attach();
 
         this.inputs.forEach((input) => {
-            this.observers.get(input).observe(input, {
+            this.#observers.get(input).observe(input, {
                 attributeFilter: ["class"],
                 attributes: true,
             });
+
+            input.addEventListener("contextmenu", this.#contextmenus.get(input));
         });
     }
 
     detach() {
         super.detach();
 
-        this.observers.forEach((o) => o.disconnect());
+        this.#observers.forEach((o) => o.disconnect());
+
+        this.#contextmenus.forEach((l, input) => input.removeEventListener("contextmenu", l));
     }
 }

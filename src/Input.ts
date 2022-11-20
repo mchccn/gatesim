@@ -11,11 +11,11 @@ export class Input extends Reified {
         this.move(x, y);
     }
 
-    click = () => {
+    readonly #click = () => {
         this.element.classList.toggle("activated");
     };
 
-    contextmenu = (e: MouseEvent) => {
+    readonly #contextmenu = (e: MouseEvent) => {
         e.preventDefault();
 
         this.element.classList.toggle("activated");
@@ -24,13 +24,14 @@ export class Input extends Reified {
     attach() {
         super.attach();
 
-        this.element.addEventListener("click", this.click);
-        this.element.addEventListener("contextmenu", this.contextmenu);
+        this.element.addEventListener("click", this.#click);
+        this.element.addEventListener("contextmenu", this.#contextmenu);
     }
 
     detach() {
         super.detach();
 
-        this.element.removeEventListener("click", this.click);
+        this.element.removeEventListener("click", this.#click);
+        this.element.removeEventListener("contextmenu", this.#contextmenu);
     }
 }

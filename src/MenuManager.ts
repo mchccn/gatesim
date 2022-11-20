@@ -11,7 +11,7 @@ export type MenuManagerContext = {
 };
 
 export class MenuManager {
-    static #elements = new Map<HTMLElement, MenuManagerContext>();
+    static readonly #elements = new Map<HTMLElement, MenuManagerContext>();
 
     static use(element: HTMLElement, actions: Record<string, { label: string; callback: () => void }>[]) {
         const menu = html`
