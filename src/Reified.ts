@@ -14,6 +14,8 @@ export function preventDefault(e: Event) {
 }
 
 export abstract class Reified {
+    static active = new Set<Reified>();
+
     static readonly root = document.querySelector<HTMLElement>(".reified-root")!;
 
     abstract readonly element: HTMLElement;
@@ -24,10 +26,14 @@ export abstract class Reified {
     }
 
     attach() {
+        Reified.active.add(this);
+
         Reified.root.append(this.element);
     }
 
     detach() {
+        Reified.active.delete(this);
+
         this.element.remove();
     }
 }

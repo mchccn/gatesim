@@ -29,5 +29,9 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
             label: "Save as file",
             callback: () => {},
         },
+        "import-from": {
+            label: "Import from file",
+            callback: () => {},
+        },
     },
 ]);

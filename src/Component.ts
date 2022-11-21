@@ -8,9 +8,10 @@ export class Component<I extends number, O extends number> extends Reified {
 
     readonly inputs;
     readonly outputs;
+    readonly name;
 
-    readonly #observers = new Map();
-    readonly #contextmenus = new Map();
+    readonly #observers = new Map<Element, MutationObserver>();
+    readonly #contextmenus = new Map<Element, () => void>();
 
     readonly chip: Chip<I, O>;
 
@@ -31,10 +32,9 @@ export class Component<I extends number, O extends number> extends Reified {
             </div>
         `;
 
-        // add custom context menu on component-name
-
         this.inputs = Array.from(this.element.querySelectorAll(".component-input-button"));
         this.outputs = Array.from(this.element.querySelectorAll(".component-output-button"));
+        this.name = this.element.querySelector(".component-name")!;
 
         this.inputs.forEach((input) => {
             this.#observers.set(
@@ -79,6 +79,36 @@ export class Component<I extends number, O extends number> extends Reified {
             });
         });
 
+        this.#contextmenus.set(this.name, () => {
+            queueNewContext((prev) => [
+                {
+                    "delete-component": {
+                        label: "Delete component",
+                        callback: () => {
+                            this.detach();
+
+                            WiringManager.wires = WiringManager.wires.filter(
+                                (wire) =>
+                                    this.inputs.every((i) => wire.to !== i) &&
+                                    this.outputs.every((o) => wire.from !== o)
+                            );
+                        },
+                    },
+                    "delete-connections": {
+                        label: "Delete connections",
+                        callback: () => {
+                            WiringManager.wires = WiringManager.wires.filter(
+                                (wire) =>
+                                    this.inputs.every((i) => wire.to !== i) &&
+                                    this.outputs.every((o) => wire.from !== o)
+                            );
+                        },
+                    },
+                },
+                ...prev,
+            ]);
+        });
+
         this.move(x, y);
     }
 
@@ -86,17 +116,19 @@ export class Component<I extends number, O extends number> extends Reified {
         super.attach();
 
         this.inputs.forEach((input) => {
-            this.#observers.get(input).observe(input, {
+            this.#observers.get(input)!.observe(input, {
                 attributeFilter: ["class"],
                 attributes: true,
             });
 
-            input.addEventListener("contextmenu", this.#contextmenus.get(input));
+            input.addEventListener("contextmenu", this.#contextmenus.get(input)!);
         });
 
         this.outputs.forEach((output) => {
-            output.addEventListener("contextmenu", this.#contextmenus.get(output));
+            output.addEventListener("contextmenu", this.#contextmenus.get(output)!);
         });
+
+        this.name.addEventListener("contextmenu", this.#contextmenus.get(this.name)!);
     }
 
     detach() {
