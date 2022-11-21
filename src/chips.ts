@@ -1,6 +1,8 @@
 import { BooleanTuple } from "./types";
 
 export abstract class Chip<I extends number, O extends number> {
+    static readonly NAME: string;
+
     readonly name;
 
     readonly inputs;
@@ -20,6 +22,8 @@ export abstract class Chip<I extends number, O extends number> {
 }
 
 export class AndGate extends Chip<2, 1> {
+    static readonly NAME = "AND";
+
     constructor() {
         super("AND", 2, 1);
     }
@@ -30,6 +34,8 @@ export class AndGate extends Chip<2, 1> {
 }
 
 export class OrGate extends Chip<2, 1> {
+    static readonly NAME = "OR";
+
     constructor() {
         super("OR", 2, 1);
     }
@@ -40,6 +46,8 @@ export class OrGate extends Chip<2, 1> {
 }
 
 export class NotGate extends Chip<1, 1> {
+    static readonly NAME = "NOT";
+
     constructor() {
         super("NOT", 1, 1);
     }
@@ -48,3 +56,9 @@ export class NotGate extends Chip<1, 1> {
         return [!n];
     }
 }
+
+export const chips = new Map<string, new () => Chip<number, number>>([
+    [AndGate.NAME, AndGate],
+    [OrGate.NAME, OrGate],
+    [NotGate.NAME, NotGate],
+]);

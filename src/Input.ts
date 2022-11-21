@@ -5,12 +5,12 @@ import { WiringManager } from "./WiringManager";
 export class Input extends Reified {
     readonly element;
 
-    constructor({ x, y }: { x: number; y: number } = { x: 0, y: 0 }) {
+    constructor(pos: { x: number; y: number } = { x: 0, y: 0 }) {
         super();
 
         this.element = html`<button class="board-input">I</button>`;
 
-        this.move(x, y);
+        this.move(pos);
     }
 
     readonly #click = () => {
@@ -42,6 +42,8 @@ export class Input extends Reified {
 
         this.element.addEventListener("click", this.#click);
         this.element.addEventListener("contextmenu", this.#contextmenu);
+
+        return this;
     }
 
     detach() {
@@ -51,5 +53,7 @@ export class Input extends Reified {
         this.element.removeEventListener("contextmenu", this.#contextmenu);
 
         WiringManager.wires = WiringManager.wires.filter((wire) => wire.from !== this.element);
+
+        return this;
     }
 }

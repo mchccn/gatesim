@@ -1,5 +1,6 @@
 import { Chip } from "./chips";
 import { queueNewContext } from "./contextmenu";
+import { DraggingManager } from "./DraggingManager";
 import { html, Reified } from "./Reified";
 import { WiringManager } from "./WiringManager";
 
@@ -15,7 +16,10 @@ export class Component<I extends number, O extends number> extends Reified {
 
     readonly chip: Chip<I, O>;
 
-    constructor(chip: Chip<I, O>, { x, y }: { x: number; y: number } = { x: 0, y: 0 }) {
+    constructor(
+        chip: Chip<I, O>,
+        pos: { x: number; y: number } | ((comp: Component<I, O>) => { x: number; y: number })
+    ) {
         super();
 
         this.chip = chip;
@@ -32,9 +36,9 @@ export class Component<I extends number, O extends number> extends Reified {
             </div>
         `;
 
-        this.inputs = Array.from(this.element.querySelectorAll(".component-input-button"));
-        this.outputs = Array.from(this.element.querySelectorAll(".component-output-button"));
-        this.name = this.element.querySelector(".component-name")!;
+        this.inputs = Array.from(this.element.querySelectorAll<HTMLElement>(".component-input-button"));
+        this.outputs = Array.from(this.element.querySelectorAll<HTMLElement>(".component-output-button"));
+        this.name = this.element.querySelector<HTMLElement>(".component-name")!;
 
         this.inputs.forEach((input) => {
             this.#observers.set(
@@ -109,7 +113,7 @@ export class Component<I extends number, O extends number> extends Reified {
             ]);
         });
 
-        this.move(x, y);
+        this.move(typeof pos === "function" ? pos.call(undefined, this) : pos);
     }
 
     attach() {
@@ -129,6 +133,8 @@ export class Component<I extends number, O extends number> extends Reified {
         });
 
         this.name.addEventListener("contextmenu", this.#contextmenus.get(this.name)!);
+
+        return this;
     }
 
     detach() {
@@ -137,5 +143,11 @@ export class Component<I extends number, O extends number> extends Reified {
         this.#observers.forEach((o) => o.disconnect());
 
         this.#contextmenus.forEach((listener, element) => element.removeEventListener("contextmenu", listener));
+
+        this.name.removeEventListener("contextmenu", this.#contextmenus.get(this.name)!);
+
+        DraggingManager.forget(this.element, true);
+
+        return this;
     }
 }

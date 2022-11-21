@@ -34,10 +34,10 @@ export class DraggingManager {
         this.#watched.set(target, mousedown);
     }
 
-    static forget(element: HTMLElement) {
+    static forget(element: HTMLElement, force?: boolean) {
         const listener = this.#watched.get(element);
 
-        if (!listener) throw new Error(`Element is not currently being watched.`);
+        if (!listener && !force) throw new Error(`Element is not currently being watched.`);
 
         delete element.dataset.watched;
 

@@ -15,7 +15,7 @@ const d = new Output({ x: 500, y: 150 });
     c.attach();
 
     if (c instanceof Component) {
-        DraggingManager.watch(c.element, c.element.querySelector<HTMLElement>(".component-name")!);
+        DraggingManager.watch(c.element, c.name);
     }
 });
 

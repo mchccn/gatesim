@@ -20,7 +20,7 @@ export abstract class Reified {
 
     abstract readonly element: HTMLElement;
 
-    move(x: number, y: number) {
+    move({ x, y }: { x: number; y: number }) {
         this.element.style.left = x + "px";
         this.element.style.top = y + "px";
     }
@@ -29,11 +29,15 @@ export abstract class Reified {
         Reified.active.add(this);
 
         Reified.root.append(this.element);
+
+        return this;
     }
 
     detach() {
         Reified.active.delete(this);
 
         this.element.remove();
+
+        return this;
     }
 }

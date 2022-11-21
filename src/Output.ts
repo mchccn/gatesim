@@ -25,18 +25,20 @@ export class Output extends Reified {
         ]);
     };
 
-    constructor({ x, y }: { x: number; y: number } = { x: 0, y: 0 }) {
+    constructor(pos: { x: number; y: number } = { x: 0, y: 0 }) {
         super();
 
         this.element = html`<button class="board-output">O</button>`;
 
-        this.move(x, y);
+        this.move(pos);
     }
 
     attach() {
         super.attach();
 
         this.element.addEventListener("contextmenu", this.#contextmenu);
+
+        return this;
     }
 
     detach() {
@@ -45,5 +47,7 @@ export class Output extends Reified {
         this.element.removeEventListener("contextmenu", this.#contextmenu);
 
         WiringManager.wires = WiringManager.wires.filter((wire) => wire.to !== this.element);
+
+        return this;
     }
 }
