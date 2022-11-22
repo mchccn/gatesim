@@ -3,18 +3,35 @@ import { MouseTracker } from "./MouseTracker";
 import { NewWireContext } from "./NewWireContext";
 
 export class Wiring {
+    #destroyed = false;
+    #observer;
+
     constructor(readonly from: Element, readonly to: Element) {
-        new MutationObserver(() => {
+        this.#observer = new MutationObserver(() => {
             to.classList.toggle("activated", from.classList.contains("activated"));
-        }).observe(from, { attributeFilter: ["class"], attributes: true });
+        });
+
+        this.#observer.observe(from, { attributeFilter: ["class"], attributes: true });
+    }
+
+    destroy() {
+        this.#destroyed = true;
+
+        this.#observer.disconnect();
+    }
+
+    get destroyed() {
+        return this.#destroyed;
     }
 }
 
 export class WiringManager {
-    static wires = new Set<Wiring>();
+    static wires = new Array<Wiring>();
 
     static render() {
         const ctx = useCanvas();
+
+        this.wires = this.wires.filter((wire) => !wire.destroyed);
 
         this.wires.forEach((wire) => {
             const from = wire.from.getBoundingClientRect();

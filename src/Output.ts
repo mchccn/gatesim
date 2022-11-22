@@ -12,14 +12,18 @@ export class Output extends Reified {
                     label: "Delete output",
                     callback: () => {
                         this.detach();
+
+                        WiringManager.wires.forEach((wire) => {
+                            if (wire.to === this.element) wire.destroy();
+                        });
                     },
                 },
                 "delete-connections": {
                     label: "Delete connections",
                     callback: () => {
-                        WiringManager.wires = new Set(
-                            [...WiringManager.wires].filter((wire) => wire.to !== this.element)
-                        );
+                        WiringManager.wires.forEach((wire) => {
+                            if (wire.to === this.element) wire.destroy();
+                        });
                     },
                 },
             },
@@ -47,8 +51,6 @@ export class Output extends Reified {
         super.detach();
 
         this.element.removeEventListener("contextmenu", this.#contextmenu);
-
-        WiringManager.wires = new Set([...WiringManager.wires].filter((wire) => wire.to !== this.element));
 
         return this;
     }

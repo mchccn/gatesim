@@ -29,7 +29,7 @@ MouseTracker.onMouseDown((e) => {
 
         if (target && target instanceof HTMLElement) {
             if (target.classList.contains("board-output") || target.classList.contains("component-input-button")) {
-                WiringManager.wires.add(new Wiring(NewWireContext.from, target));
+                WiringManager.wires.push(new Wiring(NewWireContext.from, target));
             }
         }
 
@@ -40,9 +40,9 @@ MouseTracker.onMouseDown((e) => {
 MouseTracker.start();
 DraggingManager.listen();
 
-WiringManager.wires.add(new Wiring(a.element, c.inputs[0]));
-WiringManager.wires.add(new Wiring(b.element, c.inputs[1]));
-WiringManager.wires.add(new Wiring(c.outputs[0], d.element));
+WiringManager.wires.push(new Wiring(a.element, c.inputs[0]));
+WiringManager.wires.push(new Wiring(b.element, c.inputs[1]));
+WiringManager.wires.push(new Wiring(c.outputs[0], d.element));
 
 (function loop() {
     WiringManager.render();

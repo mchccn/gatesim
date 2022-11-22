@@ -38,14 +38,18 @@ export class Input extends Reified {
                     label: "Delete input",
                     callback: () => {
                         this.detach();
+
+                        WiringManager.wires.forEach((wire) => {
+                            if (wire.from === this.element) wire.destroy();
+                        });
                     },
                 },
                 "delete-connections": {
                     label: "Delete connections",
                     callback: () => {
-                        WiringManager.wires = new Set(
-                            [...WiringManager.wires].filter((wire) => wire.from !== this.element)
-                        );
+                        WiringManager.wires.forEach((wire) => {
+                            if (wire.from === this.element) wire.destroy();
+                        });
                     },
                 },
             },
@@ -69,8 +73,6 @@ export class Input extends Reified {
         this.element.removeEventListener("mousedown", this.#mousedown);
         this.element.removeEventListener("click", this.#click);
         this.element.removeEventListener("contextmenu", this.#contextmenu);
-
-        WiringManager.wires = new Set([...WiringManager.wires].filter((wire) => wire.from !== this.element));
 
         return this;
     }
