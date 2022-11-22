@@ -10,65 +10,77 @@ function* gen() {
     while (true) yield i++;
 }
 
-//TODO: make this work
 export function saveDiagram(components: Reified[], wires: Wiring[]) {
     const id = gen();
 
     const elementIds = new Map<Element, number>();
 
-    const preparedComponents = components.map((component, componentId) => {
-        if (component instanceof Input) {
-            elementIds.set(component.element, id.next().value!);
+    const data = {
+        components: components.map((component, reified) => {
+            if (component instanceof Input) {
+                elementIds.set(component.element, id.next().value!);
 
-            return {
-                componentId,
-                type: "INPUT",
-                activated: component.element.classList.contains("activated"),
-                x: parseFloat(component.element.style.left),
-                y: parseFloat(component.element.style.top),
-            };
-        }
+                return {
+                    reified,
+                    type: "INPUT",
+                    activated: component.element.classList.contains("activated"),
+                    id: elementIds.get(component.element)!,
+                    x: parseFloat(component.element.style.left),
+                    y: parseFloat(component.element.style.top),
+                };
+            }
 
-        if (component instanceof Output) {
-            elementIds.set(component.element, id.next().value!);
+            if (component instanceof Output) {
+                elementIds.set(component.element, id.next().value!);
 
-            return {
-                componentId,
-                type: "OUTPUT",
-                activated: component.element.classList.contains("activated"),
-                x: parseFloat(component.element.style.left),
-                y: parseFloat(component.element.style.top),
-            };
-        }
+                return {
+                    reified,
+                    type: "OUTPUT",
+                    activated: component.element.classList.contains("activated"),
+                    id: elementIds.get(component.element)!,
+                    x: parseFloat(component.element.style.left),
+                    y: parseFloat(component.element.style.top),
+                };
+            }
 
-        if (component instanceof Component) {
-            component.inputs.forEach((i) => elementIds.set(i, id.next().value!));
-            component.outputs.forEach((o) => elementIds.set(o, id.next().value!));
+            if (component instanceof Component) {
+                return {
+                    reified,
+                    type: "COMPONENT",
+                    name: component.chip.name,
+                    inputs: component.inputs.map((i) => {
+                        elementIds.set(i, id.next().value!);
 
-            return {
-                componentId,
-                type: "COMPONENT",
-                name: component.chip.name,
-                inputs: component.inputs.map((i) => i.classList.contains("activated")),
-                outputs: component.outputs.map((o) => o.classList.contains("activated")),
-                x: parseFloat(component.element.style.left),
-                y: parseFloat(component.element.style.top),
-            };
-        }
+                        return { id: elementIds.get(i)!, activated: i.classList.contains("activated") };
+                    }),
+                    outputs: component.outputs.map((o) => {
+                        elementIds.set(o, id.next().value!);
 
-        throw new Error("Unknown Reified component type.");
-    });
+                        return { id: elementIds.get(o)!, activated: o.classList.contains("activated") };
+                    }),
+                    x: parseFloat(component.element.style.left),
+                    y: parseFloat(component.element.style.top),
+                };
+            }
 
-    console.log(preparedComponents);
+            throw new Error("Unknown Reified component type.");
+        }),
+        wires: wires.map((wire) => ({
+            from: elementIds.get(wire.from)!,
+            to: elementIds.get(wire.to)!,
+        })),
+    };
 
-    // const preparedWires = wires
-
-    const data = {};
-
-    return "";
+    return JSON.stringify(data, undefined, 4);
 }
 
 //TODO: make this work
 export function fromFile(file: string) {
-    return [];
+    try {
+        const data = JSON.parse(file);
+
+        return { result: [], error: undefined };
+    } catch {
+        return { error: "Failed to parse JSON file.", result: [] };
+    }
 }
