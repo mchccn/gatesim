@@ -115,7 +115,9 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
             callback: () => {
                 Object.assign(document.createElement("a"), {
                     href: URL.createObjectURL(
-                        new Blob([saveDiagram([...Reified.active], WiringManager.wires)], { type: "application/json" })
+                        new Blob([saveDiagram([...Reified.active], [...WiringManager.wires])], {
+                            type: "application/json",
+                        })
                     ),
                     download: `gatesim-${Date.now()}.json`,
                 }).click();

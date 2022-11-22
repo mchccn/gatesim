@@ -17,7 +17,9 @@ export class Output extends Reified {
                 "delete-connections": {
                     label: "Delete connections",
                     callback: () => {
-                        WiringManager.wires = WiringManager.wires.filter((wire) => wire.to !== this.element);
+                        WiringManager.wires = new Set(
+                            [...WiringManager.wires].filter((wire) => wire.to !== this.element)
+                        );
                     },
                 },
             },
@@ -46,7 +48,7 @@ export class Output extends Reified {
 
         this.element.removeEventListener("contextmenu", this.#contextmenu);
 
-        WiringManager.wires = WiringManager.wires.filter((wire) => wire.to !== this.element);
+        WiringManager.wires = new Set([...WiringManager.wires].filter((wire) => wire.to !== this.element));
 
         return this;
     }

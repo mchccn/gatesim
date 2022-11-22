@@ -49,10 +49,12 @@ export class Component<I extends number, O extends number> extends Reified {
             this.#contextmenus.set(input, () => {
                 queueNewContext((prev) => [
                     {
-                        "delete-connection": {
-                            label: "Delete connection",
+                        "delete-connections": {
+                            label: "Delete connections",
                             callback: () => {
-                                WiringManager.wires = WiringManager.wires.filter((wire) => wire.to !== input);
+                                WiringManager.wires = new Set(
+                                    [...WiringManager.wires].filter((wire) => wire.to !== input)
+                                );
                             },
                         },
                     },
@@ -74,7 +76,9 @@ export class Component<I extends number, O extends number> extends Reified {
                         "delete-connections": {
                             label: "Delete connections",
                             callback: () => {
-                                WiringManager.wires = WiringManager.wires.filter((wire) => wire.from !== output);
+                                WiringManager.wires = new Set(
+                                    [...WiringManager.wires].filter((wire) => wire.from !== output)
+                                );
                             },
                         },
                     },
@@ -90,21 +94,24 @@ export class Component<I extends number, O extends number> extends Reified {
                         label: "Delete component",
                         callback: () => {
                             this.detach();
-
-                            WiringManager.wires = WiringManager.wires.filter(
-                                (wire) =>
-                                    this.inputs.every((i) => wire.to !== i) &&
-                                    this.outputs.every((o) => wire.from !== o)
+                            WiringManager.wires = new Set(
+                                [...WiringManager.wires].filter(
+                                    (wire) =>
+                                        this.inputs.every((i) => wire.to !== i) &&
+                                        this.outputs.every((o) => wire.from !== o)
+                                )
                             );
                         },
                     },
                     "delete-connections": {
                         label: "Delete connections",
                         callback: () => {
-                            WiringManager.wires = WiringManager.wires.filter(
-                                (wire) =>
-                                    this.inputs.every((i) => wire.to !== i) &&
-                                    this.outputs.every((o) => wire.from !== o)
+                            WiringManager.wires = new Set(
+                                [...WiringManager.wires].filter(
+                                    (wire) =>
+                                        this.inputs.every((i) => wire.to !== i) &&
+                                        this.outputs.every((o) => wire.from !== o)
+                                )
                             );
                         },
                     },

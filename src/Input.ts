@@ -14,7 +14,14 @@ export class Input extends Reified {
         this.move(pos);
     }
 
-    readonly #click = () => {
+    readonly #mousedown = (e: MouseEvent) => {
+        this.element.dataset.x = e.clientX.toString();
+        this.element.dataset.y = e.clientY.toString();
+    };
+
+    readonly #click = (e: MouseEvent) => {
+        if (Math.hypot(e.clientX - +this.element.dataset.x!, e.clientY - +this.element.dataset.y!) > 2) return;
+
         this.element.classList.toggle("activated");
     };
 
@@ -24,7 +31,6 @@ export class Input extends Reified {
                 "create-connection": {
                     label: "Create connection",
                     callback: () => {
-                        //
                         NewWireContext.from = this.element;
                     },
                 },
@@ -37,7 +43,9 @@ export class Input extends Reified {
                 "delete-connections": {
                     label: "Delete connections",
                     callback: () => {
-                        WiringManager.wires = WiringManager.wires.filter((wire) => wire.from !== this.element);
+                        WiringManager.wires = new Set(
+                            [...WiringManager.wires].filter((wire) => wire.from !== this.element)
+                        );
                     },
                 },
             },
@@ -48,6 +56,7 @@ export class Input extends Reified {
     attach() {
         super.attach();
 
+        this.element.addEventListener("mousedown", this.#mousedown);
         this.element.addEventListener("click", this.#click);
         this.element.addEventListener("contextmenu", this.#contextmenu);
 
@@ -57,10 +66,11 @@ export class Input extends Reified {
     detach() {
         super.detach();
 
+        this.element.removeEventListener("mousedown", this.#mousedown);
         this.element.removeEventListener("click", this.#click);
         this.element.removeEventListener("contextmenu", this.#contextmenu);
 
-        WiringManager.wires = WiringManager.wires.filter((wire) => wire.from !== this.element);
+        WiringManager.wires = new Set([...WiringManager.wires].filter((wire) => wire.from !== this.element));
 
         return this;
     }

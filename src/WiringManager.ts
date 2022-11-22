@@ -11,7 +11,7 @@ export class Wiring {
 }
 
 export class WiringManager {
-    static wires = new Array<Wiring>();
+    static wires = new Set<Wiring>();
 
     static render() {
         const ctx = useCanvas();
