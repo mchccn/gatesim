@@ -3,6 +3,8 @@ import { Component } from "./Component";
 import "./contextmenu";
 import { DraggingManager } from "./DraggingManager";
 import { Input } from "./Input";
+import { MouseTracker } from "./MouseTracker";
+import { NewWireContext } from "./NewWireContext";
 import { Output } from "./Output";
 import { Wiring, WiringManager } from "./WiringManager";
 
@@ -19,6 +21,22 @@ const d = new Output({ x: 500, y: 150 });
     }
 });
 
+MouseTracker.onMouseDown((e) => {
+    if (NewWireContext.from) {
+        //TODO: check if e.target is valid connection
+        const target = e.target as HTMLElement;
+
+        if (target) {
+            if (target.classList.contains("board-output") || target.classList.contains("component-input-button")) {
+                WiringManager.wires.push(new Wiring(NewWireContext.from, target));
+            }
+        }
+
+        NewWireContext.from = undefined;
+    }
+});
+
+MouseTracker.start();
 DraggingManager.listen();
 
 WiringManager.wires.push(new Wiring(a.element, c.inputs[0]));

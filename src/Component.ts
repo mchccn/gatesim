@@ -1,6 +1,7 @@
 import { Chip } from "./chips";
 import { queueNewContext } from "./contextmenu";
 import { DraggingManager } from "./DraggingManager";
+import { NewWireContext } from "./NewWireContext";
 import { html, Reified } from "./Reified";
 import { WiringManager } from "./WiringManager";
 
@@ -40,17 +41,10 @@ export class Component<I extends number, O extends number> extends Reified {
         this.outputs = Array.from(this.element.querySelectorAll<HTMLElement>(".component-output-button"));
         this.name = this.element.querySelector<HTMLElement>(".component-name")!;
 
-        this.inputs.forEach((input) => {
-            this.#observers.set(
-                input,
-                new MutationObserver(() => {
-                    const out = this.chip.evaluate(this.inputs.map((i) => i.classList.contains("activated")));
+        this.update();
 
-                    this.outputs.forEach((output, i) => {
-                        output.classList.toggle("activated", out[i]);
-                    });
-                })
-            );
+        this.inputs.forEach((input) => {
+            this.#observers.set(input, new MutationObserver(this.update.bind(this)));
 
             this.#contextmenus.set(input, () => {
                 queueNewContext((prev) => [
@@ -71,6 +65,12 @@ export class Component<I extends number, O extends number> extends Reified {
             this.#contextmenus.set(output, () => {
                 queueNewContext((prev) => [
                     {
+                        "create-connection": {
+                            label: "Create connection",
+                            callback: () => {
+                                NewWireContext.from = output;
+                            },
+                        },
                         "delete-connections": {
                             label: "Delete connections",
                             callback: () => {
@@ -114,6 +114,16 @@ export class Component<I extends number, O extends number> extends Reified {
         });
 
         this.move(typeof pos === "function" ? pos.call(undefined, this) : pos);
+    }
+
+    update() {
+        const out = this.chip.evaluate(this.inputs.map((i) => i.classList.contains("activated")));
+
+        this.outputs.forEach((output, i) => {
+            output.classList.toggle("activated", out[i]);
+        });
+
+        return this;
     }
 
     attach() {

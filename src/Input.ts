@@ -1,4 +1,5 @@
 import { queueNewContext } from "./contextmenu";
+import { NewWireContext } from "./NewWireContext";
 import { html, Reified } from "./Reified";
 import { WiringManager } from "./WiringManager";
 
@@ -20,6 +21,13 @@ export class Input extends Reified {
     readonly #contextmenu = () => {
         queueNewContext((prev) => [
             {
+                "create-connection": {
+                    label: "Create connection",
+                    callback: () => {
+                        //
+                        NewWireContext.from = this.element;
+                    },
+                },
                 "delete-input": {
                     label: "Delete input",
                     callback: () => {

@@ -14,8 +14,8 @@ export class Output extends Reified {
                         this.detach();
                     },
                 },
-                "delete-connection": {
-                    label: "Delete connection",
+                "delete-connections": {
+                    label: "Delete connections",
                     callback: () => {
                         WiringManager.wires = WiringManager.wires.filter((wire) => wire.to !== this.element);
                     },

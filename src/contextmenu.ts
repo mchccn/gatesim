@@ -1,4 +1,4 @@
-import { Chip, chips } from "./chips";
+import { chips } from "./chips";
 import { Component } from "./Component";
 import { INPUT_COMPONENT_CSS_SIZE, OUTPUT_COMPONENT_CSS_SIZE } from "./constants";
 import { DraggingManager } from "./DraggingManager";
@@ -69,43 +69,46 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
             },
         },
     },
-    {
-        "new-chip": {
-            label: "New chip from diagram",
-            callback: () => {
-                //TODO: add modal/toast system
+    // {
+    //     "new-chip": {
+    //         label: "New chip from diagram",
+    //         callback: () => {
+    //             //TODO: add modal/toast system
 
-                const name = prompt("Enter the name of the chip:");
+    //             const name = prompt("Enter the name of the chip:");
 
-                if (!name) return;
+    //             if (!name) return;
 
-                if (
-                    !chips.has(name.toUpperCase()) &&
-                    !confirm("A chip already exists with this name. Are you sure you want to replace it?")
-                )
-                    return;
+    //             if (
+    //                 !chips.has(name.trim().toUpperCase()) &&
+    //                 !confirm("A chip already exists with this name. Are you sure you want to replace it?")
+    //             )
+    //                 return;
 
-                chips.set(
-                    name.toUpperCase(),
-                    class _ extends Chip<number, number> {
-                        constructor() {
-                            super(
-                                name!,
-                                [...Reified.active.values()].filter((v) => v instanceof Input).length,
-                                [...Reified.active.values()].filter((v) => v instanceof Output).length
-                            );
-                        }
+    //             if (!/^\w+$/.test(name.trim().toUpperCase()))
+    //                 return alert("Chip name must consist of only alphanumeric characters.");
 
-                        output(inputs: boolean[]): boolean[] {
-                            //TODO: SOMEHOW COMPILE THE DIAGRAM
+    //             chips.set(
+    //                 name.trim().toUpperCase(),
+    //                 class _ extends Chip<number, number> {
+    //                     constructor() {
+    //                         super(
+    //                             name!,
+    //                             [...Reified.active.values()].filter((v) => v instanceof Input).length,
+    //                             [...Reified.active.values()].filter((v) => v instanceof Output).length
+    //                         );
+    //                     }
 
-                            return [];
-                        }
-                    }
-                );
-            },
-        },
-    },
+    //                     output(inputs: boolean[]): boolean[] {
+    //                         //TODO: SOMEHOW COMPILE THE DIAGRAM
+
+    //                         return [];
+    //                     }
+    //                 }
+    //             );
+    //         },
+    //     },
+    // },
     {
         "save-as": {
             label: "Save as file",
