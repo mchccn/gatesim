@@ -16,6 +16,8 @@ export class Output extends Reified {
                         WiringManager.wires.forEach((wire) => {
                             if (wire.to === this.element) wire.destroy();
                         });
+
+                        this.element.classList.remove("activated");
                     },
                 },
                 "delete-connections": {
@@ -24,6 +26,8 @@ export class Output extends Reified {
                         WiringManager.wires.forEach((wire) => {
                             if (wire.to === this.element) wire.destroy();
                         });
+
+                        this.element.classList.remove("activated");
                     },
                 },
             },

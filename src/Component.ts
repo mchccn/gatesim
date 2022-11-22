@@ -55,6 +55,8 @@ export class Component<I extends number, O extends number> extends Reified {
                                 WiringManager.wires.forEach((wire) => {
                                     if (wire.to === input) wire.destroy();
                                 });
+
+                                input.classList.remove("activated");
                             },
                         },
                     },
@@ -77,7 +79,11 @@ export class Component<I extends number, O extends number> extends Reified {
                             label: "Delete connections",
                             callback: () => {
                                 WiringManager.wires.forEach((wire) => {
-                                    if (wire.from === output) wire.destroy();
+                                    if (wire.from === output) {
+                                        wire.destroy();
+
+                                        wire.to.classList.remove("activated");
+                                    }
                                 });
                             },
                         },
@@ -96,18 +102,34 @@ export class Component<I extends number, O extends number> extends Reified {
                             this.detach();
 
                             WiringManager.wires.forEach((wire) => {
-                                if (this.inputs.some((i) => wire.to === i) || this.outputs.some((o) => wire.from === o))
+                                if (
+                                    this.inputs.some((i) => wire.to === i) ||
+                                    this.outputs.some((o) => wire.from === o)
+                                ) {
                                     wire.destroy();
+
+                                    wire.to.classList.remove("activated");
+                                }
                             });
+
+                            this.inputs.forEach((i) => i.classList.remove("activated"));
                         },
                     },
                     "delete-connections": {
                         label: "Delete connections",
                         callback: () => {
                             WiringManager.wires.forEach((wire) => {
-                                if (this.inputs.some((i) => wire.to === i) || this.outputs.some((o) => wire.from === o))
+                                if (
+                                    this.inputs.some((i) => wire.to === i) ||
+                                    this.outputs.some((o) => wire.from === o)
+                                ) {
                                     wire.destroy();
+
+                                    wire.to.classList.remove("activated");
+                                }
                             });
+
+                            this.inputs.forEach((i) => i.classList.remove("activated"));
                         },
                     },
                 },

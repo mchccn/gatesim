@@ -113,14 +113,16 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
         "save-as": {
             label: "Save as file",
             callback: () => {
-                Object.assign(document.createElement("a"), {
-                    href: URL.createObjectURL(
-                        new Blob([saveDiagram([...Reified.active], [...WiringManager.wires])], {
-                            type: "application/json",
-                        })
-                    ),
-                    download: `gatesim-${Date.now()}.json`,
-                }).click();
+                console.log(saveDiagram([...Reified.active], [...WiringManager.wires]));
+
+                // Object.assign(document.createElement("a"), {
+                //     href: URL.createObjectURL(
+                //         new Blob([saveDiagram([...Reified.active], [...WiringManager.wires])], {
+                //             type: "application/json",
+                //         })
+                //     ),
+                //     download: `gatesim-${Date.now()}.json`,
+                // }).click();
             },
         },
         "import-from": {
