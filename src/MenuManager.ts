@@ -22,7 +22,7 @@ export class MenuManager {
                     .map((record) =>
                         Object.entries(record)
                             .map(([name, { label }]) => `<button class="${name}">${label}</button>`)
-                            .join("")
+                            .join(""),
                     )
                     .join('<div class="br"></div>')}
             </div>
@@ -37,7 +37,7 @@ export class MenuManager {
                 .map((record) =>
                     Object.entries(record)
                         .map(([name, { label }]) => `<button class="${name}">${label}</button>`)
-                        .join("")
+                        .join(""),
                 )
                 .join('<div class="br"></div>');
 

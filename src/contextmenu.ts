@@ -71,8 +71,6 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
     //     "new-chip": {
     //         label: "New chip from diagram",
     //         callback: () => {
-    //             //TODO: add modal/toast system
-
     //             const name = prompt("Enter the name of the chip:");
 
     //             if (!name) return;
@@ -86,15 +84,18 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
     //             if (!/^\w+$/.test(name.trim().toUpperCase()))
     //                 return alert("Chip name must consist of only alphanumeric characters.");
 
+    //             const inputs = [...Reified.active.values()].filter((v) => v instanceof Input).length;
+    //             const outputs = [...Reified.active.values()].filter((v) => v instanceof Output).length;
+
     //             chips.set(
     //                 name.trim().toUpperCase(),
     //                 class _ extends Chip<number, number> {
+    //                     static readonly NAME = name!.trim().toUpperCase();
+    //                     static readonly INPUTS = inputs;
+    //                     static readonly OUTPUTS = outputs;
+
     //                     constructor() {
-    //                         super(
-    //                             name!,
-    //                             [...Reified.active.values()].filter((v) => v instanceof Input).length,
-    //                             [...Reified.active.values()].filter((v) => v instanceof Output).length
-    //                         );
+    //                         super(name!, inputs, outputs);
     //                     }
 
     //                     output(inputs: boolean[]): boolean[] {
@@ -102,8 +103,12 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
 
     //                         return [];
     //                     }
-    //                 }
+    //                 },
     //             );
+
+    //             Reified.active.forEach((component) => component.detach());
+
+    //             WiringManager.wires.forEach((wire) => wire.destroy());
     //         },
     //     },
     // },
@@ -115,7 +120,7 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
                     href: URL.createObjectURL(
                         new Blob([saveDiagram([...Reified.active], [...WiringManager.wires])], {
                             type: "application/json",
-                        })
+                        }),
                     ),
                     download: `gatesim-${Date.now()}.json`,
                 }).click();

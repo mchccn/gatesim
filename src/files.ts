@@ -107,7 +107,7 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
 }
 
 export function fromFile(
-    file: string
+    file: string,
 ): { error: string; result: [] } | { error: undefined; result: [Reified[], Wiring[]] } {
     try {
         const data = JSON.parse(file);
@@ -266,7 +266,7 @@ function validate(data: unknown): asserts data is SerializedDiagram {
                   ...component.inputs.map(({ id }: { id: number }) => id),
                   ...component.outputs.map(({ id }: { id: number }) => id),
               ]
-            : component.id
+            : component.id,
     );
 
     for (const wire of data.wires as unknown[]) {

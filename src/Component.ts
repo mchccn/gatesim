@@ -19,7 +19,7 @@ export class Component<I extends number, O extends number> extends Reified {
 
     constructor(
         chip: Chip<I, O>,
-        pos: { x: number; y: number } | ((comp: Component<I, O>) => { x: number; y: number })
+        pos: { x: number; y: number } | ((comp: Component<I, O>) => { x: number; y: number }),
     ) {
         super();
 

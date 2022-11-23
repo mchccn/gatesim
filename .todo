@@ -1,4 +1,16 @@
 -   handle custom chips
+
     -   create custom chip from diagram
     -   serialize custom chip
     -   deserialize custom chip
+
+-   add puzzles/exercises
+
+    -   need some API to create limited playgrounds
+    -   limitations and validity of solution
+
+-   add toast/modal system
+
+    -   alerts
+    -   prompts
+    -   confirmation
