@@ -26,12 +26,14 @@ export class Wiring {
 }
 
 export class WiringManager {
-    static wires = new Array<Wiring>();
+    static #rAF = 0;
+
+    static wires = new Set<Wiring>();
 
     static render() {
         const ctx = useCanvas();
 
-        this.wires = this.wires.filter((wire) => !wire.destroyed);
+        this.wires = new Set([...this.wires].filter((wire) => !wire.destroyed));
 
         this.wires.forEach((wire) => {
             const from = wire.from.getBoundingClientRect();
@@ -67,5 +69,11 @@ export class WiringManager {
             ctx.closePath();
             ctx.stroke();
         }
+    }
+
+    static loop() {
+        this.render();
+
+        this.#rAF = requestAnimationFrame(this.loop.bind(this));
     }
 }

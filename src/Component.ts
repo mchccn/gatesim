@@ -168,6 +168,8 @@ export class Component<I extends number, O extends number> extends Reified {
 
         this.name.addEventListener("contextmenu", this.#contextmenus.get(this.name)!);
 
+        DraggingManager.watch(this.element, this.name);
+
         return this;
     }
 

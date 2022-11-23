@@ -1,4 +1,5 @@
 import { queueNewContext } from "./contextmenu";
+import { DraggingManager } from "./DraggingManager";
 import { NewWireContext } from "./NewWireContext";
 import { html, Reified } from "./Reified";
 import { WiringManager } from "./WiringManager";
@@ -72,6 +73,8 @@ export class Input extends Reified {
         this.element.addEventListener("click", this.#click);
         this.element.addEventListener("contextmenu", this.#contextmenu);
 
+        DraggingManager.watch(this.element);
+
         return this;
     }
 
@@ -81,6 +84,8 @@ export class Input extends Reified {
         this.element.removeEventListener("mousedown", this.#mousedown);
         this.element.removeEventListener("click", this.#click);
         this.element.removeEventListener("contextmenu", this.#contextmenu);
+
+        DraggingManager.forget(this.element, true);
 
         return this;
     }

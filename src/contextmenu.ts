@@ -1,6 +1,6 @@
 import { chips } from "./chips";
 import { Component } from "./Component";
-import { INPUT_COMPONENT_CSS_SIZE, OUTPUT_COMPONENT_CSS_SIZE } from "./constants";
+import { INPUT_COMPONENT_CSS_SIZE, ORIGIN_POINT, OUTPUT_COMPONENT_CSS_SIZE } from "./constants";
 import { DraggingManager } from "./DraggingManager";
 import { fromFile, saveDiagram } from "./files";
 import { Input } from "./Input";
@@ -14,8 +14,6 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
         "insert-chip": {
             label: "Insert chip",
             callback: (e) => {
-                //TODO: add modal/toast system
-
                 const name = prompt("Enter the chip's name:");
 
                 if (!name) return;
@@ -24,19 +22,19 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
 
                 if (!chip) return;
 
-                const component = new Component(Reflect.construct(chip, []), (component) => {
-                    Reified.active.add(component);
+                const component = new Component(Reflect.construct(chip, []), ORIGIN_POINT);
 
-                    component.attach();
+                Reified.active.add(component);
 
-                    DraggingManager.watch(component.element, component.name);
+                component.attach();
 
-                    const { width, height } = getComputedStyle(component.element);
+                DraggingManager.watch(component.element, component.name);
 
-                    return {
-                        x: e.clientX - parseFloat(width) / 2,
-                        y: e.clientY - parseFloat(height) / 2,
-                    };
+                const { width, height } = getComputedStyle(component.element);
+
+                component.move({
+                    x: e.clientX - parseFloat(width) / 2,
+                    y: e.clientY - parseFloat(height) / 2,
                 });
             },
         },
@@ -150,20 +148,24 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
 
                 if (!raw) return;
 
-                //
-                console.log(raw);
-                //
-
                 const {
                     error,
                     result: [components, wires],
                 } = fromFile(raw);
 
+                if (error) return alert(error);
+
                 Reified.active.forEach((component) => component.detach());
 
                 Reified.active = new Set(components);
 
-                WiringManager.wires = wires;
+                Reified.active.forEach((component) => component.attach());
+
+                WiringManager.wires.forEach((wire) => wire.destroy());
+
+                WiringManager.wires = new Set(wires);
+
+                //
             },
         },
     },
