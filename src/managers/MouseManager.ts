@@ -1,4 +1,4 @@
-export class MouseTracker {
+export class MouseManager {
     static #mouse = { x: 0, y: 0 };
 
     static #mousedowns = new Set<(e: MouseEvent) => void>();

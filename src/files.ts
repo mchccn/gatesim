@@ -1,9 +1,9 @@
-import { chips } from "./chips";
-import { Component } from "./Component";
-import { Input } from "./Input";
-import { Output } from "./Output";
-import { Reified } from "./Reified";
-import { Wiring } from "./WiringManager";
+import { Wiring } from "./managers/WiringManager";
+import { chips } from "./reified/chips";
+import { Component } from "./reified/Component";
+import { Input } from "./reified/Input";
+import { Output } from "./reified/Output";
+import { Reified } from "./reified/Reified";
 
 function* gen() {
     let i = 0;

@@ -1,13 +1,13 @@
-import { chips } from "./chips";
-import { Component } from "./Component";
 import { INPUT_COMPONENT_CSS_SIZE, ORIGIN_POINT, OUTPUT_COMPONENT_CSS_SIZE } from "./constants";
-import { DraggingManager } from "./DraggingManager";
 import { fromFile, saveDiagram } from "./files";
-import { Input } from "./Input";
-import { MenuManager } from "./MenuManager";
-import { Output } from "./Output";
-import { Reified } from "./Reified";
-import { WiringManager } from "./WiringManager";
+import { DraggingManager } from "./managers/DraggingManager";
+import { MenuManager } from "./managers/MenuManager";
+import { WiringManager } from "./managers/WiringManager";
+import { chips } from "./reified/chips";
+import { Component } from "./reified/Component";
+import { Input } from "./reified/Input";
+import { Output } from "./reified/Output";
+import { Reified } from "./reified/Reified";
 
 export const [queueNewContext] = MenuManager.use(Reified.root, [
     {

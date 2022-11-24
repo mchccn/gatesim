@@ -1,6 +1,27 @@
-import { useCanvas } from "./canvas";
-import { MouseTracker } from "./MouseTracker";
-import { NewWireContext } from "./NewWireContext";
+import { MouseManager } from "./MouseManager";
+
+export class NewWireContext {
+    static from: HTMLElement | undefined;
+
+    static {
+        MouseManager.onMouseDown((e) => {
+            if (NewWireContext.from) {
+                const { target } = e;
+
+                if (target && target instanceof HTMLElement) {
+                    if (
+                        target.classList.contains("board-output") ||
+                        target.classList.contains("component-input-button")
+                    ) {
+                        WiringManager.wires.add(new Wiring(NewWireContext.from, target));
+                    }
+                }
+
+                NewWireContext.from = undefined;
+            }
+        });
+    }
+}
 
 export class Wiring {
     #destroyed = false;
@@ -31,7 +52,10 @@ export class WiringManager {
     static wires = new Set<Wiring>();
 
     static render() {
-        const ctx = useCanvas();
+        const ctx = document.querySelector("canvas")!.getContext("2d")!;
+
+        ctx.canvas.width = window.innerWidth;
+        ctx.canvas.height = window.innerHeight;
 
         this.wires = new Set([...this.wires].filter((wire) => !wire.destroyed));
 
@@ -65,7 +89,7 @@ export class WiringManager {
 
             ctx.beginPath();
             ctx.moveTo(from.x + from.width / 2, from.y + from.height / 2);
-            ctx.lineTo(MouseTracker.mouse.x, MouseTracker.mouse.y);
+            ctx.lineTo(MouseManager.mouse.x, MouseManager.mouse.y);
             ctx.closePath();
             ctx.stroke();
         }

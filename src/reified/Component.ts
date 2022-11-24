@@ -1,9 +1,8 @@
+import { queueNewContext } from "../contextmenu";
+import { DraggingManager } from "../managers/DraggingManager";
+import { NewWireContext, WiringManager } from "../managers/WiringManager";
 import { Chip } from "./chips";
-import { queueNewContext } from "./contextmenu";
-import { DraggingManager } from "./DraggingManager";
-import { NewWireContext } from "./NewWireContext";
 import { html, Reified } from "./Reified";
-import { WiringManager } from "./WiringManager";
 
 export class Component<I extends number, O extends number> extends Reified {
     readonly element;

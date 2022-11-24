@@ -1,4 +1,4 @@
-import { BooleanTuple } from "./types";
+import { BooleanTuple } from "../types";
 
 export abstract class Chip<I extends number, O extends number> {
     static readonly NAME: string;

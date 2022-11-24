@@ -1,10 +1,10 @@
 import { queueNewContext } from "./contextmenu";
-import { DraggingManager } from "./DraggingManager";
-import { MouseTracker } from "./MouseTracker";
-import { WiringManager } from "./WiringManager";
+import { DraggingManager } from "./managers/DraggingManager";
+import { WiringManager } from "./managers/WiringManager";
+import { MouseManager } from "./managers/MouseManager";
 
 queueNewContext(() => []);
 
-MouseTracker.start();
+MouseManager.start();
 DraggingManager.listen();
 WiringManager.loop();

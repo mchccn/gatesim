@@ -1,7 +1,7 @@
-import { queueNewContext } from "./contextmenu";
-import { DraggingManager } from "./DraggingManager";
+import { queueNewContext } from "../contextmenu";
+import { DraggingManager } from "../managers/DraggingManager";
+import { WiringManager } from "../managers/WiringManager";
 import { html, Reified } from "./Reified";
-import { WiringManager } from "./WiringManager";
 
 export class Output extends Reified {
     readonly element;

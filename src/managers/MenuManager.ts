@@ -1,4 +1,4 @@
-import { html } from "./Reified";
+import { html } from "../reified/Reified";
 
 export type MenuManagerContext = {
     menu: HTMLElement;
