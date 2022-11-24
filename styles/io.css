@@ -35,6 +35,10 @@
     cursor: pointer;
 }
 
+.board-output:hover {
+    cursor: grab;   
+}
+
 .activated {
     background-color: #ff2626;
 
