@@ -1,3 +1,4 @@
+import { ACTIVATED_CSS_COLOR, LIGHT_GRAY_CSS_COLOR } from "../constants";
 import { MouseManager } from "./MouseManager";
 
 export class NewWireContext {
@@ -65,7 +66,7 @@ export class WiringManager {
 
             if (wire.from.classList.contains("activated")) wire.to.classList.add("activated");
 
-            ctx.strokeStyle = wire.from.classList.contains("activated") ? "#ff2626" : "#dedede";
+            ctx.strokeStyle = wire.from.classList.contains("activated") ? ACTIVATED_CSS_COLOR : LIGHT_GRAY_CSS_COLOR;
 
             ctx.lineWidth = 5;
 
@@ -81,7 +82,9 @@ export class WiringManager {
         if (NewWireContext.from) {
             const from = NewWireContext.from.getBoundingClientRect();
 
-            ctx.strokeStyle = NewWireContext.from.classList.contains("activated") ? "#ff2626" : "#dedede";
+            ctx.strokeStyle = NewWireContext.from.classList.contains("activated")
+                ? ACTIVATED_CSS_COLOR
+                : LIGHT_GRAY_CSS_COLOR;
 
             ctx.lineWidth = 5;
 

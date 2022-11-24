@@ -1,7 +1,8 @@
-import { INPUT_COMPONENT_CSS_SIZE, ORIGIN_POINT, OUTPUT_COMPONENT_CSS_SIZE } from "./constants";
+import { ACTIVATED_CSS_COLOR, INPUT_COMPONENT_CSS_SIZE, ORIGIN_POINT, OUTPUT_COMPONENT_CSS_SIZE } from "./constants";
 import { fromFile, saveDiagram } from "./files";
 import { DraggingManager } from "./managers/DraggingManager";
 import { MenuManager } from "./managers/MenuManager";
+import { ToastManager } from "./managers/ToastManager";
 import { WiringManager } from "./managers/WiringManager";
 import { chips } from "./reified/chips";
 import { Component } from "./reified/Component";
@@ -100,6 +101,7 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
 
     //                     output(inputs: boolean[]): boolean[] {
     //                         //TODO: SOMEHOW COMPILE THE DIAGRAM
+    //                         //TODO: SORT INPUTS/OUTPUTS BY Y-COORD
 
     //                         return [];
     //                     }
@@ -158,7 +160,7 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
                     result: [components, wires],
                 } = fromFile(raw);
 
-                if (error) return alert(error);
+                if (error) return ToastManager.toast({ message: error, color: ACTIVATED_CSS_COLOR, duration: 2500 });
 
                 Reified.active.forEach((component) => component.detach());
 
@@ -169,8 +171,6 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
                 WiringManager.wires.forEach((wire) => wire.destroy());
 
                 WiringManager.wires = new Set(wires);
-
-                //
             },
         },
     },

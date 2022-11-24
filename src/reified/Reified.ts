@@ -28,7 +28,7 @@ export abstract class Reified {
     attach() {
         Reified.active.add(this);
 
-        Reified.root.append(this.element);
+        Reified.root.appendChild(this.element);
 
         return this;
     }

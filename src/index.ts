@@ -1,7 +1,7 @@
 import { queueNewContext } from "./contextmenu";
 import { DraggingManager } from "./managers/DraggingManager";
-import { WiringManager } from "./managers/WiringManager";
 import { MouseManager } from "./managers/MouseManager";
+import { WiringManager } from "./managers/WiringManager";
 
 queueNewContext(() => []);
 
