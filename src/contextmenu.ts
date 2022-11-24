@@ -2,6 +2,7 @@ import { ACTIVATED_CSS_COLOR, INPUT_COMPONENT_CSS_SIZE, ORIGIN_POINT, OUTPUT_COM
 import { fromFile, saveDiagram } from "./files";
 import { DraggingManager } from "./managers/DraggingManager";
 import { MenuManager } from "./managers/MenuManager";
+import { ModalManager } from "./managers/ModalManager";
 import { ToastManager } from "./managers/ToastManager";
 import { WiringManager } from "./managers/WiringManager";
 import { chips } from "./reified/chips";
@@ -14,14 +15,14 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
     {
         "insert-chip": {
             label: "Insert chip",
-            callback: (e) => {
-                const name = prompt("Enter the chip's name:");
+            callback: async (e) => {
+                const name = await ModalManager.prompt("Enter the chip's name:");
 
-                if (!name) return;
+                if (typeof name !== "string") return;
 
                 const chip = chips.get(name.toUpperCase());
 
-                if (!chip) return;
+                if (!chip) return ModalManager.alert("No chip was found with that name.");
 
                 const component = new Component(Reflect.construct(chip, []), ORIGIN_POINT);
 
@@ -37,6 +38,8 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
                     x: e.clientX - parseFloat(width) / 2,
                     y: e.clientY - parseFloat(height) / 2,
                 });
+
+                return;
             },
         },
     },
@@ -71,19 +74,21 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
     // {
     //     "new-chip": {
     //         label: "New chip from diagram",
-    //         callback: () => {
-    //             const name = prompt("Enter the name of the chip:");
+    //         callback: async () => {
+    //             const name = await ModalManager.prompt("Enter the name of the chip:");
 
     //             if (!name) return;
 
     //             if (
-    //                 !chips.has(name.trim().toUpperCase()) &&
-    //                 !confirm("A chip already exists with this name. Are you sure you want to replace it?")
+    //                 chips.has(name.trim().toUpperCase()) &&
+    //                 !(await ModalManager.confirm(
+    //                     "A chip already exists with this name.\nAre you sure you want to replace it?",
+    //                 ))
     //             )
     //                 return;
 
     //             if (!/^\w+$/.test(name.trim().toUpperCase()))
-    //                 return alert("Chip name must consist of only alphanumeric characters.");
+    //                 return ModalManager.alert("Chip name must consist of only alphanumeric characters.");
 
     //             const inputs = [...Reified.active.values()].filter((v) => v instanceof Input).length;
     //             const outputs = [...Reified.active.values()].filter((v) => v instanceof Output).length;
@@ -141,7 +146,12 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
                     input.onerror = () => resolve(undefined);
                 });
 
-                if (!file) return;
+                if (!file)
+                    return ToastManager.toast({
+                        message: "No file was provided.",
+                        color: ACTIVATED_CSS_COLOR,
+                        duration: 2500,
+                    });
 
                 const reader = new FileReader();
 
@@ -153,7 +163,12 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
                     reader.onerror = () => resolve(undefined);
                 });
 
-                if (!raw) return;
+                if (!raw)
+                    return ToastManager.toast({
+                        message: "Unable to read the file.",
+                        color: ACTIVATED_CSS_COLOR,
+                        duration: 2500,
+                    });
 
                 const {
                     error,
