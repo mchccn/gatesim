@@ -47,7 +47,7 @@ export class Wiring {
 }
 
 export class WiringManager {
-    static #rAF = 0;
+    static #rAF: number | undefined = -1;
 
     static wires = new Set<Wiring>();
 
@@ -95,9 +95,17 @@ export class WiringManager {
         }
     }
 
-    static loop() {
+    static loop(): () => void {
+        if (typeof this.#rAF === "undefined") {
+            this.#rAF = -1;
+
+            return () => undefined;
+        }
+
         this.render();
 
         this.#rAF = requestAnimationFrame(this.loop.bind(this));
+
+        return () => (this.#rAF = undefined);
     }
 }
