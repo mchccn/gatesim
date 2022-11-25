@@ -52,7 +52,7 @@ export class WiringManager {
 
     static wires = new Set<Wiring>();
 
-    static render() {
+    static update() {
         const ctx = document.querySelector("canvas")!.getContext("2d")!;
 
         ctx.canvas.width = window.innerWidth;
@@ -64,7 +64,7 @@ export class WiringManager {
             const from = wire.from.getBoundingClientRect();
             const to = wire.to.getBoundingClientRect();
 
-            if (wire.from.classList.contains("activated")) wire.to.classList.add("activated");
+            wire.to.classList.toggle("activated", wire.from.classList.contains("activated"));
 
             ctx.strokeStyle = wire.from.classList.contains("activated") ? ACTIVATED_CSS_COLOR : LIGHT_GRAY_CSS_COLOR;
 
@@ -98,16 +98,18 @@ export class WiringManager {
         }
     }
 
-    static loop() {
+    static start() {
+        this.update();
+
+        const id = requestAnimationFrame(this.start.bind(this));
+
         if (typeof this.#rAF === "undefined") {
             this.#rAF = -1;
 
             return;
         }
 
-        this.render();
-
-        this.#rAF = requestAnimationFrame(this.loop.bind(this));
+        this.#rAF = id;
     }
 
     static stop() {

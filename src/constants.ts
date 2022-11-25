@@ -7,3 +7,4 @@ export const CHIP_OUTPUT_CSS_SIZE = 16;
 export const ORIGIN_POINT = Object.freeze({ x: 0, y: 0 });
 export const ACTIVATED_CSS_COLOR = "#ff2626";
 export const LIGHT_GRAY_CSS_COLOR = "#dedede";
+export const IN_DEBUG_MODE = !!new URL(location.href).searchParams.has("debug");

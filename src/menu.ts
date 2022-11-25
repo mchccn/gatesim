@@ -1,4 +1,10 @@
-import { ACTIVATED_CSS_COLOR, INPUT_COMPONENT_CSS_SIZE, ORIGIN_POINT, OUTPUT_COMPONENT_CSS_SIZE } from "./constants";
+import {
+    ACTIVATED_CSS_COLOR,
+    INPUT_COMPONENT_CSS_SIZE,
+    IN_DEBUG_MODE,
+    ORIGIN_POINT,
+    OUTPUT_COMPONENT_CSS_SIZE,
+} from "./constants";
 import { fromFile, saveDiagram } from "./files";
 import { DraggingManager } from "./managers/DraggingManager";
 import { MenuManagerActions } from "./managers/MenuManager";
@@ -178,12 +184,26 @@ export const menu: MenuManagerActions = [
 
                 SandboxManager.reset();
 
-                Reified.active = new Set(components);
-
-                Reified.active.forEach((component) => component.attach());
-
-                WiringManager.wires = new Set(wires);
+                SandboxManager.setup({ menu, initial: [components!, wires!] });
             },
         },
     },
+    ...(IN_DEBUG_MODE
+        ? [
+              {
+                  STOP: {
+                      label: "STOP RENDER",
+                      callback: () => {
+                          WiringManager.stop();
+                      },
+                  },
+                  START: {
+                      label: "START RENDER",
+                      callback: () => {
+                          WiringManager.start();
+                      },
+                  },
+              },
+          ]
+        : []),
 ];

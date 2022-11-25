@@ -24,13 +24,25 @@ export class SandboxManager {
         document.body.appendChild(html`<canvas></canvas>`);
         document.body.appendChild(html`<div class="toasts-container"></div>`);
 
-        if (config.menu) MenuManager.use(Reified.root, config.menu);
-
         MouseManager.start();
         DraggingManager.listen();
-        WiringManager.loop();
+        WiringManager.start();
 
-        //TODO: Implement initial state
+        if (config.menu) MenuManager.use(Reified.root, config.menu);
+
+        if (config.initial) {
+            Reified.active = new Set(config.initial[0]);
+
+            Reified.active.forEach((component) => component.attach());
+
+            WiringManager.wires = new Set(config.initial[1]);
+        }
+
+        // Save to storage
+        new MutationObserver((records) => {
+            console.log(records);
+        }).observe(Reified.root, { attributes: true, childList: true, characterData: true, subtree: true });
+
         //TODO: Implement limits
         //TODO: Implement diagram state check callbacks
     }
@@ -49,5 +61,7 @@ export class SandboxManager {
         this.watchedUnresolvedPromises.forEach((finish) => finish.call(undefined));
 
         this.watchedUnresolvedPromises.clear();
+
+        document.body.innerHTML = "";
     }
 }

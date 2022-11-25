@@ -1,4 +1,4 @@
-import { menu } from "./contextmenu";
 import { SandboxManager } from "./managers/SandboxManager";
+import { menu } from "./menu";
 
 SandboxManager.setup({ menu });
