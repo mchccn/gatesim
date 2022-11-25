@@ -1,20 +1,28 @@
+import { ACTIVATED_CSS_COLOR } from "../constants";
+import { fromFile, saveDiagram } from "../files";
 import { html, Reified } from "../reified/Reified";
 import { DraggingManager } from "./DraggingManager";
 import { MenuManager, MenuManagerActions } from "./MenuManager";
 import { MouseManager } from "./MouseManager";
+import { StorageManager } from "./StorageManager";
+import { ToastManager } from "./ToastManager";
 import { Wiring, WiringManager } from "./WiringManager";
 
 type SandboxConfig = {
     menu?: MenuManagerActions;
-    initial?: [Reified[], Wiring[]];
+    initial?: [components: Reified[], wires: Wiring[]];
     limits?: ({ type: "INPUT" | "OUTPUT"; count: number } | { type: "COMPONENT"; name?: string; count: number })[];
     states?: { inputs?: boolean[]; outputs?: boolean[]; callback: () => void }[];
+    save?: string;
+    overrideSaveIfExists?: boolean;
 };
 
 export class SandboxManager {
     static queueNewContext: ReturnType<typeof MenuManager["use"]>[0];
 
     static watchedUnresolvedPromises = new Set<() => void>();
+
+    static #observer: MutationObserver | undefined;
 
     static setup(config: SandboxConfig) {
         document.body.innerHTML = "";
@@ -28,9 +36,11 @@ export class SandboxManager {
         DraggingManager.listen();
         WiringManager.start();
 
-        if (config.menu) MenuManager.use(Reified.root, config.menu);
+        if (typeof config.menu !== "undefined") [this.queueNewContext] = MenuManager.use(Reified.root, config.menu);
 
-        if (config.initial) {
+        if (typeof config.initial !== "undefined") {
+            this.clear();
+
             Reified.active = new Set(config.initial[0]);
 
             Reified.active.forEach((component) => component.attach());
@@ -38,30 +48,85 @@ export class SandboxManager {
             WiringManager.wires = new Set(config.initial[1]);
         }
 
-        // Save to storage
-        new MutationObserver((records) => {
+        if (typeof config.save !== "undefined") {
+            const file = StorageManager.get<string>("saves:" + config.save);
+
+            if (file) {
+                const {
+                    error,
+                    result: [components, wires],
+                } = fromFile(file);
+
+                if (error) {
+                    ToastManager.toast({
+                        message: "Unable to read from saves.",
+                        color: ACTIVATED_CSS_COLOR,
+                        duration: 2500,
+                    });
+                } else {
+                    if (!config.overrideSaveIfExists) {
+                        this.clear();
+
+                        Reified.active = new Set(components);
+
+                        Reified.active.forEach((component) => component.attach());
+
+                        WiringManager.wires = new Set(wires);
+                    }
+
+                    StorageManager.set(
+                        "saves:" + config.save,
+                        saveDiagram([...Reified.active], [...WiringManager.wires]),
+                    );
+                }
+            }
+        }
+
+        //TODO: Implement undo/redo
+        this.#observer = new MutationObserver((records) => {
             console.log(records);
-        }).observe(Reified.root, { attributes: true, childList: true, characterData: true, subtree: true });
+
+            if (typeof config.save !== "undefined")
+                StorageManager.set("saves:" + config.save, saveDiagram([...Reified.active], [...WiringManager.wires]));
+        });
+
+        this.#observer.observe(Reified.root, {
+            attributes: true,
+            attributeOldValue: true,
+            characterData: true,
+            characterDataOldValue: true,
+            subtree: true,
+        });
 
         //TODO: Implement limits
         //TODO: Implement diagram state check callbacks
     }
 
     static reset() {
+        if (this.#observer) {
+            this.#observer.disconnect();
+
+            this.#observer = undefined;
+        }
+
         MouseManager.reset();
         DraggingManager.reset();
         WiringManager.stop();
 
         MenuManager.remove(Reified.root);
 
-        Reified.active.forEach((component) => component.detach());
-
-        WiringManager.wires.forEach((wire) => wire.destroy());
+        this.clear();
 
         this.watchedUnresolvedPromises.forEach((finish) => finish.call(undefined));
 
         this.watchedUnresolvedPromises.clear();
 
         document.body.innerHTML = "";
+    }
+
+    static clear() {
+        Reified.active.forEach((component) => component.detach());
+
+        WiringManager.wires.forEach((wire) => wire.destroy());
     }
 }

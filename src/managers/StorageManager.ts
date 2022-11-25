@@ -9,7 +9,7 @@ export class StorageManager {
         return value;
     }
 
-    static get<T>(key: string): T {
+    static get<T>(key: string): T | undefined {
         return JSON.parse(this.storage.getItem(this.prefix + key)!) ?? undefined;
     }
 }

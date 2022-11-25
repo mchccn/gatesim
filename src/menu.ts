@@ -184,7 +184,12 @@ export const menu: MenuManagerActions = [
 
                 SandboxManager.reset();
 
-                SandboxManager.setup({ menu, initial: [components!, wires!] });
+                SandboxManager.setup({
+                    menu,
+                    initial: [components!, wires!],
+                    save: "sandbox",
+                    overrideSaveIfExists: true,
+                });
             },
         },
     },

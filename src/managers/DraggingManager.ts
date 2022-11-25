@@ -53,7 +53,7 @@ export class DraggingManager {
         this.#mouse.oy = -1;
         this.#mouse.down = false;
 
-        this.#watched.forEach((element) => this.forget(element));
+        this.#watched.forEach((_, element) => this.forget(element));
 
         this.#dragged = undefined;
 

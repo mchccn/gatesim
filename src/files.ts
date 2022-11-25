@@ -1,4 +1,4 @@
-import { ACTIVATED_CSS_COLOR } from "./constants";
+import { ACTIVATED_CSS_COLOR, IN_DEBUG_MODE } from "./constants";
 import { ToastManager } from "./managers/ToastManager";
 import { Wiring } from "./managers/WiringManager";
 import { chips } from "./reified/chips";
@@ -105,18 +105,20 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
 
             throw new Error("Unknown Reified component type.");
         }),
-        wires: wires.map((wire) => ({
-            from: ids.get(wire.from)!,
-            to: ids.get(wire.to)!,
-        })),
+        wires: wires
+            .filter((wire) => !wire.destroyed)
+            .map((wire) => ({
+                from: ids.get(wire.from)!,
+                to: ids.get(wire.to)!,
+            })),
     };
 
-    return JSON.stringify(data, undefined, 4);
+    return JSON.stringify(data, undefined, IN_DEBUG_MODE ? 4 : undefined);
 }
 
 export function fromFile(
     file: string,
-): { error: string; result: [] } | { error: undefined; result: [Reified[], Wiring[]] } {
+): { error: string; result: [] } | { error: undefined; result: [components: Reified[], wires: Wiring[]] } {
     try {
         const data = JSON.parse(file);
 
