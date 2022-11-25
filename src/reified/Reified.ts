@@ -16,7 +16,9 @@ export function preventDefault(e: Event) {
 export abstract class Reified {
     static active = new Set<Reified>();
 
-    static readonly root = document.querySelector<HTMLElement>(".reified-root")!;
+    static get root() {
+        return document.querySelector<HTMLElement>(".reified-root")!;
+    }
 
     abstract readonly element: HTMLElement;
 

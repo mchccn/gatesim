@@ -46,6 +46,20 @@ export class DraggingManager {
         this.#watched.delete(element);
     }
 
+    static reset() {
+        this.#mouse.x = -1;
+        this.#mouse.y = -1;
+        this.#mouse.ox = -1;
+        this.#mouse.oy = -1;
+        this.#mouse.down = false;
+
+        this.#watched.forEach((element) => this.forget(element));
+
+        this.#dragged = undefined;
+
+        this.deafen();
+    }
+
     static listen() {
         document.body.addEventListener("mousemove", this.#mousemove);
         window.addEventListener("mousedown", this.#mousedown);

@@ -1,8 +1,8 @@
 export class MouseManager {
     static #mouse = { x: 0, y: 0 };
 
-    static #mousedowns = new Set<(e: MouseEvent) => void>();
-    static #mouseups = new Set<(e: MouseEvent) => void>();
+    static readonly #mousedowns = new Set<(e: MouseEvent) => void>();
+    static readonly #mouseups = new Set<(e: MouseEvent) => void>();
 
     static #mousemove = (e: MouseEvent) => {
         this.#mouse.x = e.clientX;
@@ -29,6 +29,13 @@ export class MouseManager {
         document.removeEventListener("mouseup", this.#mouseup);
 
         this.#mouse = { x: 0, y: 0 };
+    }
+
+    static reset() {
+        this.stop();
+
+        this.#mousedowns.clear();
+        this.#mouseups.clear();
     }
 
     static onMouseDown(handler: (e: MouseEvent) => void) {

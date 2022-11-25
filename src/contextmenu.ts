@@ -1,8 +1,9 @@
 import { ACTIVATED_CSS_COLOR, INPUT_COMPONENT_CSS_SIZE, ORIGIN_POINT, OUTPUT_COMPONENT_CSS_SIZE } from "./constants";
 import { fromFile, saveDiagram } from "./files";
 import { DraggingManager } from "./managers/DraggingManager";
-import { MenuManager } from "./managers/MenuManager";
+import { MenuManagerActions } from "./managers/MenuManager";
 import { ModalManager } from "./managers/ModalManager";
+import { SandboxManager } from "./managers/SandboxManager";
 import { ToastManager } from "./managers/ToastManager";
 import { WiringManager } from "./managers/WiringManager";
 import { chips } from "./reified/chips";
@@ -11,7 +12,7 @@ import { Input } from "./reified/Input";
 import { Output } from "./reified/Output";
 import { Reified } from "./reified/Reified";
 
-export const [queueNewContext] = MenuManager.use(Reified.root, [
+export const menu: MenuManagerActions = [
     {
         "insert-chip": {
             label: "Insert chip",
@@ -113,9 +114,7 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
     //                 },
     //             );
 
-    //             Reified.active.forEach((component) => component.detach());
-
-    //             WiringManager.wires.forEach((wire) => wire.destroy());
+    //             SandboxManager.reset();
     //         },
     //     },
     // },
@@ -177,16 +176,14 @@ export const [queueNewContext] = MenuManager.use(Reified.root, [
 
                 if (error) return ToastManager.toast({ message: error, color: ACTIVATED_CSS_COLOR, duration: 2500 });
 
-                Reified.active.forEach((component) => component.detach());
+                SandboxManager.reset();
 
                 Reified.active = new Set(components);
 
                 Reified.active.forEach((component) => component.attach());
 
-                WiringManager.wires.forEach((wire) => wire.destroy());
-
                 WiringManager.wires = new Set(wires);
             },
         },
     },
-]);
+];

@@ -1,5 +1,5 @@
-import { queueNewContext } from "../contextmenu";
 import { DraggingManager } from "../managers/DraggingManager";
+import { SandboxManager } from "../managers/SandboxManager";
 import { NewWireContext, WiringManager } from "../managers/WiringManager";
 import { html, Reified } from "./Reified";
 
@@ -26,7 +26,7 @@ export class Input extends Reified {
     };
 
     readonly #contextmenu = () => {
-        queueNewContext((prev) => [
+        SandboxManager.queueNewContext((prev) => [
             {
                 "create-connection": {
                     label: "Create connection",

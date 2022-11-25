@@ -1,5 +1,5 @@
-import { queueNewContext } from "../contextmenu";
 import { DraggingManager } from "../managers/DraggingManager";
+import { SandboxManager } from "../managers/SandboxManager";
 import { WiringManager } from "../managers/WiringManager";
 import { html, Reified } from "./Reified";
 
@@ -7,7 +7,7 @@ export class Output extends Reified {
     readonly element;
 
     readonly #contextmenu = () => {
-        queueNewContext((prev) => [
+        SandboxManager.queueNewContext((prev) => [
             {
                 "delete-output": {
                     label: "Delete output",

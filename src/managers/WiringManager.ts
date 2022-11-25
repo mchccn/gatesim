@@ -98,17 +98,23 @@ export class WiringManager {
         }
     }
 
-    static loop(): () => void {
+    static loop() {
         if (typeof this.#rAF === "undefined") {
             this.#rAF = -1;
 
-            return () => undefined;
+            return;
         }
 
         this.render();
 
         this.#rAF = requestAnimationFrame(this.loop.bind(this));
+    }
 
-        return () => (this.#rAF = undefined);
+    static stop() {
+        if (typeof this.#rAF !== "undefined") {
+            cancelAnimationFrame(this.#rAF ?? 0);
+
+            this.#rAF = undefined;
+        }
     }
 }

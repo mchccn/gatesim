@@ -1,7 +1,10 @@
 import { html } from "../reified/Reified";
+import { SandboxManager } from "./SandboxManager";
 
 export class ModalManager {
-    static readonly container = document.querySelector<HTMLElement>(".modal-container")!;
+    static get container() {
+        return document.querySelector<HTMLElement>(".modal-container")!;
+    }
 
     static #onModalMount() {
         if (this.container.childElementCount <= 0) this.container.classList.remove("modal-inactive");
@@ -36,12 +39,18 @@ export class ModalManager {
         alert.querySelector<HTMLElement>(".modal-ok")!.focus();
 
         return new Promise<void>((resolve) => {
+            const finish = () => resolve(undefined);
+
+            SandboxManager.watchedUnresolvedPromises.add(finish);
+
             alert.querySelector<HTMLElement>(".modal-ok")!.addEventListener("click", () => {
                 alert.remove();
 
                 this.#onModalResolved();
 
-                return resolve(undefined);
+                SandboxManager.watchedUnresolvedPromises.delete(finish);
+
+                return finish();
             });
         });
     }
@@ -64,21 +73,23 @@ export class ModalManager {
         confirm.querySelector<HTMLElement>(".modal-ok")!.focus();
 
         return new Promise<boolean>((resolve) => {
-            confirm.querySelector<HTMLElement>(".modal-cancel")!.addEventListener("click", () => {
+            const finish = () => resolve(false);
+
+            SandboxManager.watchedUnresolvedPromises.add(finish);
+
+            const handler = (value: boolean) => () => {
                 confirm.remove();
 
                 this.#onModalResolved();
 
-                return resolve(false);
-            });
+                SandboxManager.watchedUnresolvedPromises.delete(finish);
 
-            confirm.querySelector<HTMLElement>(".modal-ok")!.addEventListener("click", () => {
-                confirm.remove();
+                return resolve(value);
+            };
 
-                this.#onModalResolved();
+            confirm.querySelector<HTMLElement>(".modal-cancel")!.addEventListener("click", handler(false));
 
-                return resolve(true);
-            });
+            confirm.querySelector<HTMLElement>(".modal-ok")!.addEventListener("click", handler(true));
         });
     }
 
@@ -101,28 +112,34 @@ export class ModalManager {
         prompt.querySelector<HTMLElement>(".modal-input")!.focus();
 
         return new Promise<string | undefined>((resolve) => {
+            const finish = () => resolve(undefined);
+
+            SandboxManager.watchedUnresolvedPromises.add(finish);
+
+            const done = () => {
+                prompt.remove();
+
+                this.#onModalResolved();
+
+                SandboxManager.watchedUnresolvedPromises.delete(finish);
+            };
+
             prompt.querySelector<HTMLElement>(".modal-input")!.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {
-                    prompt.remove();
-
-                    this.#onModalResolved();
+                    done();
 
                     return resolve(prompt.querySelector<HTMLInputElement>(".modal-input")!.value);
                 }
             });
 
             prompt.querySelector<HTMLElement>(".modal-cancel")!.addEventListener("click", () => {
-                prompt.remove();
+                done();
 
-                this.#onModalResolved();
-
-                return resolve(undefined);
+                return finish();
             });
 
             prompt.querySelector<HTMLElement>(".modal-ok")!.addEventListener("click", () => {
-                prompt.remove();
-
-                this.#onModalResolved();
+                done();
 
                 return resolve(prompt.querySelector<HTMLInputElement>(".modal-input")!.value);
             });

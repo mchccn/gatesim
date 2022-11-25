@@ -1,5 +1,5 @@
-import { queueNewContext } from "../contextmenu";
 import { DraggingManager } from "../managers/DraggingManager";
+import { SandboxManager } from "../managers/SandboxManager";
 import { NewWireContext, WiringManager } from "../managers/WiringManager";
 import { Chip } from "./chips";
 import { html, Reified } from "./Reified";
@@ -46,7 +46,7 @@ export class Component<I extends number, O extends number> extends Reified {
             this.#observers.set(input, new MutationObserver(this.update.bind(this)));
 
             this.#contextmenus.set(input, () => {
-                queueNewContext((prev) => [
+                SandboxManager.queueNewContext((prev) => [
                     {
                         "delete-connections": {
                             label: "Delete connections",
@@ -66,7 +66,7 @@ export class Component<I extends number, O extends number> extends Reified {
 
         this.outputs.forEach((output) => {
             this.#contextmenus.set(output, () => {
-                queueNewContext((prev) => [
+                SandboxManager.queueNewContext((prev) => [
                     {
                         "create-connection": {
                             label: "Create connection",
@@ -93,7 +93,7 @@ export class Component<I extends number, O extends number> extends Reified {
         });
 
         this.#contextmenus.set(this.name, () => {
-            queueNewContext((prev) => [
+            SandboxManager.queueNewContext((prev) => [
                 {
                     "delete-component": {
                         label: "Delete component",

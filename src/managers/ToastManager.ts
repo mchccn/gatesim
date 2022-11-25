@@ -1,4 +1,5 @@
 import { html } from "../reified/Reified";
+import { SandboxManager } from "./SandboxManager";
 
 export interface ToastData {
     message: string;
@@ -7,7 +8,9 @@ export interface ToastData {
 }
 
 export class ToastManager {
-    static readonly container = document.querySelector<HTMLElement>(".toasts-container")!;
+    static get container() {
+        return document.querySelector<HTMLElement>(".toasts-container")!;
+    }
 
     static async toast({ message, color, duration }: ToastData) {
         const toast = html`
@@ -25,17 +28,21 @@ export class ToastManager {
         this.container.appendChild(toast);
 
         return new Promise<void>((resolve) => {
-            toast.querySelector<HTMLElement>(".close-toast")!.addEventListener("click", () => {
+            const finish = () => resolve(undefined);
+
+            SandboxManager.watchedUnresolvedPromises.add(finish);
+
+            const handler = () => {
                 toast.remove();
 
-                return resolve(undefined);
-            });
+                SandboxManager.watchedUnresolvedPromises.delete(finish);
 
-            toast.addEventListener("animationend", () => {
-                toast.remove();
+                return finish();
+            };
 
-                return resolve(undefined);
-            });
+            toast.querySelector<HTMLElement>(".close-toast")!.addEventListener("click", handler);
+
+            toast.addEventListener("animationend", handler);
         });
     }
 }
