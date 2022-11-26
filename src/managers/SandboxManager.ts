@@ -91,7 +91,6 @@ export class SandboxManager {
             }
         }
 
-        //TODO: Implement undo/redo
         this.#observer = new MutationObserver(() => {
             if (typeof config.save !== "undefined")
                 StorageManager.set("saves:" + config.save, saveDiagram([...Reified.active], [...WiringManager.wires]));
@@ -140,6 +139,8 @@ export class SandboxManager {
 
     static pushHistory(command: () => void, undo: () => void) {
         this.#redos.length = 0;
+
+        command.call(undefined);
 
         this.#history.push([command, undo]);
     }

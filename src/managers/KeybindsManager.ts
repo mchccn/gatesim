@@ -1,4 +1,5 @@
-//TODO: Fix dumb fucking bug where holding a key makes it somehow pressed forever...
+import { IS_MAC_OS } from "../constants";
+
 export class KeybindsManager {
     static #keymap = new Map<string, boolean>();
 
@@ -8,24 +9,35 @@ export class KeybindsManager {
         this.#keymap.set(e.code, true);
 
         if (document.activeElement === document.body) {
-            const entry = this.#keychords.find(([chord]) => chord.split("+").every((key) => this.#keymap.get(key)));
+            const [, runs] =
+                this.#keychords.find(([chord]) => chord.split("+").every((key) => this.#keymap.get(key))) ?? [];
 
-            if (entry) entry[1].forEach((run) => run.call(undefined, e));
+            if (runs) runs.forEach((run) => run.call(undefined, e));
         }
     };
 
     static #keyup = (e: KeyboardEvent) => {
         this.#keymap.delete(e.code);
+
+        if (!e.metaKey && (e.code === "MetaLeft" || e.code === "MetaRight") && IS_MAC_OS) this.#keymap.clear();
+        if (e.metaKey && (e.code === "ShiftLeft" || e.code === "ShiftRight") && IS_MAC_OS)
+            this.#keymap = new Map([...this.#keymap.entries()].filter(([key]) => !key.startsWith("Key")));
+    };
+
+    static #blur = () => {
+        this.#keymap.clear();
     };
 
     static listen() {
         document.addEventListener("keydown", this.#keydown);
         document.addEventListener("keyup", this.#keyup);
+        document.addEventListener("blur", this.#blur);
     }
 
     static deafen() {
         document.removeEventListener("keydown", this.#keydown);
         document.removeEventListener("keyup", this.#keyup);
+        document.removeEventListener("blur", this.#blur);
     }
 
     static onKeyChord(chord: string, run: (e: KeyboardEvent) => void) {

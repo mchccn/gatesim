@@ -1,3 +1,5 @@
+import { SandboxManager } from "./SandboxManager";
+
 export class DraggingManager {
     static #dragged: HTMLElement | undefined;
 
@@ -77,8 +79,23 @@ export class DraggingManager {
         this.#mouse.y = e.clientY;
 
         if (this.#dragged) {
-            this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
-            this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
+            //EXPERIMENTAL
+            const target = this.#dragged;
+            const prevLeft = target.style.left;
+            const prevTop = target.style.top;
+            console.log(prevLeft, prevTop);
+
+            SandboxManager.pushHistory(
+                () => {
+                    target.style.left = this.#mouse.x - this.#mouse.ox + "px";
+                    target.style.top = this.#mouse.y - this.#mouse.oy + "px";
+                },
+                () => {
+                    target.style.left = prevLeft;
+                    target.style.top = prevTop;
+                },
+            );
+            //END-EXPERIMENTAL
         }
     };
 
