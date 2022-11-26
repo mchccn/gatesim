@@ -2,6 +2,7 @@ import { ACTIVATED_CSS_COLOR } from "../constants";
 import { fromFile, saveDiagram } from "../files";
 import { html, Reified } from "../reified/Reified";
 import { DraggingManager } from "./DraggingManager";
+import { KeybindsManager } from "./KeybindsManager";
 import { MenuManager, MenuManagerActions } from "./MenuManager";
 import { MouseManager } from "./MouseManager";
 import { StorageManager } from "./StorageManager";
@@ -9,6 +10,7 @@ import { ToastManager } from "./ToastManager";
 import { Wiring, WiringManager } from "./WiringManager";
 
 type SandboxConfig = {
+    keybinds?: Record<string, (e: KeyboardEvent) => void>;
     menu?: MenuManagerActions;
     initial?: [components: Reified[], wires: Wiring[]];
     limits?: ({ type: "INPUT" | "OUTPUT"; count: number } | { type: "COMPONENT"; name?: string; count: number })[];
@@ -24,6 +26,9 @@ export class SandboxManager {
 
     static #observer: MutationObserver | undefined;
 
+    static #history = new Array<[command: () => void, redo: () => void]>();
+    static #redos = new Array<[command: () => void, redo: () => void]>();
+
     static setup(config: SandboxConfig) {
         document.body.innerHTML = "";
 
@@ -33,10 +38,14 @@ export class SandboxManager {
         document.body.appendChild(html`<div class="toasts-container"></div>`);
 
         MouseManager.start();
+        KeybindsManager.listen();
         DraggingManager.listen();
         WiringManager.start();
 
         if (typeof config.menu !== "undefined") [this.queueNewContext] = MenuManager.use(Reified.root, config.menu);
+
+        if (typeof config.keybinds !== "undefined")
+            Object.entries(config.keybinds).forEach(([chord, run]) => KeybindsManager.onKeyChord(chord, run));
 
         if (typeof config.initial !== "undefined") {
             this.clear();
@@ -83,9 +92,7 @@ export class SandboxManager {
         }
 
         //TODO: Implement undo/redo
-        this.#observer = new MutationObserver((records) => {
-            console.log(records);
-
+        this.#observer = new MutationObserver(() => {
             if (typeof config.save !== "undefined")
                 StorageManager.set("saves:" + config.save, saveDiagram([...Reified.active], [...WiringManager.wires]));
         });
@@ -110,6 +117,7 @@ export class SandboxManager {
         }
 
         MouseManager.reset();
+        KeybindsManager.reset();
         DraggingManager.reset();
         WiringManager.stop();
 
@@ -128,5 +136,41 @@ export class SandboxManager {
         Reified.active.forEach((component) => component.detach());
 
         WiringManager.wires.forEach((wire) => wire.destroy());
+    }
+
+    static pushHistory(command: () => void, undo: () => void) {
+        this.#redos.length = 0;
+
+        this.#history.push([command, undo]);
+    }
+
+    static popHistory() {
+        if (!this.#history.length)
+            return void ToastManager.toast({
+                message: "Nothing to undo.",
+                color: ACTIVATED_CSS_COLOR,
+                duration: 2500,
+            });
+
+        const [redo, undo] = this.#history.pop()!;
+
+        this.#redos.push([redo, undo]);
+
+        return undo.call(undefined);
+    }
+
+    static redoHistory() {
+        if (!this.#redos.length)
+            return void ToastManager.toast({
+                message: "Nothing to redo.",
+                color: ACTIVATED_CSS_COLOR,
+                duration: 2500,
+            });
+
+        const [command, undo] = this.#redos.pop()!;
+
+        this.#history.push([command, undo]);
+
+        return command.call(undefined);
     }
 }
