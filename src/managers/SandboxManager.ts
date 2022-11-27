@@ -130,6 +130,20 @@ export class SandboxManager {
                         return false;
                     }
 
+                    if (
+                        item instanceof Component &&
+                        totals.chips.has(item.chip.name) &&
+                        totals.chips.get(item.chip.name)! > (this.#config.limits?.chips?.[item.chip.name] ?? Infinity)
+                    ) {
+                        ToastManager.toast({
+                            message: `Exceeded total '${item.chip.name}' limit.`,
+                            color: ACTIVATED_CSS_COLOR,
+                            duration: 2500,
+                        });
+
+                        return false;
+                    }
+
                     return true;
                 })
                 .addAll(components);

@@ -196,7 +196,6 @@ export const menu: MenuManagerActions = [
                     keybinds,
                     menu,
                     save: "sandbox",
-                    limits: { componentsTotal: 6, inputs: 2, outputs: 1, wirings: 4 },
                     initial: [components!, wires!],
                     overrideSaveIfExists: true,
                 });
