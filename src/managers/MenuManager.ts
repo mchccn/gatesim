@@ -15,6 +15,8 @@ export type MenuManagerActions = Array<Record<string, { label: string; callback:
 export class MenuManager {
     static readonly #elements = new Map<HTMLElement, MenuManagerContext>();
 
+    static #opened: MouseEvent;
+
     static use(element: HTMLElement, actions: MenuManagerActions) {
         const menu = html`
             <div class="contextmenu">
@@ -45,8 +47,10 @@ export class MenuManager {
                 Object.keys(record).forEach((key) => {
                     const click = record[key].callback.bind(undefined);
 
-                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("click", click);
-                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("contextmenu", click);
+                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("click", () => click(this.#opened));
+                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("contextmenu", () =>
+                        click(this.#opened),
+                    );
 
                     clicks.set(key, clicks);
                 });
@@ -75,8 +79,10 @@ export class MenuManager {
 
         document.body.appendChild(menu);
 
-        const mousedown = () => {
+        const mousedown = (e: MouseEvent) => {
             setup(getActions());
+
+            this.#opened = e;
 
             menu.style.left = "0px";
             menu.style.top = "0px";
