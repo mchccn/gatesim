@@ -37,6 +37,8 @@ export class Input extends Reified {
                 "delete-input": {
                     label: "Delete input",
                     callback: () => {
+                        Reified.active.delete(this);
+
                         this.detach();
 
                         WiringManager.wires.forEach((wire) => {

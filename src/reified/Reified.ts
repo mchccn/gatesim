@@ -1,3 +1,5 @@
+import { WatchedSet } from "../augments/WatchedSet";
+
 export function html(template: TemplateStringsArray, ...values: unknown[]): HTMLElement;
 export function html(html: string): HTMLElement;
 export function html(...args: [string] | [TemplateStringsArray, ...unknown[]]) {
@@ -14,7 +16,7 @@ export function preventDefault(e: Event) {
 }
 
 export abstract class Reified {
-    static active = new Set<Reified>();
+    static active = new WatchedSet<Reified>();
 
     static get root() {
         return document.querySelector<HTMLElement>(".reified-root")!;
@@ -28,16 +30,12 @@ export abstract class Reified {
     }
 
     attach() {
-        Reified.active.add(this);
-
         Reified.root.appendChild(this.element);
 
         return this;
     }
 
     detach() {
-        Reified.active.delete(this);
-
         this.element.remove();
 
         return this;

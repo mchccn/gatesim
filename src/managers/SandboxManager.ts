@@ -1,5 +1,9 @@
+import { WatchedSet } from "../augments/WatchedSet";
 import { ACTIVATED_CSS_COLOR } from "../constants";
 import { fromFile, saveDiagram } from "../files";
+import { Component } from "../reified/Component";
+import { Input } from "../reified/Input";
+import { Output } from "../reified/Output";
 import { html, Reified } from "../reified/Reified";
 import { DraggingManager } from "./DraggingManager";
 import { KeybindsManager } from "./KeybindsManager";
@@ -13,11 +17,43 @@ type SandboxConfig = {
     keybinds?: Record<string, (e: KeyboardEvent) => void>;
     menu?: MenuManagerActions;
     initial?: [components: Reified[], wires: Wiring[]];
-    limits?: ({ type: "INPUT" | "OUTPUT"; count: number } | { type: "COMPONENT"; name?: string; count: number })[];
+    limits?: {
+        inputs?: number;
+        outputs?: number;
+        wirings?: number;
+        chips?: Record<string, number>;
+        chipsTotal?: number;
+        componentsTotal?: number;
+    };
     states?: { inputs?: boolean[]; outputs?: boolean[]; callback: () => void }[];
     save?: string;
     overrideSaveIfExists?: boolean;
 };
+
+const calculateReifiedTotals = (set: Set<Reified>) =>
+    [...set].reduce(
+        (map, item) => {
+            if (item instanceof Input) {
+                map.inputsTotal++;
+            } else if (item instanceof Output) {
+                map.outputsTotal++;
+            } else if (item instanceof Component) {
+                map.chipsTotal++;
+
+                map.chips.set(item.chip.name, (map.chips.get(item.chip.name) ?? 0) + 1);
+            } else {
+                throw new Error("Unknown component type.");
+            }
+
+            return map;
+        },
+        {
+            inputsTotal: 0,
+            outputsTotal: 0,
+            chipsTotal: 0,
+            chips: new Map<string, number>(),
+        },
+    );
 
 export class SandboxManager {
     static queueNewContext: ReturnType<typeof MenuManager["use"]>[0];
@@ -29,7 +65,11 @@ export class SandboxManager {
     static #history = new Array<[command: () => void, redo: () => void]>();
     static #redos = new Array<[command: () => void, redo: () => void]>();
 
+    static #config: SandboxConfig;
+
     static setup(config: SandboxConfig) {
+        this.#config = config;
+
         document.body.innerHTML = "";
 
         document.body.appendChild(html`<div class="modal-container modal-inactive"></div>`);
@@ -42,23 +82,93 @@ export class SandboxManager {
         DraggingManager.listen();
         WiringManager.start();
 
-        if (typeof config.menu !== "undefined") [this.queueNewContext] = MenuManager.use(Reified.root, config.menu);
+        const createReifiedActive = (components: Reified[]) =>
+            new WatchedSet<Reified>()
+                .onAdd((item, set) => {
+                    const totals = calculateReifiedTotals(set.clone().add(item));
 
-        if (typeof config.keybinds !== "undefined")
-            Object.entries(config.keybinds).forEach(([chord, run]) => KeybindsManager.onKeyChord(chord, run));
+                    if (
+                        totals.chipsTotal + totals.inputsTotal + totals.outputsTotal >
+                        (this.#config.limits?.componentsTotal ?? Infinity)
+                    ) {
+                        ToastManager.toast({
+                            message: "Exceeded total components limit.",
+                            color: ACTIVATED_CSS_COLOR,
+                            duration: 2500,
+                        });
 
-        if (typeof config.initial !== "undefined") {
+                        return false;
+                    }
+
+                    if (totals.inputsTotal > (this.#config.limits?.inputs ?? Infinity)) {
+                        ToastManager.toast({
+                            message: "Exceeded total inputs limit.",
+                            color: ACTIVATED_CSS_COLOR,
+                            duration: 2500,
+                        });
+
+                        return false;
+                    }
+
+                    if (totals.outputsTotal > (this.#config.limits?.outputs ?? Infinity)) {
+                        ToastManager.toast({
+                            message: "Exceeded total outputs limit.",
+                            color: ACTIVATED_CSS_COLOR,
+                            duration: 2500,
+                        });
+
+                        return false;
+                    }
+
+                    if (totals.chipsTotal > (this.#config.limits?.chipsTotal ?? Infinity)) {
+                        ToastManager.toast({
+                            message: "Exceeded total chips limit.",
+                            color: ACTIVATED_CSS_COLOR,
+                            duration: 2500,
+                        });
+
+                        return false;
+                    }
+
+                    return true;
+                })
+                .addAll(components);
+
+        const createWiringsSet = (wirings: Wiring[]) =>
+            new WatchedSet<Wiring>()
+                .onAdd((_, set) => {
+                    if (set.size + 1 > (this.#config.limits?.wirings ?? Infinity)) {
+                        ToastManager.toast({
+                            message: "Exceeded total wirings limit.",
+                            color: ACTIVATED_CSS_COLOR,
+                            duration: 2500,
+                        });
+
+                        return false;
+                    }
+
+                    return true;
+                })
+                .addAll(wirings);
+
+        if (typeof this.#config.menu !== "undefined")
+            [this.queueNewContext] = MenuManager.use(Reified.root, this.#config.menu);
+
+        if (typeof this.#config.keybinds !== "undefined")
+            Object.entries(this.#config.keybinds).forEach(([chord, run]) => KeybindsManager.onKeyChord(chord, run));
+
+        if (typeof this.#config.initial !== "undefined") {
             this.clear();
 
-            Reified.active = new Set(config.initial[0]);
+            Reified.active = createReifiedActive(this.#config.initial[0]);
 
             Reified.active.forEach((component) => component.attach());
 
-            WiringManager.wires = new Set(config.initial[1]);
+            WiringManager.wires = createWiringsSet(this.#config.initial[1]);
         }
 
-        if (typeof config.save !== "undefined") {
-            const file = StorageManager.get<string>("saves:" + config.save);
+        if (typeof this.#config.save !== "undefined") {
+            const file = StorageManager.get<string>("saves:" + this.#config.save);
 
             if (file) {
                 const {
@@ -67,24 +177,26 @@ export class SandboxManager {
                 } = fromFile(file);
 
                 if (error) {
+                    StorageManager.delete("saves:" + this.#config.save);
+
                     ToastManager.toast({
                         message: "Unable to read from saves.",
                         color: ACTIVATED_CSS_COLOR,
                         duration: 2500,
                     });
                 } else {
-                    if (!config.overrideSaveIfExists) {
+                    if (!this.#config.overrideSaveIfExists) {
                         this.clear();
 
-                        Reified.active = new Set(components);
+                        Reified.active = createReifiedActive(components!);
 
                         Reified.active.forEach((component) => component.attach());
 
-                        WiringManager.wires = new Set(wires);
+                        WiringManager.wires = createWiringsSet(wires!);
                     }
 
                     StorageManager.set(
-                        "saves:" + config.save,
+                        "saves:" + this.#config.save,
                         saveDiagram([...Reified.active], [...WiringManager.wires]),
                     );
                 }
@@ -92,8 +204,11 @@ export class SandboxManager {
         }
 
         this.#observer = new MutationObserver(() => {
-            if (typeof config.save !== "undefined")
-                StorageManager.set("saves:" + config.save, saveDiagram([...Reified.active], [...WiringManager.wires]));
+            if (typeof this.#config.save !== "undefined")
+                StorageManager.set(
+                    "saves:" + this.#config.save,
+                    saveDiagram([...Reified.active], [...WiringManager.wires]),
+                );
         });
 
         this.#observer.observe(Reified.root, {
@@ -129,6 +244,8 @@ export class SandboxManager {
         this.watchedUnresolvedPromises.clear();
 
         document.body.innerHTML = "";
+
+        this.#config = {};
     }
 
     static clear() {

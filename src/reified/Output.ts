@@ -12,6 +12,8 @@ export class Output extends Reified {
                 "delete-output": {
                     label: "Delete output",
                     callback: () => {
+                        Reified.active.delete(this);
+
                         this.detach();
 
                         WiringManager.wires.forEach((wire) => {

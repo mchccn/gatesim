@@ -6,10 +6,12 @@ import {
     OUTPUT_COMPONENT_CSS_SIZE,
 } from "./constants";
 import { fromFile, saveDiagram } from "./files";
+import { keybinds } from "./keybinds";
 import { DraggingManager } from "./managers/DraggingManager";
 import { MenuManagerActions } from "./managers/MenuManager";
 import { ModalManager } from "./managers/ModalManager";
 import { SandboxManager } from "./managers/SandboxManager";
+import { StorageManager } from "./managers/StorageManager";
 import { ToastManager } from "./managers/ToastManager";
 import { WiringManager } from "./managers/WiringManager";
 import { chips } from "./reified/chips";
@@ -35,16 +37,18 @@ export const menu: MenuManagerActions = [
 
                 Reified.active.add(component);
 
-                component.attach();
+                if (Reified.active.has(component)) {
+                    component.attach();
 
-                DraggingManager.watch(component.element, component.name);
+                    DraggingManager.watch(component.element, component.name);
 
-                const { width, height } = getComputedStyle(component.element);
+                    const { width, height } = getComputedStyle(component.element);
 
-                component.move({
-                    x: e.clientX - parseFloat(width) / 2,
-                    y: e.clientY - parseFloat(height) / 2,
-                });
+                    component.move({
+                        x: e.clientX - parseFloat(width) / 2,
+                        y: e.clientY - parseFloat(height) / 2,
+                    });
+                }
 
                 return;
             },
@@ -61,7 +65,9 @@ export const menu: MenuManagerActions = [
 
                 Reified.active.add(input);
 
-                input.attach();
+                if (Reified.active.has(input)) {
+                    input.attach();
+                }
             },
         },
         "new-output": {
@@ -74,7 +80,9 @@ export const menu: MenuManagerActions = [
 
                 Reified.active.add(output);
 
-                output.attach();
+                if (Reified.active.has(output)) {
+                    output.attach();
+                }
             },
         },
     },
@@ -185,11 +193,15 @@ export const menu: MenuManagerActions = [
                 SandboxManager.reset();
 
                 SandboxManager.setup({
+                    keybinds,
                     menu,
-                    initial: [components!, wires!],
                     save: "sandbox",
+                    limits: { componentsTotal: 6, inputs: 2, outputs: 1, wirings: 4 },
+                    initial: [components!, wires!],
                     overrideSaveIfExists: true,
                 });
+
+                StorageManager.set("saves:" + "sandbox", saveDiagram([...Reified.active], [...WiringManager.wires]));
             },
         },
     },

@@ -12,4 +12,12 @@ export class StorageManager {
     static get<T>(key: string): T | undefined {
         return JSON.parse(this.storage.getItem(this.prefix + key)!) ?? undefined;
     }
+
+    static delete(key: string) {
+        if (this.storage.getItem(this.prefix + key) === null) return false;
+
+        this.storage.removeItem(this.prefix + key);
+
+        return true;
+    }
 }

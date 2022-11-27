@@ -1,3 +1,4 @@
+import { WatchedSet } from "../augments/WatchedSet";
 import { ACTIVATED_CSS_COLOR, LIGHT_GRAY_CSS_COLOR } from "../constants";
 import { MouseManager } from "./MouseManager";
 
@@ -50,7 +51,7 @@ export class Wiring {
 export class WiringManager {
     static #rAF: number | undefined = -1;
 
-    static wires = new Set<Wiring>();
+    static wires = new WatchedSet<Wiring>();
 
     static update() {
         const ctx = document.querySelector("canvas")!.getContext("2d")!;
@@ -58,9 +59,13 @@ export class WiringManager {
         ctx.canvas.width = window.innerWidth;
         ctx.canvas.height = window.innerHeight;
 
-        this.wires = new Set([...this.wires].filter((wire) => !wire.destroyed));
-
         this.wires.forEach((wire) => {
+            if (wire.destroyed) {
+                this.wires.delete(wire);
+
+                return;
+            }
+
             const from = wire.from.getBoundingClientRect();
             const to = wire.to.getBoundingClientRect();
 

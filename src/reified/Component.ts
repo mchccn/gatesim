@@ -98,6 +98,8 @@ export class Component<I extends number, O extends number> extends Reified {
                     "delete-component": {
                         label: "Delete component",
                         callback: () => {
+                            Reified.active.delete(this);
+
                             this.detach();
 
                             WiringManager.wires.forEach((wire) => {
