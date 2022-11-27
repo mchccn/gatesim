@@ -1,6 +1,7 @@
 import { WatchedSet } from "../augments/WatchedSet";
 import { ACTIVATED_CSS_COLOR, LIGHT_GRAY_CSS_COLOR } from "../constants";
 import { MouseManager } from "./MouseManager";
+import { SandboxManager } from "./SandboxManager";
 
 export class NewWireContext {
     static from: HTMLElement | undefined;
@@ -15,7 +16,23 @@ export class NewWireContext {
                         target.classList.contains("board-output") ||
                         target.classList.contains("component-input-button")
                     ) {
-                        WiringManager.wires.add(new Wiring(NewWireContext.from, target));
+                        //TODO:
+                        const from = NewWireContext.from;
+
+                        SandboxManager.pushHistory(
+                            () => {
+                                WiringManager.wires.add(new Wiring(from, target));
+                            },
+                            () => {
+                                for (const wire of WiringManager.wires) {
+                                    if (wire.from === from && wire.to === target) {
+                                        WiringManager.wires.delete(wire);
+
+                                        break;
+                                    }
+                                }
+                            },
+                        );
                     }
                 }
 

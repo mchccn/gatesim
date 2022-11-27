@@ -233,7 +233,6 @@ export class SandboxManager {
             subtree: true,
         });
 
-        //TODO: Implement limits
         //TODO: Implement diagram state check callbacks
     }
 

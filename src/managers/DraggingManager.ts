@@ -23,6 +23,9 @@ export class DraggingManager {
 
             const body = this.#dragged.parentElement?.getBoundingClientRect() ?? new DOMRect();
 
+            this.#mouse.x = e.clientX;
+            this.#mouse.y = e.clientY;
+
             this.#mouse.ox = e.clientX - rect.left + body.left;
             this.#mouse.oy = e.clientY - rect.top + body.top;
 
@@ -83,10 +86,16 @@ export class DraggingManager {
     };
 
     static readonly #mousedown = (e: MouseEvent) => {
+        this.#mouse.x = e.clientX;
+        this.#mouse.y = e.clientY;
+
         this.#mouse.down = true;
     };
 
-    static readonly #mouseup = () => {
+    static readonly #mouseup = (e: MouseEvent) => {
+        this.#mouse.x = e.clientX;
+        this.#mouse.y = e.clientY;
+
         if (this.#dragged) {
             document.querySelectorAll<HTMLElement>('[data-dragged="true"]').forEach((e) => {
                 delete e.dataset.dragged;
@@ -101,8 +110,10 @@ export class DraggingManager {
 
                 SandboxManager.pushHistory(
                     () => {
-                        target.style.left = mouse.x - mouse.ox + "px";
-                        target.style.top = mouse.y - mouse.oy + "px";
+                        console.log(mouse);
+
+                        target.style.left = mouse.x - mouse.ox - 1 + "px";
+                        target.style.top = mouse.y - mouse.oy - 1 + "px";
                     },
                     () => {
                         target.style.left = original.x + "px";
