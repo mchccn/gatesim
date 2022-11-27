@@ -8,9 +8,32 @@ export class KeybindsManager {
     static #keydown = (e: KeyboardEvent) => {
         this.#keymap.set(e.code, true);
 
+        if (e.metaKey && (e.code === "ShiftLeft" || e.code === "ShiftRight") && IS_MAC_OS)
+            this.#keymap = new Map([...this.#keymap.entries()].filter(([key]) => !key.startsWith("Key")));
+
         if (document.activeElement === document.body) {
             const [, runs] =
-                this.#keychords.find(([chord]) => chord.split("+").every((key) => this.#keymap.get(key))) ?? [];
+                this.#keychords.find(([chord]) => {
+                    let keys = chord.split("+");
+
+                    const checkShift = keys.includes("ShiftLeft") || keys.includes("ShiftRight");
+                    const checkMeta = keys.includes("MetaLeft") || keys.includes("MetaRight");
+                    const checkAlt = keys.includes("AltLeft") || keys.includes("AltRight");
+                    const checkCtrl = keys.includes("ControlLeft") || keys.includes("ControlRight");
+
+                    if (checkShift) keys = keys.filter((key) => key !== "ShiftLeft" && key !== "ShiftRight");
+                    if (checkMeta) keys = keys.filter((key) => key !== "MetaLeft" && key !== "MetaRight");
+                    if (checkAlt) keys = keys.filter((key) => key !== "AltLeft" && key !== "AltRight");
+                    if (checkCtrl) keys = keys.filter((key) => key !== "ControlLeft" && key !== "ControlRight");
+
+                    return (
+                        keys.every((key) => this.#keymap.get(key)) &&
+                        (checkShift ? e.shiftKey : true) &&
+                        (checkMeta ? e.metaKey : true) &&
+                        (checkAlt ? e.altKey : true) &&
+                        (checkCtrl ? e.ctrlKey : true)
+                    );
+                }) ?? [];
 
             if (runs) runs.forEach((run) => run.call(undefined, e));
         }
@@ -20,8 +43,6 @@ export class KeybindsManager {
         this.#keymap.delete(e.code);
 
         if (!e.metaKey && (e.code === "MetaLeft" || e.code === "MetaRight") && IS_MAC_OS) this.#keymap.clear();
-        if (e.metaKey && (e.code === "ShiftLeft" || e.code === "ShiftRight") && IS_MAC_OS)
-            this.#keymap = new Map([...this.#keymap.entries()].filter(([key]) => !key.startsWith("Key")));
     };
 
     static #blur = () => {

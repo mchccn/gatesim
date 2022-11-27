@@ -3,15 +3,11 @@ import { SandboxManager } from "./SandboxManager";
 export class DraggingManager {
     static #dragged: HTMLElement | undefined;
 
-    static readonly #mouse = {
-        x: -1,
-        y: -1,
-        ox: -1,
-        oy: -1,
-        down: false,
-    };
-
     static readonly #watched = new Map();
+
+    static #mouse = { x: -1, y: -1, ox: -1, oy: -1, down: false };
+
+    static #original: { x: number; y: number } | undefined;
 
     static watch(element: HTMLElement, target = element) {
         element.dataset.watched = "true";
@@ -29,6 +25,8 @@ export class DraggingManager {
 
             this.#mouse.ox = e.clientX - rect.left + body.left;
             this.#mouse.oy = e.clientY - rect.top + body.top;
+
+            this.#original = { x: rect.left, y: rect.top };
         };
 
         target.addEventListener("mousedown", mousedown, { capture: true });
@@ -79,23 +77,8 @@ export class DraggingManager {
         this.#mouse.y = e.clientY;
 
         if (this.#dragged) {
-            //EXPERIMENTAL
-            const target = this.#dragged;
-            const prevLeft = target.style.left;
-            const prevTop = target.style.top;
-            console.log(prevLeft, prevTop);
-
-            SandboxManager.pushHistory(
-                () => {
-                    target.style.left = this.#mouse.x - this.#mouse.ox + "px";
-                    target.style.top = this.#mouse.y - this.#mouse.oy + "px";
-                },
-                () => {
-                    target.style.left = prevLeft;
-                    target.style.top = prevTop;
-                },
-            );
-            //END-EXPERIMENTAL
+            this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
+            this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
         }
     };
 
@@ -110,16 +93,29 @@ export class DraggingManager {
 
                 e.style.cursor = "";
             });
+
+            if (this.#original) {
+                const target = this.#dragged;
+                const mouse = this.#mouse;
+                const original = this.#original;
+
+                SandboxManager.pushHistory(
+                    () => {
+                        target.style.left = mouse.x - mouse.ox + "px";
+                        target.style.top = mouse.y - mouse.oy + "px";
+                    },
+                    () => {
+                        target.style.left = original.x + "px";
+                        target.style.top = original.y + "px";
+                    },
+                );
+            }
         }
 
-        this.#mouse.down = false;
-
-        this.#mouse.x = -1;
-        this.#mouse.y = -1;
-
-        this.#mouse.ox = -1;
-        this.#mouse.oy = -1;
+        this.#mouse = { x: -1, y: -1, ox: -1, oy: -1, down: false };
 
         this.#dragged = undefined;
+
+        this.#original = undefined;
     };
 }

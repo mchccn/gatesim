@@ -6,7 +6,6 @@
 
 -   add puzzles/exercises
 
-    -   need some API to create limited playgrounds
-    -   limitations and validity of solution
+    -   check validity of solution
 
 -   change everything to command/undo pattern
