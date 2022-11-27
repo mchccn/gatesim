@@ -110,8 +110,6 @@ export class DraggingManager {
 
                 SandboxManager.pushHistory(
                     () => {
-                        console.log(mouse);
-
                         target.style.left = mouse.x - mouse.ox - 1 + "px";
                         target.style.top = mouse.y - mouse.oy - 1 + "px";
                     },

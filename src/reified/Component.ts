@@ -1,6 +1,6 @@
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
-import { NewWireContext, WiringManager } from "../managers/WiringManager";
+import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
 import { Chip } from "./chips";
 import { html, Reified } from "./Reified";
 
@@ -51,11 +51,26 @@ export class Component<I extends number, O extends number> extends Reified {
                         "delete-connections": {
                             label: "Delete connections",
                             callback: () => {
-                                WiringManager.wires.forEach((wire) => {
-                                    if (wire.to === input) wire.destroy();
-                                });
+                                const deleted: Element[] = [];
 
-                                input.classList.remove("activated");
+                                SandboxManager.pushHistory(
+                                    () => {
+                                        WiringManager.wires.forEach((wire) => {
+                                            if (wire.to === input) {
+                                                wire.destroy();
+
+                                                deleted.push(wire.from);
+                                            }
+                                        });
+
+                                        input.classList.remove("activated");
+                                    },
+                                    () => {
+                                        WiringManager.wires.addAll(
+                                            deleted.splice(0, deleted.length).map((from) => new Wiring(from, input)),
+                                        );
+                                    },
+                                );
                             },
                         },
                     },
@@ -77,13 +92,26 @@ export class Component<I extends number, O extends number> extends Reified {
                         "delete-connections": {
                             label: "Delete connections",
                             callback: () => {
-                                WiringManager.wires.forEach((wire) => {
-                                    if (wire.from === output) {
-                                        wire.destroy();
+                                const deleted: Element[] = [];
 
-                                        wire.to.classList.remove("activated");
-                                    }
-                                });
+                                SandboxManager.pushHistory(
+                                    () => {
+                                        WiringManager.wires.forEach((wire) => {
+                                            if (wire.from === output) {
+                                                wire.destroy();
+
+                                                wire.to.classList.remove("activated");
+
+                                                deleted.push(wire.to);
+                                            }
+                                        });
+                                    },
+                                    () => {
+                                        WiringManager.wires.addAll(
+                                            deleted.splice(0, deleted.length).map((to) => new Wiring(output, to)),
+                                        );
+                                    },
+                                );
                             },
                         },
                     },
@@ -98,39 +126,69 @@ export class Component<I extends number, O extends number> extends Reified {
                     "delete-component": {
                         label: "Delete component",
                         callback: () => {
-                            Reified.active.delete(this);
+                            const deleted: [from: Element, to: Element][] = [];
 
-                            this.detach();
+                            SandboxManager.pushHistory(
+                                () => {
+                                    Reified.active.delete(this);
 
-                            WiringManager.wires.forEach((wire) => {
-                                if (
-                                    this.inputs.some((i) => wire.to === i) ||
-                                    this.outputs.some((o) => wire.from === o)
-                                ) {
-                                    wire.destroy();
+                                    this.detach();
 
-                                    wire.to.classList.remove("activated");
-                                }
-                            });
+                                    WiringManager.wires.forEach((wire) => {
+                                        if (
+                                            this.inputs.some((i) => wire.to === i) ||
+                                            this.outputs.some((o) => wire.from === o)
+                                        ) {
+                                            wire.destroy();
 
-                            this.inputs.forEach((i) => i.classList.remove("activated"));
+                                            wire.to.classList.remove("activated");
+
+                                            deleted.push([wire.from, wire.to]);
+                                        }
+                                    });
+
+                                    this.inputs.forEach((i) => i.classList.remove("activated"));
+                                },
+                                () => {
+                                    Reified.active.add(this);
+
+                                    this.attach();
+
+                                    WiringManager.wires.addAll(
+                                        deleted.splice(0, deleted.length).map(([from, to]) => new Wiring(from, to)),
+                                    );
+                                },
+                            );
                         },
                     },
                     "delete-connections": {
                         label: "Delete connections",
                         callback: () => {
-                            WiringManager.wires.forEach((wire) => {
-                                if (
-                                    this.inputs.some((i) => wire.to === i) ||
-                                    this.outputs.some((o) => wire.from === o)
-                                ) {
-                                    wire.destroy();
+                            const deleted: [from: Element, to: Element][] = [];
 
-                                    wire.to.classList.remove("activated");
-                                }
-                            });
+                            SandboxManager.pushHistory(
+                                () => {
+                                    WiringManager.wires.forEach((wire) => {
+                                        if (
+                                            this.inputs.some((i) => wire.to === i) ||
+                                            this.outputs.some((o) => wire.from === o)
+                                        ) {
+                                            wire.destroy();
 
-                            this.inputs.forEach((i) => i.classList.remove("activated"));
+                                            wire.to.classList.remove("activated");
+
+                                            deleted.push([wire.from, wire.to]);
+                                        }
+                                    });
+
+                                    this.inputs.forEach((i) => i.classList.remove("activated"));
+                                },
+                                () => {
+                                    WiringManager.wires.addAll(
+                                        deleted.splice(0, deleted.length).map(([from, to]) => new Wiring(from, to)),
+                                    );
+                                },
+                            );
                         },
                     },
                 },

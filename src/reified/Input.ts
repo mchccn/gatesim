@@ -1,6 +1,6 @@
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
-import { NewWireContext, WiringManager } from "../managers/WiringManager";
+import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
 import { html, Reified } from "./Reified";
 
 export class Input extends Reified {
@@ -46,29 +46,59 @@ export class Input extends Reified {
                 "delete-input": {
                     label: "Delete input",
                     callback: () => {
-                        Reified.active.delete(this);
+                        const deleted: Element[] = [];
 
-                        this.detach();
+                        SandboxManager.pushHistory(
+                            () => {
+                                Reified.active.delete(this);
 
-                        WiringManager.wires.forEach((wire) => {
-                            if (wire.from === this.element) {
-                                wire.destroy();
+                                this.detach();
 
-                                wire.to.classList.remove("activated");
-                            }
-                        });
+                                WiringManager.wires.forEach((wire) => {
+                                    if (wire.from === this.element) {
+                                        wire.destroy();
+
+                                        wire.to.classList.remove("activated");
+
+                                        deleted.push(wire.to);
+                                    }
+                                });
+                            },
+                            () => {
+                                Reified.active.add(this);
+
+                                this.attach();
+
+                                WiringManager.wires.addAll(
+                                    deleted.splice(0, deleted.length).map((to) => new Wiring(this.element, to)),
+                                );
+                            },
+                        );
                     },
                 },
                 "delete-connections": {
                     label: "Delete connections",
                     callback: () => {
-                        WiringManager.wires.forEach((wire) => {
-                            if (wire.from === this.element) {
-                                wire.destroy();
+                        const deleted: Element[] = [];
 
-                                wire.to.classList.remove("activated");
-                            }
-                        });
+                        SandboxManager.pushHistory(
+                            () => {
+                                WiringManager.wires.forEach((wire) => {
+                                    if (wire.from === this.element) {
+                                        wire.destroy();
+
+                                        wire.to.classList.remove("activated");
+
+                                        deleted.push(wire.to);
+                                    }
+                                });
+                            },
+                            () => {
+                                WiringManager.wires.addAll(
+                                    deleted.splice(0, deleted.length).map((to) => new Wiring(this.element, to)),
+                                );
+                            },
+                        );
                     },
                 },
             },

@@ -1,6 +1,6 @@
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
-import { WiringManager } from "../managers/WiringManager";
+import { Wiring, WiringManager } from "../managers/WiringManager";
 import { html, Reified } from "./Reified";
 
 export class Output extends Reified {
@@ -12,25 +12,59 @@ export class Output extends Reified {
                 "delete-output": {
                     label: "Delete output",
                     callback: () => {
-                        Reified.active.delete(this);
+                        const deleted: Element[] = [];
 
-                        this.detach();
+                        SandboxManager.pushHistory(
+                            () => {
+                                Reified.active.delete(this);
 
-                        WiringManager.wires.forEach((wire) => {
-                            if (wire.to === this.element) wire.destroy();
-                        });
+                                this.detach();
 
-                        this.element.classList.remove("activated");
+                                WiringManager.wires.forEach((wire) => {
+                                    if (wire.to === this.element) {
+                                        wire.destroy();
+
+                                        deleted.push(wire.from);
+                                    }
+                                });
+
+                                this.element.classList.remove("activated");
+                            },
+                            () => {
+                                Reified.active.add(this);
+
+                                this.attach();
+
+                                WiringManager.wires.addAll(
+                                    deleted.splice(0, deleted.length).map((from) => new Wiring(from, this.element)),
+                                );
+                            },
+                        );
                     },
                 },
                 "delete-connections": {
                     label: "Delete connections",
                     callback: () => {
-                        WiringManager.wires.forEach((wire) => {
-                            if (wire.to === this.element) wire.destroy();
-                        });
+                        const deleted: Element[] = [];
 
-                        this.element.classList.remove("activated");
+                        SandboxManager.pushHistory(
+                            () => {
+                                WiringManager.wires.forEach((wire) => {
+                                    if (wire.to === this.element) {
+                                        wire.destroy();
+
+                                        deleted.push(wire.from);
+                                    }
+                                });
+
+                                this.element.classList.remove("activated");
+                            },
+                            () => {
+                                WiringManager.wires.addAll(
+                                    deleted.splice(0, deleted.length).map((from) => new Wiring(from, this.element)),
+                                );
+                            },
+                        );
                     },
                 },
             },
