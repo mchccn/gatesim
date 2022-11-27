@@ -7,7 +7,6 @@ import {
 } from "./constants";
 import { fromFile, saveDiagram } from "./files";
 import { keybinds } from "./keybinds";
-import { DraggingManager } from "./managers/DraggingManager";
 import { MenuManagerActions } from "./managers/MenuManager";
 import { ModalManager } from "./managers/ModalManager";
 import { SandboxManager } from "./managers/SandboxManager";
@@ -35,22 +34,27 @@ export const menu: MenuManagerActions = [
 
                 const component = new Component(Reflect.construct(chip, []), ORIGIN_POINT);
 
-                Reified.active.add(component);
+                return SandboxManager.pushHistory(
+                    () => {
+                        Reified.active.add(component);
 
-                if (Reified.active.has(component)) {
-                    component.attach();
+                        if (Reified.active.has(component)) {
+                            component.attach();
 
-                    DraggingManager.watch(component.element, component.name);
+                            const { width, height } = getComputedStyle(component.element);
 
-                    const { width, height } = getComputedStyle(component.element);
+                            component.move({
+                                x: e.clientX - parseFloat(width) / 2,
+                                y: e.clientY - parseFloat(height) / 2,
+                            });
+                        }
+                    },
+                    () => {
+                        Reified.active.delete(component);
 
-                    component.move({
-                        x: e.clientX - parseFloat(width) / 2,
-                        y: e.clientY - parseFloat(height) / 2,
-                    });
-                }
-
-                return;
+                        component.detach();
+                    },
+                );
             },
         },
     },
@@ -63,11 +67,20 @@ export const menu: MenuManagerActions = [
                     y: e.clientY - INPUT_COMPONENT_CSS_SIZE / 2,
                 });
 
-                Reified.active.add(input);
+                return SandboxManager.pushHistory(
+                    () => {
+                        Reified.active.add(input);
 
-                if (Reified.active.has(input)) {
-                    input.attach();
-                }
+                        if (Reified.active.has(input)) {
+                            input.attach();
+                        }
+                    },
+                    () => {
+                        Reified.active.delete(input);
+
+                        input.detach();
+                    },
+                );
             },
         },
         "new-output": {
@@ -78,11 +91,20 @@ export const menu: MenuManagerActions = [
                     y: e.clientY - OUTPUT_COMPONENT_CSS_SIZE / 2,
                 });
 
-                Reified.active.add(output);
+                return SandboxManager.pushHistory(
+                    () => {
+                        Reified.active.add(output);
 
-                if (Reified.active.has(output)) {
-                    output.attach();
-                }
+                        if (Reified.active.has(output)) {
+                            output.attach();
+                        }
+                    },
+                    () => {
+                        Reified.active.delete(output);
+
+                        output.detach();
+                    },
+                );
             },
         },
     },

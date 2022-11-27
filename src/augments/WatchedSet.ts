@@ -56,7 +56,14 @@ export class WatchedSet<T> extends Set<T> {
         return results.some((out) => out === false) ? false : super.delete(item);
     }
 
-    clone() {
-        return new WatchedSet(this);
+    clone(withListeners?: boolean) {
+        const set = new WatchedSet(this);
+
+        if (withListeners) {
+            this.#adds.forEach((run) => set.onAdd(run));
+            this.#deletes.forEach((run) => set.onDelete(run));
+        }
+
+        return set;
     }
 }

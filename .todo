@@ -9,3 +9,5 @@
     -   check validity of solution
 
 -   change everything to command/undo pattern
+
+    -   listen to keys globally

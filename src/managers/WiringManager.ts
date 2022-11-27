@@ -16,7 +16,6 @@ export class NewWireContext {
                         target.classList.contains("board-output") ||
                         target.classList.contains("component-input-button")
                     ) {
-                        //TODO:
                         const from = NewWireContext.from;
 
                         SandboxManager.pushHistory(

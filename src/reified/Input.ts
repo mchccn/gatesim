@@ -22,7 +22,6 @@ export class Input extends Reified {
     readonly #click = (e: MouseEvent) => {
         if (Math.hypot(e.clientX - +this.element.dataset.x!, e.clientY - +this.element.dataset.y!) > 2) return;
 
-        //TODO:
         const active = this.element.classList.contains("activated");
 
         SandboxManager.pushHistory(

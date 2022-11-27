@@ -259,6 +259,9 @@ export class SandboxManager {
         document.body.innerHTML = "";
 
         this.#config = {};
+
+        this.#history = [];
+        this.#redos = [];
     }
 
     static clear() {
