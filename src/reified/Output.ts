@@ -1,5 +1,7 @@
+import { ACTIVATED_CSS_COLOR } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
+import { ToastManager } from "../managers/ToastManager";
 import { Wiring, WiringManager } from "../managers/WiringManager";
 import { html, Reified } from "./Reified";
 
@@ -16,9 +18,16 @@ export class Output extends Reified {
                 "delete-output": {
                     label: "Delete output",
                     callback: () => {
+                        if (this.PERMANENT)
+                            return void ToastManager.toast({
+                                message: "This output is permanent and cannot be deleted.",
+                                color: ACTIVATED_CSS_COLOR,
+                                duration: 2500,
+                            });
+
                         const deleted: Element[] = [];
 
-                        SandboxManager.pushHistory(
+                        return SandboxManager.pushHistory(
                             () => {
                                 Reified.active.delete(this);
 
@@ -51,7 +60,7 @@ export class Output extends Reified {
                     callback: () => {
                         const deleted: Element[] = [];
 
-                        SandboxManager.pushHistory(
+                        return SandboxManager.pushHistory(
                             () => {
                                 WiringManager.wires.forEach((wire) => {
                                     if (wire.to === this.element) {

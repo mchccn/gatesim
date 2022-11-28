@@ -1,5 +1,7 @@
+import { ACTIVATED_CSS_COLOR } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
+import { ToastManager } from "../managers/ToastManager";
 import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
 import { Chip } from "./chips";
 import { html, Reified } from "./Reified";
@@ -56,7 +58,7 @@ export class Component<I extends number, O extends number> extends Reified {
                             callback: () => {
                                 const deleted: Element[] = [];
 
-                                SandboxManager.pushHistory(
+                                return SandboxManager.pushHistory(
                                     () => {
                                         WiringManager.wires.forEach((wire) => {
                                             if (wire.to === input) {
@@ -99,7 +101,7 @@ export class Component<I extends number, O extends number> extends Reified {
                             callback: () => {
                                 const deleted: Element[] = [];
 
-                                SandboxManager.pushHistory(
+                                return SandboxManager.pushHistory(
                                     () => {
                                         WiringManager.wires.forEach((wire) => {
                                             if (wire.from === output) {
@@ -131,9 +133,16 @@ export class Component<I extends number, O extends number> extends Reified {
                     "delete-component": {
                         label: "Delete component",
                         callback: () => {
+                            if (this.PERMANENT)
+                                return void ToastManager.toast({
+                                    message: "This component is permanent and cannot be deleted.",
+                                    color: ACTIVATED_CSS_COLOR,
+                                    duration: 2500,
+                                });
+
                             const deleted: [from: Element, to: Element][] = [];
 
-                            SandboxManager.pushHistory(
+                            return SandboxManager.pushHistory(
                                 () => {
                                     Reified.active.delete(this);
 
@@ -171,7 +180,7 @@ export class Component<I extends number, O extends number> extends Reified {
                         callback: () => {
                             const deleted: [from: Element, to: Element][] = [];
 
-                            SandboxManager.pushHistory(
+                            return SandboxManager.pushHistory(
                                 () => {
                                     WiringManager.wires.forEach((wire) => {
                                         if (

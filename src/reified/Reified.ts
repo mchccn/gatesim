@@ -16,6 +16,8 @@ export function preventDefault(e: Event) {
 }
 
 export abstract class Reified {
+    protected PERMANENT = false;
+
     static active = new WatchedSet<Reified>();
 
     static get root() {
@@ -37,6 +39,12 @@ export abstract class Reified {
 
     detach() {
         this.element.remove();
+
+        return this;
+    }
+
+    permanent() {
+        this.PERMANENT = true;
 
         return this;
     }

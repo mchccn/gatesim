@@ -1,5 +1,7 @@
+import { ACTIVATED_CSS_COLOR } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
+import { ToastManager } from "../managers/ToastManager";
 import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
 import { html, Reified } from "./Reified";
 
@@ -28,7 +30,7 @@ export class Input extends Reified {
 
         const active = this.element.classList.contains("activated");
 
-        SandboxManager.pushHistory(
+        return SandboxManager.pushHistory(
             () => {
                 this.element.classList.toggle("activated", !active);
             },
@@ -50,9 +52,16 @@ export class Input extends Reified {
                 "delete-input": {
                     label: "Delete input",
                     callback: () => {
+                        if (this.PERMANENT)
+                            return void ToastManager.toast({
+                                message: "This input is permanent and cannot be deleted.",
+                                color: ACTIVATED_CSS_COLOR,
+                                duration: 2500,
+                            });
+
                         const deleted: Element[] = [];
 
-                        SandboxManager.pushHistory(
+                        return SandboxManager.pushHistory(
                             () => {
                                 Reified.active.delete(this);
 
@@ -85,7 +94,7 @@ export class Input extends Reified {
                     callback: () => {
                         const deleted: Element[] = [];
 
-                        SandboxManager.pushHistory(
+                        return SandboxManager.pushHistory(
                             () => {
                                 WiringManager.wires.forEach((wire) => {
                                     if (wire.from === this.element) {
