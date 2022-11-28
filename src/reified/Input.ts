@@ -14,6 +14,10 @@ export class Input extends Reified {
         this.move(pos);
     }
 
+    readonly #mouseup = () => {
+        this.element.blur();
+    };
+
     readonly #mousedown = (e: MouseEvent) => {
         this.element.dataset.x = e.clientX.toString();
         this.element.dataset.y = e.clientY.toString();
@@ -109,6 +113,7 @@ export class Input extends Reified {
     attach() {
         super.attach();
 
+        this.element.addEventListener("mouseup", this.#mouseup);
         this.element.addEventListener("mousedown", this.#mousedown);
         this.element.addEventListener("click", this.#click);
         this.element.addEventListener("contextmenu", this.#contextmenu);
@@ -121,6 +126,7 @@ export class Input extends Reified {
     detach() {
         super.detach();
 
+        this.element.removeEventListener("mouseup", this.#mouseup);
         this.element.removeEventListener("mousedown", this.#mousedown);
         this.element.removeEventListener("click", this.#click);
         this.element.removeEventListener("contextmenu", this.#contextmenu);

@@ -12,6 +12,7 @@ export class Component<I extends number, O extends number> extends Reified {
     readonly name;
 
     readonly #observers = new Map<Element, MutationObserver>();
+    readonly #mouseups = new Map<Element, () => void>();
     readonly #contextmenus = new Map<Element, () => void>();
 
     readonly chip: Chip<I, O>;
@@ -44,6 +45,8 @@ export class Component<I extends number, O extends number> extends Reified {
 
         this.inputs.forEach((input) => {
             this.#observers.set(input, new MutationObserver(this.update.bind(this)));
+
+            this.#mouseups.set(input, () => input.blur());
 
             this.#contextmenus.set(input, () => {
                 SandboxManager.queueNewContext((prev) => [
@@ -80,6 +83,8 @@ export class Component<I extends number, O extends number> extends Reified {
         });
 
         this.outputs.forEach((output) => {
+            this.#mouseups.set(output, () => output.blur());
+
             this.#contextmenus.set(output, () => {
                 SandboxManager.queueNewContext((prev) => [
                     {
@@ -218,10 +223,14 @@ export class Component<I extends number, O extends number> extends Reified {
                 attributes: true,
             });
 
+            input.addEventListener("mouseup", this.#mouseups.get(input)!);
+
             input.addEventListener("contextmenu", this.#contextmenus.get(input)!);
         });
 
         this.outputs.forEach((output) => {
+            output.addEventListener("mouseup", this.#mouseups.get(output)!);
+
             output.addEventListener("contextmenu", this.#contextmenus.get(output)!);
         });
 

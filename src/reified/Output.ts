@@ -6,6 +6,10 @@ import { html, Reified } from "./Reified";
 export class Output extends Reified {
     readonly element;
 
+    readonly #mouseup = () => {
+        this.element.blur();
+    };
+
     readonly #contextmenu = () => {
         SandboxManager.queueNewContext((prev) => [
             {
@@ -83,6 +87,7 @@ export class Output extends Reified {
     attach() {
         super.attach();
 
+        this.element.addEventListener("mouseup", this.#mouseup);
         this.element.addEventListener("contextmenu", this.#contextmenu);
 
         DraggingManager.watch(this.element);
@@ -93,6 +98,7 @@ export class Output extends Reified {
     detach() {
         super.detach();
 
+        this.element.removeEventListener("mouseup", this.#mouseup);
         this.element.removeEventListener("contextmenu", this.#contextmenu);
 
         DraggingManager.forget(this.element, true);
