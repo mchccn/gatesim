@@ -108,16 +108,20 @@ export class DraggingManager {
                 const mouse = this.#mouse;
                 const original = this.#original;
 
-                SandboxManager.pushHistory(
-                    () => {
-                        target.style.left = mouse.x - mouse.ox - 1 + "px";
-                        target.style.top = mouse.y - mouse.oy - 1 + "px";
-                    },
-                    () => {
-                        target.style.left = original.x + "px";
-                        target.style.top = original.y + "px";
-                    },
-                );
+                if (
+                    Math.round(parseFloat(target.style.left)) !== mouse.x - mouse.ox - 1 ||
+                    Math.round(parseFloat(target.style.top)) !== mouse.y - mouse.oy - 1
+                )
+                    SandboxManager.pushHistory(
+                        () => {
+                            target.style.left = mouse.x - mouse.ox - 1 + "px";
+                            target.style.top = mouse.y - mouse.oy - 1 + "px";
+                        },
+                        () => {
+                            target.style.left = original.x - 1 + "px";
+                            target.style.top = original.y - 1 + "px";
+                        },
+                    );
             }
         }
 

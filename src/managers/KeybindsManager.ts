@@ -84,4 +84,6 @@ export class KeybindsManager {
 
         this.deafen();
     }
+
+    static {}
 }
