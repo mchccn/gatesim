@@ -28,6 +28,8 @@ type SandboxConfig = {
     states?: { inputs?: boolean[]; outputs?: boolean[]; callback: () => void }[];
     save?: string;
     overrideSaveIfExists?: boolean;
+    checkState?: (reified: WatchedSet<Reified>, wirings: WatchedSet<Wiring>) => boolean;
+    ifStateChecked?: () => void;
 };
 
 const calculateReifiedTotals = (set: Set<Reified>) =>
@@ -217,7 +219,17 @@ export class SandboxManager {
             }
         }
 
+        let lastChecked = Date.now();
+
         this.#observer = new MutationObserver(() => {
+            if (Date.now() - lastChecked > 25) {
+                lastChecked = Date.now();
+
+                const check = this.#config.checkState?.(Reified.active.clone(), WiringManager.wires.clone()) ?? false;
+
+                if (check) this.#config.ifStateChecked?.();
+            }
+
             if (typeof this.#config.save !== "undefined")
                 StorageManager.set(
                     "saves:" + this.#config.save,
@@ -232,8 +244,6 @@ export class SandboxManager {
             characterDataOldValue: true,
             subtree: true,
         });
-
-        //TODO: Implement diagram state check callbacks
     }
 
     static reset() {
