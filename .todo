@@ -1,9 +1,3 @@
--   handle custom chips
-
-    -   create custom chip from diagram
-    -   serialize custom chip
-    -   deserialize custom chip
-
 -   add puzzles/exercises
 
     -   check validity of solution
