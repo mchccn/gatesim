@@ -28,6 +28,7 @@ type SandboxConfig = {
     states?: { inputs?: boolean[]; outputs?: boolean[]; callback: () => void }[];
     save?: string;
     overrideSaveIfExists?: boolean;
+    checkInterval?: number;
     checkState?: (reified: WatchedSet<Reified>, wirings: WatchedSet<Wiring>) => boolean;
     ifStateChecked?: () => void;
 };
@@ -62,6 +63,7 @@ export class SandboxManager {
 
     static watchedUnresolvedPromises = new Set<() => void>();
 
+    static #interval = -1;
     static #observer: MutationObserver | undefined;
 
     static #history = new Array<[command: () => void, redo: () => void]>();
@@ -70,6 +72,10 @@ export class SandboxManager {
     static #config: SandboxConfig;
 
     static setup(config: SandboxConfig) {
+        if (this.#observer) this.#observer.disconnect();
+
+        clearInterval(this.#interval);
+
         this.#config = config;
 
         document.body.innerHTML = "";
@@ -219,17 +225,7 @@ export class SandboxManager {
             }
         }
 
-        let lastChecked = Date.now();
-
         this.#observer = new MutationObserver(() => {
-            if (Date.now() - lastChecked > 25) {
-                lastChecked = Date.now();
-
-                const check = this.#config.checkState?.(Reified.active.clone(), WiringManager.wires.clone()) ?? false;
-
-                if (check) this.#config.ifStateChecked?.();
-            }
-
             if (typeof this.#config.save !== "undefined")
                 StorageManager.set(
                     "saves:" + this.#config.save,
@@ -244,6 +240,12 @@ export class SandboxManager {
             characterDataOldValue: true,
             subtree: true,
         });
+
+        this.#interval = setInterval(() => {
+            const check = this.#config.checkState?.(Reified.active.clone(), WiringManager.wires.clone()) ?? false;
+
+            if (check) this.#config.ifStateChecked?.();
+        }, this.#config.checkInterval ?? 50) as never;
     }
 
     static reset() {
@@ -252,6 +254,10 @@ export class SandboxManager {
 
             this.#observer = undefined;
         }
+
+        clearInterval(this.#interval);
+
+        this.#interval = -1;
 
         MouseManager.reset();
         KeybindsManager.reset();

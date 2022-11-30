@@ -48,4 +48,8 @@ export abstract class Reified {
 
         return this;
     }
+
+    get permanence() {
+        return this.PERMANENT;
+    }
 }

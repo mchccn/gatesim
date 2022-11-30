@@ -17,6 +17,7 @@ export type SerializedDiagram = {
     components: (
         | {
               reified: number;
+              permanent: boolean;
               type: "INPUT";
               activated: boolean;
               id: number;
@@ -25,6 +26,7 @@ export type SerializedDiagram = {
           }
         | {
               reified: number;
+              permanent: boolean;
               type: "OUTPUT";
               activated: boolean;
               id: number;
@@ -33,6 +35,7 @@ export type SerializedDiagram = {
           }
         | {
               reified: number;
+              permanent: boolean;
               type: "COMPONENT";
               name: string;
               inputs: { id: number; activated: boolean }[];
@@ -56,6 +59,7 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
 
                 return {
                     reified,
+                    permanent: component.permanence,
                     type: "INPUT",
                     activated: component.element.classList.contains("activated"),
                     id: ids.get(component.element)!,
@@ -69,6 +73,7 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
 
                 return {
                     reified,
+                    permanent: component.permanence,
                     type: "OUTPUT",
                     activated: component.element.classList.contains("activated"),
                     id: ids.get(component.element)!,
@@ -80,6 +85,7 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
             if (component instanceof Component) {
                 return {
                     reified,
+                    permanent: component.permanence,
                     type: "COMPONENT",
                     name: component.chip.name,
                     inputs: component.inputs.map((i) => {
@@ -134,7 +140,7 @@ export function fromFile(
 
                 elements.set(raw.id, input.element);
 
-                return input;
+                return raw.permanent ? input.permanent() : input;
             }
 
             if (raw.type === "OUTPUT") {
@@ -144,7 +150,7 @@ export function fromFile(
 
                 elements.set(raw.id, output.element);
 
-                return output;
+                return raw.permanent ? output.permanent() : output;
             }
 
             const component = new Component(new (chips.get(raw.name)!)(), raw);
@@ -161,7 +167,7 @@ export function fromFile(
                 elements.set(raw.outputs[index].id, output);
             });
 
-            return component;
+            return raw.permanent ? component.permanent() : component;
         });
 
         const wires = data.wires.map(({ from, to }) => new Wiring(elements.get(from)!, elements.get(to)!));
@@ -191,6 +197,10 @@ function validate(data: unknown): asserts data is SerializedDiagram {
         if (!("reified" in component)) throw new Error("Components data is missing reified id.");
 
         if (typeof component.reified !== "number") throw new Error("Reified id must be a number.");
+
+        if (!("permanent" in component)) throw new Error("Components data is missing permanence status.");
+
+        if (typeof component.permanent !== "boolean") throw new Error("Component permanence must be a boolean.");
 
         if (!("type" in component)) throw new Error("Components data is missing a type.");
 

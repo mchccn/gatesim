@@ -2,6 +2,7 @@ import {
     ACTIVATED_CSS_COLOR,
     INPUT_COMPONENT_CSS_SIZE,
     IN_DEBUG_MODE,
+    LOCKED_FOR_TESTING,
     ORIGIN_POINT,
     OUTPUT_COMPONENT_CSS_SIZE,
 } from "./constants";
@@ -11,6 +12,7 @@ import { MenuManagerActions } from "./managers/MenuManager";
 import { ModalManager } from "./managers/ModalManager";
 import { SandboxManager } from "./managers/SandboxManager";
 import { StorageManager } from "./managers/StorageManager";
+import { TestingManager } from "./managers/TestingManager";
 import { ToastManager } from "./managers/ToastManager";
 import { WiringManager } from "./managers/WiringManager";
 import { chips } from "./reified/chips";
@@ -24,6 +26,8 @@ export const menu: MenuManagerActions = [
         "insert-chip": {
             label: "Insert chip",
             callback: async (e) => {
+                if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                 const name = await ModalManager.prompt("Enter the chip's name:");
 
                 if (typeof name !== "string") return;
@@ -62,6 +66,8 @@ export const menu: MenuManagerActions = [
         "new-input": {
             label: "New input",
             callback: (e) => {
+                if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                 const input = new Input({
                     x: e.clientX - INPUT_COMPONENT_CSS_SIZE / 2,
                     y: e.clientY - INPUT_COMPONENT_CSS_SIZE / 2,
@@ -86,6 +92,8 @@ export const menu: MenuManagerActions = [
         "new-output": {
             label: "New output",
             callback: (e) => {
+                if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                 const output = new Output({
                     x: e.clientX - OUTPUT_COMPONENT_CSS_SIZE / 2,
                     y: e.clientY - OUTPUT_COMPONENT_CSS_SIZE / 2,
@@ -108,52 +116,6 @@ export const menu: MenuManagerActions = [
             },
         },
     },
-    // {
-    //     "new-chip": {
-    //         label: "New chip from diagram",
-    //         callback: async () => {
-    //             const name = await ModalManager.prompt("Enter the name of the chip:");
-
-    //             if (!name) return;
-
-    //             if (
-    //                 chips.has(name.trim().toUpperCase()) &&
-    //                 !(await ModalManager.confirm(
-    //                     "A chip already exists with this name.\nAre you sure you want to replace it?",
-    //                 ))
-    //             )
-    //                 return;
-
-    //             if (!/^\w+$/.test(name.trim().toUpperCase()))
-    //                 return ModalManager.alert("Chip name must consist of only alphanumeric characters.");
-
-    //             const inputs = [...Reified.active.values()].filter((v) => v instanceof Input).length;
-    //             const outputs = [...Reified.active.values()].filter((v) => v instanceof Output).length;
-
-    //             chips.set(
-    //                 name.trim().toUpperCase(),
-    //                 class _ extends Chip<number, number> {
-    //                     static readonly NAME = name!.trim().toUpperCase();
-    //                     static readonly INPUTS = inputs;
-    //                     static readonly OUTPUTS = outputs;
-
-    //                     constructor() {
-    //                         super(name!, inputs, outputs);
-    //                     }
-
-    //                     output(inputs: boolean[]): boolean[] {
-    //                         //TODO: SOMEHOW COMPILE THE DIAGRAM
-    //                         //TODO: SORT INPUTS/OUTPUTS BY Y-COORD
-
-    //                         return [];
-    //                     }
-    //                 },
-    //             );
-
-    //             SandboxManager.reset();
-    //         },
-    //     },
-    // },
     {
         "save-as": {
             label: "Save as file",

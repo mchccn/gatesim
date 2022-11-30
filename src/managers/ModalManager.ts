@@ -17,6 +17,7 @@ export class ModalManager {
             this.container.lastElementChild!.classList.remove("modal-inactive");
 
             if (this.container.lastElementChild!.classList.contains("modal-alert")) {
+                //
                 this.container.lastElementChild!.querySelector<HTMLElement>(".modal-ok")!.focus();
             }
         }

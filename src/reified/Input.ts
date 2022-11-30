@@ -1,6 +1,7 @@
-import { ACTIVATED_CSS_COLOR } from "../constants";
+import { ACTIVATED_CSS_COLOR, LOCKED_FOR_TESTING } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
+import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
 import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
 import { html, Reified } from "./Reified";
@@ -27,6 +28,8 @@ export class Input extends Reified {
 
     readonly #click = (e: MouseEvent) => {
         if (Math.hypot(e.clientX - +this.element.dataset.x!, e.clientY - +this.element.dataset.y!) > 2) return;
+
+        if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
         const active = this.element.classList.contains("activated");
 
@@ -58,6 +61,8 @@ export class Input extends Reified {
                                 color: ACTIVATED_CSS_COLOR,
                                 duration: 2500,
                             });
+
+                        if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
                         const deleted: Element[] = [];
 
@@ -92,6 +97,8 @@ export class Input extends Reified {
                 "delete-connections": {
                     label: "Delete connections",
                     callback: () => {
+                        if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                         const deleted: Element[] = [];
 
                         return SandboxManager.pushHistory(

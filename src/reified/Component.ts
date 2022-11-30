@@ -1,6 +1,7 @@
-import { ACTIVATED_CSS_COLOR } from "../constants";
+import { ACTIVATED_CSS_COLOR, LOCKED_FOR_TESTING } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
+import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
 import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
 import { Chip } from "./chips";
@@ -56,6 +57,8 @@ export class Component<I extends number, O extends number> extends Reified {
                         "delete-connections": {
                             label: "Delete connections",
                             callback: () => {
+                                if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                                 const deleted: Element[] = [];
 
                                 return SandboxManager.pushHistory(
@@ -93,12 +96,18 @@ export class Component<I extends number, O extends number> extends Reified {
                         "create-connection": {
                             label: "Create connection",
                             callback: () => {
+                                if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                                 NewWireContext.from = output;
+
+                                return undefined;
                             },
                         },
                         "delete-connections": {
                             label: "Delete connections",
                             callback: () => {
+                                if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                                 const deleted: Element[] = [];
 
                                 return SandboxManager.pushHistory(
@@ -140,6 +149,8 @@ export class Component<I extends number, O extends number> extends Reified {
                                     duration: 2500,
                                 });
 
+                            if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                             const deleted: [from: Element, to: Element][] = [];
 
                             return SandboxManager.pushHistory(
@@ -178,6 +189,8 @@ export class Component<I extends number, O extends number> extends Reified {
                     "delete-connections": {
                         label: "Delete connections",
                         callback: () => {
+                            if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                             const deleted: [from: Element, to: Element][] = [];
 
                             return SandboxManager.pushHistory(
@@ -228,8 +241,8 @@ export class Component<I extends number, O extends number> extends Reified {
 
         this.inputs.forEach((input) => {
             this.#observers.get(input)!.observe(input, {
-                attributeFilter: ["class"],
                 attributes: true,
+                attributeFilter: ["class"],
             });
 
             input.addEventListener("mouseup", this.#mouseups.get(input)!);

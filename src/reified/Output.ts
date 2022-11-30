@@ -1,6 +1,7 @@
-import { ACTIVATED_CSS_COLOR } from "../constants";
+import { ACTIVATED_CSS_COLOR, LOCKED_FOR_TESTING } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
+import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
 import { Wiring, WiringManager } from "../managers/WiringManager";
 import { html, Reified } from "./Reified";
@@ -24,6 +25,8 @@ export class Output extends Reified {
                                 color: ACTIVATED_CSS_COLOR,
                                 duration: 2500,
                             });
+
+                        if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
                         const deleted: Element[] = [];
 
@@ -58,6 +61,8 @@ export class Output extends Reified {
                 "delete-connections": {
                     label: "Delete connections",
                     callback: () => {
+                        if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                         const deleted: Element[] = [];
 
                         return SandboxManager.pushHistory(

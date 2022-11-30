@@ -1,3 +1,5 @@
+import { ModalManager } from "./managers/ModalManager";
+
 declare global {
     interface Navigator {
         userAgentData: { platform: string };
@@ -17,3 +19,6 @@ export const IN_DEBUG_MODE = !!new URL(location.href).searchParams.has("debug");
 export const IS_MAC_OS = [navigator.userAgentData.platform, navigator.platform].some((platform) =>
     platform.toLowerCase().includes("mac"),
 );
+export const LOCKED_FOR_TESTING = () =>
+    ModalManager.alert("The diagram is currently locked for testing. No changes can be made.");
+export const DELAY = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));

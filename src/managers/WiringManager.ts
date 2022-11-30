@@ -1,7 +1,8 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import { ACTIVATED_CSS_COLOR, LIGHT_GRAY_CSS_COLOR } from "../constants";
+import { ACTIVATED_CSS_COLOR, LIGHT_GRAY_CSS_COLOR, LOCKED_FOR_TESTING } from "../constants";
 import { MouseManager } from "./MouseManager";
 import { SandboxManager } from "./SandboxManager";
+import { TestingManager } from "./TestingManager";
 
 export class NewWireContext {
     static from: HTMLElement | undefined;
@@ -16,6 +17,8 @@ export class NewWireContext {
                         target.classList.contains("board-output") ||
                         target.classList.contains("component-input-button")
                     ) {
+                        if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                         const from = NewWireContext.from;
 
                         SandboxManager.pushHistory(
@@ -37,6 +40,8 @@ export class NewWireContext {
 
                 NewWireContext.from = undefined;
             }
+
+            return undefined;
         });
     }
 }
@@ -50,13 +55,19 @@ export class Wiring {
             to.classList.toggle("activated", from.classList.contains("activated"));
         });
 
-        this.#observer.observe(from, { attributeFilter: ["class"], attributes: true });
+        this.go();
     }
 
     destroy() {
         this.#destroyed = true;
 
         this.#observer.disconnect();
+    }
+
+    go() {
+        this.#destroyed = false;
+
+        this.#observer.observe(this.from, { attributeFilter: ["class"], attributes: true });
     }
 
     get destroyed() {
@@ -77,7 +88,8 @@ export class WiringManager {
 
         this.wires.forEach((wire) => {
             if (wire.destroyed) {
-                this.wires.delete(wire);
+                if (this.wires.locked) wire.go();
+                else this.wires.delete(wire);
 
                 return;
             }

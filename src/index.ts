@@ -11,7 +11,7 @@ await loadStyles();
 const shouldLoadPremade = new URL(location.href).searchParams.get("premade");
 
 if (shouldLoadPremade && premade.has(shouldLoadPremade.trim().toLowerCase())) {
-    premade.get(shouldLoadPremade.trim().toLowerCase())!();
+    premade.get(shouldLoadPremade.trim().toLowerCase())!({ name: shouldLoadPremade.trim().toLowerCase() });
 } else {
     SandboxManager.setup({ keybinds, menu, save: "sandbox" });
 
