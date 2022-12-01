@@ -19,7 +19,7 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
                             [[true], [false]],
                             [[false], [true]],
                         ],
-                        { timeout: 300 },
+                        { timeout: 200 },
                     );
                 },
             },
@@ -61,7 +61,7 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
                             [[false, true], [false]],
                             [[true, true], [true]],
                         ],
-                        { timeout: 500 },
+                        { timeout: 400 },
                     );
                 },
             },
@@ -92,5 +92,96 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
         });
 
         ModalManager.alert("Recreate an AND gate using only NAND gates.");
+    },
+    "nand:or": ({ name: save }) => {
+        menu.splice(2, 0, {
+            test: {
+                label: "Test solution",
+                async callback() {
+                    await TestingManager.test(
+                        [
+                            [[false, false], [false]],
+                            [[true, false], [true]],
+                            [[false, true], [true]],
+                            [[true, true], [true]],
+                        ],
+                        { timeout: 600 },
+                    );
+                },
+            },
+        });
+
+        SandboxManager.setup({
+            keybinds,
+            menu,
+            save,
+            initial: [
+                [
+                    new Input({ x: 100, y: 100 }),
+                    new Input({ x: 100, y: 200 }),
+                    new Component(new NandGate(), { x: 300, y: 100 }),
+                    new Component(new NandGate(), { x: 300, y: 150 }),
+                    new Component(new NandGate(), { x: 300, y: 200 }),
+                    new Output({ x: 600, y: 150 }),
+                ].map((component) => component.permanent()),
+                [],
+            ],
+            limits: {
+                inputs: 2,
+                outputs: 1,
+                chipsTotal: 3,
+                wirings: 7,
+                componentsTotal: 6,
+                chips: { NAND: 3 },
+            },
+        });
+
+        ModalManager.alert("Recreate an OR gate using only NAND gates.");
+    },
+    "nand:xor": ({ name: save }) => {
+        menu.splice(2, 0, {
+            test: {
+                label: "Test solution",
+                async callback() {
+                    await TestingManager.test(
+                        [
+                            [[false, false], [false]],
+                            [[true, false], [true]],
+                            [[false, true], [true]],
+                            [[true, true], [false]],
+                        ],
+                        { timeout: 800 },
+                    );
+                },
+            },
+        });
+
+        SandboxManager.setup({
+            keybinds,
+            menu,
+            save,
+            initial: [
+                [
+                    new Input({ x: 100, y: 100 }),
+                    new Input({ x: 100, y: 200 }),
+                    new Component(new NandGate(), { x: 300, y: 100 }),
+                    new Component(new NandGate(), { x: 300, y: 200 }),
+                    new Component(new NandGate(), { x: 500, y: 100 }),
+                    new Component(new NandGate(), { x: 500, y: 200 }),
+                    new Output({ x: 700, y: 150 }),
+                ].map((component) => component.permanent()),
+                [],
+            ],
+            limits: {
+                inputs: 2,
+                outputs: 1,
+                chipsTotal: 4,
+                wirings: 9,
+                componentsTotal: 8,
+                chips: { NAND: 4 },
+            },
+        });
+
+        ModalManager.alert("Recreate a XOR gate using only NAND gates.");
     },
 };

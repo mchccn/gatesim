@@ -191,14 +191,42 @@ export const menu: MenuManagerActions = [
     ...(IN_DEBUG_MODE
         ? [
               {
-                  STOP: {
-                      label: "STOP RENDER",
+                  "test-alert": {
+                      label: "Test alert",
+                      callback: () => {
+                          ModalManager.alert("This is an alert.");
+                      },
+                  },
+                  "test-confirm": {
+                      label: "Test confirm",
+                      callback: () => {
+                          ModalManager.confirm("This is a confirmation.");
+                      },
+                  },
+                  "test-prompt": {
+                      label: "Test prompt",
+                      callback: () => {
+                          ModalManager.prompt("This is a prompt.");
+                      },
+                  },
+              },
+              {
+                  "wipe-storage": {
+                      label: "Wipe storage",
+                      callback: () => {
+                          StorageManager.storage.clear();
+                      },
+                  },
+              },
+              {
+                  "stop-render": {
+                      label: "Stop rendering wires",
                       callback: () => {
                           WiringManager.stop();
                       },
                   },
-                  START: {
-                      label: "START RENDER",
+                  "start-render": {
+                      label: "Start rendering wires",
                       callback: () => {
                           WiringManager.start();
                       },

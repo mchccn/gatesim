@@ -44,7 +44,7 @@ export class ModalManager {
 
             SandboxManager.watchedUnresolvedPromises.add(finish);
 
-            alert.querySelector<HTMLElement>(".modal-ok")!.addEventListener("click", () => {
+            const done = () => {
                 alert.remove();
 
                 this.#onModalResolved();
@@ -52,7 +52,21 @@ export class ModalManager {
                 SandboxManager.watchedUnresolvedPromises.delete(finish);
 
                 return finish();
-            });
+            };
+
+            const esc = (e: KeyboardEvent) => {
+                if (e.code === "Escape") {
+                    e.preventDefault();
+
+                    document.removeEventListener("keydown", esc);
+
+                    done();
+                }
+            };
+
+            document.addEventListener("keydown", esc);
+
+            alert.querySelector<HTMLElement>(".modal-ok")!.addEventListener("click", done);
         });
     }
 
@@ -87,6 +101,24 @@ export class ModalManager {
 
                 return resolve(value);
             };
+
+            const esc = (e: KeyboardEvent) => {
+                if (e.code === "Escape") {
+                    e.preventDefault();
+
+                    document.removeEventListener("keydown", esc);
+
+                    confirm.remove();
+
+                    this.#onModalResolved();
+
+                    SandboxManager.watchedUnresolvedPromises.delete(finish);
+
+                    resolve(false);
+                }
+            };
+
+            document.addEventListener("keydown", esc);
 
             confirm.querySelector<HTMLElement>(".modal-cancel")!.addEventListener("click", handler(false));
 
@@ -125,8 +157,24 @@ export class ModalManager {
                 SandboxManager.watchedUnresolvedPromises.delete(finish);
             };
 
+            const esc = (e: KeyboardEvent) => {
+                if (e.code === "Escape") {
+                    e.preventDefault();
+
+                    document.removeEventListener("keydown", esc);
+
+                    done();
+
+                    finish();
+                }
+            };
+
+            document.addEventListener("keydown", esc);
+
             prompt.querySelector<HTMLElement>(".modal-input")!.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {
+                    e.preventDefault();
+
                     done();
 
                     return resolve(prompt.querySelector<HTMLInputElement>(".modal-input")!.value);
