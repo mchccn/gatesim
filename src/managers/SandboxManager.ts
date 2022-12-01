@@ -10,6 +10,7 @@ import { KeybindsManager } from "./KeybindsManager";
 import { MenuManager, MenuManagerActions } from "./MenuManager";
 import { ModalManager } from "./ModalManager";
 import { MouseManager } from "./MouseManager";
+import { SelectionManager } from "./SelectionManager";
 import { StorageManager } from "./StorageManager";
 import { ToastManager } from "./ToastManager";
 import { Wiring, WiringManager } from "./WiringManager";
@@ -89,6 +90,7 @@ export class SandboxManager {
         MouseManager.start();
         KeybindsManager.listen();
         DraggingManager.listen();
+        SelectionManager.listen();
         WiringManager.start();
 
         const createReifiedActive = (components: Reified[]) =>
@@ -263,6 +265,7 @@ export class SandboxManager {
         MouseManager.reset();
         KeybindsManager.reset();
         DraggingManager.reset();
+        SelectionManager.reset();
         WiringManager.stop();
 
         MenuManager.remove(Reified.root);
@@ -285,6 +288,8 @@ export class SandboxManager {
         Reified.active.forEach((component) => component.detach());
 
         WiringManager.wires.forEach((wire) => wire.destroy());
+
+        SelectionManager.selected.clear();
     }
 
     static pushHistory(command: () => void, undo: () => void) {
