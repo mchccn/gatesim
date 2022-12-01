@@ -8,6 +8,7 @@ import { html, Reified } from "../reified/Reified";
 import { DraggingManager } from "./DraggingManager";
 import { KeybindsManager } from "./KeybindsManager";
 import { MenuManager, MenuManagerActions } from "./MenuManager";
+import { ModalManager } from "./ModalManager";
 import { MouseManager } from "./MouseManager";
 import { StorageManager } from "./StorageManager";
 import { ToastManager } from "./ToastManager";
@@ -322,5 +323,19 @@ export class SandboxManager {
         this.#history.push([command, undo]);
 
         return command.call(undefined);
+    }
+
+    static async saveTo(save: string) {
+        this.#config.save = save;
+
+        if (
+            StorageManager.has("saves:" + this.#config.save) &&
+            !(await ModalManager.confirm(
+                "There is already a save with this name. Are you sure you want to replace it?",
+            ))
+        )
+            return;
+
+        StorageManager.set("saves:" + this.#config.save, saveDiagram([...Reified.active], [...WiringManager.wires]));
     }
 }

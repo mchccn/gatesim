@@ -13,6 +13,10 @@ export class StorageManager {
         return JSON.parse(this.storage.getItem(this.prefix + key)!) ?? undefined;
     }
 
+    static has(key: string): boolean {
+        return this.storage.getItem(this.prefix + key) !== null;
+    }
+
     static delete(key: string) {
         if (this.storage.getItem(this.prefix + key) === null) return false;
 

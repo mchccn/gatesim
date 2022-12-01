@@ -1,4 +1,5 @@
 import { ACTIVATED_CSS_COLOR } from "./constants";
+import { fromFile } from "./files";
 import { keybinds } from "./keybinds";
 import { SandboxManager } from "./managers/SandboxManager";
 import { ToastManager } from "./managers/ToastManager";
@@ -8,24 +9,59 @@ import { loadStyles } from "./styles";
 
 await loadStyles();
 
-const shouldLoadPremade = new URL(location.href).searchParams.get("premade");
+const hrefAsUrl = new URL(location.href);
 
-if (shouldLoadPremade && premade.has(shouldLoadPremade.trim().toLowerCase())) {
-    premade.get(shouldLoadPremade.trim().toLowerCase())!({ name: shouldLoadPremade.trim().toLowerCase() });
-} else {
-    SandboxManager.setup({ keybinds, menu, save: "sandbox" });
+const shouldLoadInline = hrefAsUrl.searchParams.get("inline");
 
-    if (shouldLoadPremade) {
+if (shouldLoadInline) {
+    try {
+        const inlined = atob(shouldLoadInline);
+
+        const {
+            error,
+            result: [components, wirings],
+        } = fromFile(inlined);
+
+        if (error) throw new Error(error);
+
+        SandboxManager.setup({ keybinds, menu, initial: [components!, wirings!] });
+    } catch {
+        SandboxManager.setup({ keybinds, menu, save: "sandbox" });
+
         ToastManager.toast({
-            message: "No premades were found with that name.",
+            message: "Diagram is not correctly encoded.",
             color: ACTIVATED_CSS_COLOR,
             duration: 2500,
         });
 
-        const url = new URL(location.href);
+        hrefAsUrl.searchParams.delete("inline");
 
-        url.searchParams.delete("premade");
+        history.pushState(undefined, "", hrefAsUrl);
+    }
+} else {
+    const save = hrefAsUrl.searchParams.get("save");
 
-        history.pushState(undefined, "", url);
+    if (save) {
+        SandboxManager.setup({ keybinds, menu, save });
+    } else {
+        const shouldLoadPremade = hrefAsUrl.searchParams.get("premade");
+
+        if (shouldLoadPremade && premade.has(shouldLoadPremade.trim().toLowerCase())) {
+            premade.get(shouldLoadPremade.trim().toLowerCase())!({ name: shouldLoadPremade.trim().toLowerCase() });
+        } else {
+            SandboxManager.setup({ keybinds, menu, save: "sandbox" });
+
+            if (shouldLoadPremade) {
+                ToastManager.toast({
+                    message: "No premades were found with that name.",
+                    color: ACTIVATED_CSS_COLOR,
+                    duration: 2500,
+                });
+
+                hrefAsUrl.searchParams.delete("premade");
+
+                history.pushState(undefined, "", hrefAsUrl);
+            }
+        }
     }
 }

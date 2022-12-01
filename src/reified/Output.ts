@@ -86,7 +86,7 @@ export class Output extends Reified {
                     },
                 },
             },
-            ...prev,
+            ...prev.slice(2),
         ]);
     };
 

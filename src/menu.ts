@@ -1,7 +1,6 @@
 import {
     ACTIVATED_CSS_COLOR,
     INPUT_COMPONENT_CSS_SIZE,
-    IN_DEBUG_MODE,
     LOCKED_FOR_TESTING,
     ORIGIN_POINT,
     OUTPUT_COMPONENT_CSS_SIZE,
@@ -117,6 +116,41 @@ export const menu: MenuManagerActions = [
         },
     },
     {
+        "copy-url": {
+            label: "Copy link",
+            callback: () => {
+                const hrefAsUrl = new URL(location.href);
+
+                hrefAsUrl.searchParams.set("inline", btoa(saveDiagram([...Reified.active], [...WiringManager.wires])));
+
+                navigator.clipboard.writeText(hrefAsUrl.href);
+            },
+        },
+        "save-to": {
+            label: "Save with name",
+            callback: async () => {
+                const name = await ModalManager.prompt("What should be the name of this save?");
+
+                if (typeof name !== "string") return;
+
+                await SandboxManager.saveTo(name);
+            },
+        },
+        "load-from": {
+            label: "Load from saves",
+            callback: async () => {
+                const save = await ModalManager.prompt("Which save would you like to load?");
+
+                if (typeof save !== "string") return;
+
+                if (!StorageManager.has("saves:" + save))
+                    return ModalManager.alert("No save was found with that name.");
+
+                SandboxManager.reset();
+
+                SandboxManager.setup({ keybinds, menu, save });
+            },
+        },
         "save-as": {
             label: "Save as file",
             callback: () => {
@@ -188,50 +222,49 @@ export const menu: MenuManagerActions = [
             },
         },
     },
-    ...(IN_DEBUG_MODE
-        ? [
-              {
-                  "test-alert": {
-                      label: "Test alert",
-                      callback: () => {
-                          ModalManager.alert("This is an alert.");
-                      },
-                  },
-                  "test-confirm": {
-                      label: "Test confirm",
-                      callback: () => {
-                          ModalManager.confirm("This is a confirmation.");
-                      },
-                  },
-                  "test-prompt": {
-                      label: "Test prompt",
-                      callback: () => {
-                          ModalManager.prompt("This is a prompt.");
-                      },
-                  },
-              },
-              {
-                  "wipe-storage": {
-                      label: "Wipe storage",
-                      callback: () => {
-                          StorageManager.storage.clear();
-                      },
-                  },
-              },
-              {
-                  "stop-render": {
-                      label: "Stop rendering wires",
-                      callback: () => {
-                          WiringManager.stop();
-                      },
-                  },
-                  "start-render": {
-                      label: "Start rendering wires",
-                      callback: () => {
-                          WiringManager.start();
-                      },
-                  },
-              },
-          ]
-        : []),
+];
+
+export const debugmenu: MenuManagerActions = [
+    {
+        "test-alert": {
+            label: "Test alert",
+            callback: () => {
+                ModalManager.alert("This is an alert.");
+            },
+        },
+        "test-confirm": {
+            label: "Test confirm",
+            callback: () => {
+                ModalManager.confirm("This is a confirmation.");
+            },
+        },
+        "test-prompt": {
+            label: "Test prompt",
+            callback: () => {
+                ModalManager.prompt("This is a prompt.");
+            },
+        },
+    },
+    {
+        "wipe-storage": {
+            label: "Wipe storage",
+            callback: () => {
+                StorageManager.storage.clear();
+            },
+        },
+    },
+    {
+        "stop-render": {
+            label: "Stop rendering wires",
+            callback: () => {
+                WiringManager.stop();
+            },
+        },
+        "start-render": {
+            label: "Start rendering wires",
+            callback: () => {
+                WiringManager.start();
+            },
+        },
+    },
 ];

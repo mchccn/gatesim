@@ -82,7 +82,7 @@ export class Component<I extends number, O extends number> extends Reified {
                             },
                         },
                     },
-                    ...prev,
+                    ...prev.slice(2),
                 ]);
             });
         });
@@ -131,7 +131,7 @@ export class Component<I extends number, O extends number> extends Reified {
                             },
                         },
                     },
-                    ...prev,
+                    ...prev.slice(2),
                 ]);
             });
         });
@@ -219,7 +219,7 @@ export class Component<I extends number, O extends number> extends Reified {
                         },
                     },
                 },
-                ...prev,
+                ...prev.slice(2),
             ]);
         });
 

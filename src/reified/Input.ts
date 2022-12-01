@@ -122,7 +122,7 @@ export class Input extends Reified {
                     },
                 },
             },
-            ...prev,
+            ...prev.slice(2),
         ]);
     };
 

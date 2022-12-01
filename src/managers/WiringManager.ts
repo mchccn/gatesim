@@ -76,7 +76,8 @@ export class Wiring {
 }
 
 export class WiringManager {
-    static #rAF: number | undefined = -1;
+    static #rAF = -1;
+    static #stopped = false;
 
     static wires = new WatchedSet<Wiring>();
 
@@ -132,24 +133,24 @@ export class WiringManager {
     }
 
     static start() {
-        this.update();
-
-        const id = requestAnimationFrame(this.start.bind(this));
-
-        if (typeof this.#rAF === "undefined") {
+        if (this.#stopped) {
             this.#rAF = -1;
+
+            this.#stopped = false;
 
             return;
         }
+
+        this.update();
+
+        const id = requestAnimationFrame(this.start.bind(this));
 
         this.#rAF = id;
     }
 
     static stop() {
-        if (typeof this.#rAF !== "undefined") {
-            cancelAnimationFrame(this.#rAF ?? 0);
+        this.#stopped = true;
 
-            this.#rAF = undefined;
-        }
+        cancelAnimationFrame(this.#rAF);
     }
 }
