@@ -111,6 +111,20 @@ export class XorGate extends Chip<2, 1> {
     }
 }
 
+export class XnorGate extends Chip<2, 1> {
+    static readonly NAME = "XNOR";
+    static readonly INPUTS = 2;
+    static readonly OUTPUTS = 1;
+
+    constructor() {
+        super("XNOR", 2, 1);
+    }
+
+    output([a, b]: [boolean, boolean]): [boolean] {
+        return [!(+a ^ +b)];
+    }
+}
+
 export class BufferGate extends Chip<1, 1> {
     static readonly NAME = "BUFFER";
     static readonly INPUTS = 1;
@@ -128,5 +142,5 @@ export class BufferGate extends Chip<1, 1> {
 type StaticMembers<T> = { [K in keyof T]: T[K] };
 
 export const chips = new Map<string, StaticMembers<typeof Chip<number, number>> & { new (): Chip<number, number> }>(
-    [AndGate, OrGate, NotGate, NandGate, NorGate, XorGate, BufferGate].map((gate) => [gate.NAME, gate]),
+    [AndGate, OrGate, NotGate, NandGate, NorGate, XorGate, XnorGate, BufferGate].map((gate) => [gate.NAME, gate]),
 );
