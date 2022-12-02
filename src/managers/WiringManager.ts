@@ -1,7 +1,9 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import { ACTIVATED_CSS_COLOR, LIGHT_GRAY_CSS_COLOR, LOCKED_FOR_TESTING } from "../constants";
+import { ACTIVATED_CSS_COLOR, GET_CANVAS_CTX, LIGHT_GRAY_CSS_COLOR, LOCKED_FOR_TESTING } from "../constants";
+import { DraggingManager } from "./DraggingManager";
 import { MouseManager } from "./MouseManager";
 import { SandboxManager } from "./SandboxManager";
+import { SelectionManager } from "./SelectionManager";
 import { TestingManager } from "./TestingManager";
 
 export class NewWireContext {
@@ -77,18 +79,18 @@ export class Wiring {
 
 export class WiringManager {
     static #rAF = -1;
-    static #stopped = false;
 
     static wires = new WatchedSet<Wiring>();
 
     static update() {
-        const ctx = document.querySelector("canvas")!.getContext("2d")!;
+        const ctx = GET_CANVAS_CTX();
 
         ctx.canvas.width = window.innerWidth;
         ctx.canvas.height = window.innerHeight;
 
         this.wires.forEach((wire) => {
             if (wire.destroyed) {
+                //
                 if (this.wires.locked) wire.go();
                 else this.wires.delete(wire);
 
@@ -130,17 +132,41 @@ export class WiringManager {
             ctx.closePath();
             ctx.stroke();
         }
+
+        if (
+            DraggingManager.downpos.x !== -1 &&
+            DraggingManager.downpos.y !== -1 &&
+            MouseManager.mouse.x !== -1 &&
+            MouseManager.mouse.y !== -1
+        ) {
+            ctx.strokeStyle = ACTIVATED_CSS_COLOR;
+
+            ctx.lineWidth = 2.5;
+
+            ctx.lineJoin = "miter";
+
+            ctx.strokeRect(
+                DraggingManager.downpos.x,
+                DraggingManager.downpos.y,
+                MouseManager.mouse.x - DraggingManager.downpos.x,
+                MouseManager.mouse.y - DraggingManager.downpos.y,
+            );
+        }
+
+        SelectionManager.selected.forEach((component) => {
+            const rect = component.element.getBoundingClientRect();
+
+            ctx.strokeStyle = ACTIVATED_CSS_COLOR;
+
+            ctx.lineWidth = 1;
+
+            ctx.lineJoin = "miter";
+
+            ctx.strokeRect(rect.left - 10, rect.top - 10, rect.width + 10 + 10, rect.height + 10 + 10);
+        });
     }
 
     static start() {
-        if (this.#stopped) {
-            this.#rAF = -1;
-
-            this.#stopped = false;
-
-            return;
-        }
-
         this.update();
 
         const id = requestAnimationFrame(this.start.bind(this));
@@ -149,8 +175,6 @@ export class WiringManager {
     }
 
     static stop() {
-        this.#stopped = true;
-
         cancelAnimationFrame(this.#rAF);
     }
 }

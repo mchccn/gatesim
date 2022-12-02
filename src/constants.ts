@@ -2,7 +2,7 @@ import { ModalManager } from "./managers/ModalManager";
 
 declare global {
     interface Navigator {
-        userAgentData: { platform: string };
+        userAgentData?: { platform: string };
     }
 }
 
@@ -16,9 +16,10 @@ export const ORIGIN_POINT = Object.freeze({ x: 0, y: 0 });
 export const ACTIVATED_CSS_COLOR = "#ff2626";
 export const LIGHT_GRAY_CSS_COLOR = "#dedede";
 export const IN_DEBUG_MODE = !!new URL(location.href).searchParams.has("debug");
-export const IS_MAC_OS = [navigator.userAgentData.platform, navigator.platform].some((platform) =>
-    platform.toLowerCase().includes("mac"),
+export const IS_MAC_OS = [navigator.userAgentData?.platform, navigator.platform].some(
+    (platform) => platform?.toLowerCase().includes("mac") ?? false,
 );
 export const LOCKED_FOR_TESTING = () =>
     ModalManager.alert("The diagram is currently locked for testing. No changes can be made.");
 export const DELAY = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));
+export const GET_CANVAS_CTX = () => document.querySelector("canvas")!.getContext("2d")!;

@@ -1,5 +1,3 @@
-import { IN_DEBUG_MODE } from "../constants";
-import { debugmenu } from "../menu";
 import { html } from "../reified/Reified";
 
 export type MenuManagerContext = {
@@ -38,7 +36,6 @@ export class MenuManager {
             clicks.clear();
 
             menu.innerHTML = actions
-                .concat(IN_DEBUG_MODE ? debugmenu : [])
                 .map((record) =>
                     Object.entries(record)
                         .map(([name, { label }]) => `<button class="${name}">${label}</button>`)

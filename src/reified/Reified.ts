@@ -11,6 +11,22 @@ export function html(...args: [string] | [TemplateStringsArray, ...unknown[]]) {
     return new DOMParser().parseFromString(html, "text/html").body.childNodes[0];
 }
 
+export function overlappedBounds(rect: DOMRect, from: { x: number; y: number }, to: { x: number; y: number }) {
+    const bounds = {
+        x: Math.min(from.x, to.x),
+        y: Math.min(from.y, to.y),
+        width: Math.abs(from.x - to.x),
+        height: Math.abs(from.y - to.y),
+    };
+
+    return (
+        rect.x <= bounds.x + bounds.width &&
+        rect.x + rect.width >= bounds.x &&
+        rect.y <= bounds.y + bounds.height &&
+        rect.y + rect.height >= bounds.y
+    );
+}
+
 export function preventDefault(e: Event) {
     e.preventDefault();
 }

@@ -1,4 +1,6 @@
+import { MouseManager } from "./MouseManager";
 import { SandboxManager } from "./SandboxManager";
+import { SelectionManager } from "./SelectionManager";
 
 export class DraggingManager {
     static #dragged: HTMLElement | undefined;
@@ -8,6 +10,8 @@ export class DraggingManager {
     static #mouse = { x: -1, y: -1, ox: -1, oy: -1, down: false };
 
     static #original: { x: number; y: number } | undefined;
+
+    static #downpos = { x: -1, y: -1 };
 
     static watch(element: HTMLElement, target = element) {
         element.dataset.watched = "true";
@@ -50,11 +54,9 @@ export class DraggingManager {
     }
 
     static reset() {
-        this.#mouse.x = -1;
-        this.#mouse.y = -1;
-        this.#mouse.ox = -1;
-        this.#mouse.oy = -1;
-        this.#mouse.down = false;
+        this.#mouse = { x: -1, y: -1, ox: -1, oy: -1, down: false };
+
+        this.#downpos = { x: -1, y: -1 };
 
         this.#watched.forEach((_, element) => this.forget(element));
 
@@ -82,12 +84,50 @@ export class DraggingManager {
         if (this.#dragged) {
             this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
             this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
+
+            // if (SelectionManager.selected.size <= 1) {
+            //     this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
+            //     this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
+            // } else {
+            // const topleft = [...SelectionManager.selected]
+            //     .sort((a, b) => {
+            //         const ax = parseFloat(a.element.style.left);
+            //         const ay = parseFloat(a.element.style.top);
+            //         const bx = parseFloat(b.element.style.left);
+            //         const by = parseFloat(b.element.style.top);
+            //         const ad = Math.sqrt(ax * ax + ay * ay);
+            //         const bd = Math.sqrt(bx * bx + by * by);
+            //         return ad - bd;
+            //     })[0]
+            //     .element.getBoundingClientRect();
+            // SelectionManager.selected.forEach((component) => {
+            //     const offset = component.element.getBoundingClientRect();
+            //     component.move({
+            //         x: this.#mouse.x - this.#mouse.ox + offset.left - topleft.left,
+            //         y: this.#mouse.y - this.#mouse.oy + offset.top - topleft.top,
+            //     });
+            // });
+            // }
         }
     };
 
     static readonly #mousedown = (e: MouseEvent) => {
         this.#mouse.x = e.clientX;
         this.#mouse.y = e.clientY;
+
+        const target = e.target as Element;
+
+        const isOnInvalidTarget = [
+            target.closest("button.board-input"),
+            target.closest("button.board-output"),
+            target.closest("div.component"),
+            target.closest("div.contextmenu"),
+        ].find((element) => element !== null)!;
+
+        if (!isOnInvalidTarget && e.button === 0) {
+            this.#downpos.x = e.clientX;
+            this.#downpos.y = e.clientY;
+        }
 
         this.#mouse.down = true;
     };
@@ -125,10 +165,24 @@ export class DraggingManager {
             }
         }
 
+        if (
+            this.#downpos.x !== -1 &&
+            this.#downpos.y !== -1 &&
+            MouseManager.mouse.x !== -1 &&
+            MouseManager.mouse.y !== -1
+        )
+            SelectionManager.selectAllIn(DraggingManager.#downpos, MouseManager.mouse);
+
         this.#mouse = { x: -1, y: -1, ox: -1, oy: -1, down: false };
+
+        this.#downpos = { x: -1, y: -1 };
 
         this.#dragged = undefined;
 
         this.#original = undefined;
     };
+
+    static get downpos() {
+        return { ...this.#downpos };
+    }
 }
