@@ -1,13 +1,19 @@
 -   add more puzzles/exercises
 
--   add more gates
+-   add more components
+
+    -   tri-state buffer
+    -   switches
+    -   buttons
+    -   clocks
+    -   displays
 
 -   mobile support
 
 -   draw selection box
 
-    -   delete all
     -   move all
-    -   copy all
 
--   copy/paste
+-   github actions to create glitch.com demo
+
+-   fix bug where wiring is not properly destroyed after undoing deletions
