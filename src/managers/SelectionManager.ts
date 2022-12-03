@@ -1,10 +1,11 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import { ACTIVATED_CSS_COLOR } from "../constants";
+import { ACTIVATED_CSS_COLOR, IS_MAC_OS } from "../constants";
 import { fromFile, saveDiagram } from "../files";
 import { Component } from "../reified/Component";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
 import { overlappedBounds, Reified } from "../reified/Reified";
+import { KeybindsManager } from "./KeybindsManager";
 import { MouseManager } from "./MouseManager";
 import { SandboxManager } from "./SandboxManager";
 import { ToastManager } from "./ToastManager";
@@ -24,12 +25,15 @@ export class SelectionManager {
 
         const reified = [...Reified.active].find((component) => component.element === element);
 
-        if (!this.selected.size) {
-            if (reified) {
-                this.select(reified);
-            } else {
-                this.selected.clear();
-            }
+        if (reified) {
+            if (
+                (IS_MAC_OS && (KeybindsManager.isKeyDown("MetaLeft") || KeybindsManager.isKeyDown("MetaRight"))) ||
+                (!IS_MAC_OS && (KeybindsManager.isKeyDown("ControlLeft") || KeybindsManager.isKeyDown("ControlRight")))
+            )
+                this.addSelection(reified);
+            else if (!this.selected.has(reified)) this.select(reified);
+        } else {
+            this.selected.clear();
         }
     };
 
@@ -164,6 +168,14 @@ export class SelectionManager {
         Reified.active.forEach((component) => (component.element.style.zIndex = "100"));
 
         reified.forEach((component) => (component.element.style.zIndex = "1000"));
+    }
+
+    static addSelection(reified: Reified) {
+        this.selected.add(reified);
+
+        Reified.active.forEach((component) => (component.element.style.zIndex = "100"));
+
+        reified.element.style.zIndex = "1000";
     }
 
     static listen() {
