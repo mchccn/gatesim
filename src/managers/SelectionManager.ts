@@ -89,6 +89,8 @@ export class SelectionManager {
 
         const mouse = { ...MouseManager.mouse };
 
+        const selection = this.selected.clone(true);
+
         SandboxManager.pushHistory(
             () => {
                 Reified.active.addAll(components!);
@@ -132,6 +134,10 @@ export class SelectionManager {
                     }
 
                     WiringManager.wires.addAll(wirings!);
+
+                    this.selected.clear();
+
+                    components!.forEach((component) => this.addSelection(component));
                 }
             },
             () => {
@@ -142,6 +148,10 @@ export class SelectionManager {
                 });
 
                 WiringManager.wires.deleteAll(wirings!);
+
+                this.selected.clear();
+
+                selection.forEach((component) => this.addSelection(component));
             },
         );
     };

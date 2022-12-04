@@ -15,5 +15,3 @@
     -   move all
 
 -   github actions to create glitch.com demo
-
--   fix bug where wiring is not properly destroyed after undoing deletions

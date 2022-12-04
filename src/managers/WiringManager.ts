@@ -90,7 +90,6 @@ export class WiringManager {
 
         this.wires.forEach((wire) => {
             if (wire.destroyed) {
-                //
                 if (this.wires.locked) wire.go();
                 else this.wires.delete(wire);
 

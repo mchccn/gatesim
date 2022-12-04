@@ -1,4 +1,4 @@
-import { ACTIVATED_CSS_COLOR, LOCKED_FOR_TESTING } from "../constants";
+import { ACTIVATED_CSS_COLOR, DELAY, LOCKED_FOR_TESTING } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
@@ -43,8 +43,6 @@ export class Component<I extends number, O extends number> extends Reified {
         this.inputs = Array.from(this.element.querySelectorAll<HTMLElement>(".component-input-button"));
         this.outputs = Array.from(this.element.querySelectorAll<HTMLElement>(".component-output-button"));
         this.name = this.element.querySelector<HTMLElement>(".component-name")!;
-
-        this.update();
 
         this.inputs.forEach((input) => {
             this.#observers.set(input, new MutationObserver(this.update.bind(this)));
@@ -223,11 +221,15 @@ export class Component<I extends number, O extends number> extends Reified {
             ]);
         });
 
+        setTimeout(() => this.update(), 0);
+
         this.move(typeof pos === "function" ? pos.call(undefined, this) : pos);
     }
 
-    update() {
+    async update() {
         const out = this.chip.evaluate(this.inputs.map((i) => i.classList.contains("activated")));
+
+        await DELAY(100 + Math.random() * 50 - 25);
 
         this.outputs.forEach((output, i) => {
             output.classList.toggle("activated", out[i]);

@@ -1,4 +1,5 @@
 import { WatchedSet } from "../augments/WatchedSet";
+import { SCUFFED_UUID } from "../constants";
 
 export function html(template: TemplateStringsArray, ...values: unknown[]): HTMLElement;
 export function html(html: string): HTMLElement;
@@ -32,6 +33,8 @@ export function preventDefault(e: Event) {
 }
 
 export abstract class Reified {
+    readonly uuid = SCUFFED_UUID();
+
     protected PERMANENT = false;
 
     static active = new WatchedSet<Reified>();

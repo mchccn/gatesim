@@ -7,11 +7,15 @@ export class DraggingManager {
 
     static readonly #watched = new Map();
 
-    static #mouse = { x: -1, y: -1, ox: -1, oy: -1, down: false };
+    static #mouse = { x: -1, y: -1, ox: -1, oy: -1, ix: -1, iy: -1, down: false };
+
+    static #topleft: Element | undefined;
 
     static #original: { x: number; y: number } | undefined;
 
     static #downpos = { x: -1, y: -1 };
+
+    static #positions: { x: number; y: number }[] | undefined;
 
     static watch(element: HTMLElement, target = element) {
         element.dataset.watched = "true";
@@ -30,8 +34,35 @@ export class DraggingManager {
             this.#mouse.x = e.clientX;
             this.#mouse.y = e.clientY;
 
-            this.#mouse.ox = e.clientX - rect.left + body.left;
-            this.#mouse.oy = e.clientY - rect.top + body.top;
+            this.#mouse.ix = e.clientX;
+            this.#mouse.iy = e.clientY;
+
+            if (SelectionManager.selected.size <= 1) {
+                this.#mouse.ox = e.clientX - rect.left + body.left;
+                this.#mouse.oy = e.clientY - rect.top + body.top;
+            } else {
+                this.#positions = [...SelectionManager.selected].map((target) => ({
+                    x: parseFloat(target.element.style.left),
+                    y: parseFloat(target.element.style.top),
+                }));
+
+                const topleft = [...SelectionManager.selected].sort((a, b) => {
+                    const ax = parseFloat(a.element.style.left);
+                    const ay = parseFloat(a.element.style.top);
+                    const bx = parseFloat(b.element.style.left);
+                    const by = parseFloat(b.element.style.top);
+                    const ad = Math.sqrt(ax * ax + ay * ay);
+                    const bd = Math.sqrt(bx * bx + by * by);
+                    return ad - bd;
+                })[0].element;
+
+                const bounds = topleft.getBoundingClientRect();
+
+                this.#mouse.ox = e.clientX - bounds.x;
+                this.#mouse.oy = e.clientY - bounds.y;
+
+                this.#topleft = topleft;
+            }
 
             this.#original = { x: rect.left, y: rect.top };
         };
@@ -54,13 +85,19 @@ export class DraggingManager {
     }
 
     static reset() {
-        this.#mouse = { x: -1, y: -1, ox: -1, oy: -1, down: false };
+        this.#watched.forEach((_, element) => this.forget(element));
+
+        this.#mouse = { x: -1, y: -1, ox: -1, oy: -1, ix: -1, iy: -1, down: false };
 
         this.#downpos = { x: -1, y: -1 };
 
-        this.#watched.forEach((_, element) => this.forget(element));
+        this.#topleft = undefined;
 
         this.#dragged = undefined;
+
+        this.#original = undefined;
+
+        this.#positions = undefined;
 
         this.deafen();
     }
@@ -82,38 +119,30 @@ export class DraggingManager {
         this.#mouse.y = e.clientY;
 
         if (this.#dragged) {
-            this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
-            this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
+            if (SelectionManager.selected.size <= 1) {
+                this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
+                this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
+            } else {
+                const topleft = this.#topleft!.getBoundingClientRect();
 
-            // if (SelectionManager.selected.size <= 1) {
-            //     this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
-            //     this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
-            // } else {
-            // const topleft = [...SelectionManager.selected]
-            //     .sort((a, b) => {
-            //         const ax = parseFloat(a.element.style.left);
-            //         const ay = parseFloat(a.element.style.top);
-            //         const bx = parseFloat(b.element.style.left);
-            //         const by = parseFloat(b.element.style.top);
-            //         const ad = Math.sqrt(ax * ax + ay * ay);
-            //         const bd = Math.sqrt(bx * bx + by * by);
-            //         return ad - bd;
-            //     })[0]
-            //     .element.getBoundingClientRect();
-            // SelectionManager.selected.forEach((component) => {
-            //     const offset = component.element.getBoundingClientRect();
-            //     component.move({
-            //         x: this.#mouse.x - this.#mouse.ox + offset.left - topleft.left,
-            //         y: this.#mouse.y - this.#mouse.oy + offset.top - topleft.top,
-            //     });
-            // });
-            // }
+                SelectionManager.selected.forEach((component) => {
+                    const offset = component.element.getBoundingClientRect();
+
+                    component.move({
+                        x: this.#mouse.x - this.#mouse.ox + offset.left - topleft.left,
+                        y: this.#mouse.y - this.#mouse.oy + offset.top - topleft.top,
+                    });
+                });
+            }
         }
     };
 
     static readonly #mousedown = (e: MouseEvent) => {
         this.#mouse.x = e.clientX;
         this.#mouse.y = e.clientY;
+
+        this.#mouse.ix = e.clientX;
+        this.#mouse.iy = e.clientY;
 
         const target = e.target as Element;
 
@@ -143,15 +172,12 @@ export class DraggingManager {
                 e.style.cursor = "";
             });
 
-            if (this.#original) {
+            if (SelectionManager.selected.size <= 1) {
                 const target = this.#dragged;
                 const mouse = this.#mouse;
-                const original = this.#original;
+                const original = this.#original!;
 
-                if (
-                    Math.round(parseFloat(target.style.left)) !== mouse.x - mouse.ox - 1 ||
-                    Math.round(parseFloat(target.style.top)) !== mouse.y - mouse.oy - 1
-                )
+                if (mouse.x !== mouse.ix || mouse.y !== mouse.iy)
                     SandboxManager.pushHistory(
                         () => {
                             target.style.left = mouse.x - mouse.ox - 1 + "px";
@@ -160,6 +186,30 @@ export class DraggingManager {
                         () => {
                             target.style.left = original.x - 1 + "px";
                             target.style.top = original.y - 1 + "px";
+                        },
+                    );
+            } else {
+                const mouse = this.#mouse;
+                const targets = [...SelectionManager.selected];
+                const positions = this.#positions!;
+                const topleft = this.#topleft!.getBoundingClientRect();
+
+                if (mouse.x !== mouse.ix || mouse.y !== mouse.iy)
+                    SandboxManager.pushHistory(
+                        () => {
+                            targets.forEach((component) => {
+                                const offset = component.element.getBoundingClientRect();
+
+                                component.move({
+                                    x: mouse.x - mouse.ox + offset.left - topleft.left,
+                                    y: mouse.y - mouse.oy + offset.top - topleft.top,
+                                });
+                            });
+                        },
+                        () => {
+                            targets.forEach((component, i) => {
+                                component.move(positions[i]);
+                            });
                         },
                     );
             }
@@ -173,13 +223,17 @@ export class DraggingManager {
         )
             SelectionManager.selectAllIn(DraggingManager.#downpos, MouseManager.mouse);
 
-        this.#mouse = { x: -1, y: -1, ox: -1, oy: -1, down: false };
+        this.#mouse = { x: -1, y: -1, ox: -1, oy: -1, ix: -1, iy: -1, down: false };
 
         this.#downpos = { x: -1, y: -1 };
+
+        this.#topleft = undefined;
 
         this.#dragged = undefined;
 
         this.#original = undefined;
+
+        this.#positions = undefined;
     };
 
     static get downpos() {

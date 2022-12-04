@@ -1,4 +1,4 @@
-import { ACTIVATED_CSS_COLOR, IN_DEBUG_MODE } from "./constants";
+import { ACTIVATED_CSS_COLOR, COUNTER_GENERATOR, IN_DEBUG_MODE } from "./constants";
 import { ToastManager } from "./managers/ToastManager";
 import { Wiring } from "./managers/WiringManager";
 import { chips } from "./reified/chips";
@@ -6,12 +6,6 @@ import { Component } from "./reified/Component";
 import { Input } from "./reified/Input";
 import { Output } from "./reified/Output";
 import { Reified } from "./reified/Reified";
-
-function* gen() {
-    let i = 0;
-
-    while (true) yield i++;
-}
 
 export type SerializedDiagram = {
     components: (
@@ -48,7 +42,7 @@ export type SerializedDiagram = {
 };
 
 export function saveDiagram(components: Reified[], wires: Wiring[]) {
-    const id = gen();
+    const id = COUNTER_GENERATOR();
 
     const ids = new Map<Element, number>();
 

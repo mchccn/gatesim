@@ -19,7 +19,7 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
                             [[true], [false]],
                             [[false], [true]],
                         ],
-                        { timeout: 200 },
+                        { timeout: 250 },
                     );
                 },
             },
@@ -61,7 +61,7 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
                             [[false, true], [false]],
                             [[true, true], [true]],
                         ],
-                        { timeout: 400 },
+                        { timeout: 500 },
                     );
                 },
             },
@@ -105,7 +105,7 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
                             [[false, true], [true]],
                             [[true, true], [true]],
                         ],
-                        { timeout: 600 },
+                        { timeout: 750 },
                     );
                 },
             },
@@ -150,7 +150,7 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
                             [[false, true], [true]],
                             [[true, true], [false]],
                         ],
-                        { timeout: 800 },
+                        { timeout: 1000 },
                     );
                 },
             },

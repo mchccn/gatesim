@@ -1,3 +1,4 @@
+import * as constants from "./constants";
 import { ACTIVATED_CSS_COLOR } from "./constants";
 import { fromFile } from "./files";
 import { keybinds } from "./keybinds";
@@ -7,7 +8,9 @@ import { menu } from "./menu";
 import { premade } from "./premade";
 import { loadStyles } from "./styles";
 
-await loadStyles();
+Object.assign(globalThis, constants);
+
+await loadStyles(); 
 
 const hrefAsUrl = new URL(location.href);
 

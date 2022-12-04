@@ -2,6 +2,7 @@ import {
     ACTIVATED_CSS_COLOR,
     INPUT_COMPONENT_CSS_SIZE,
     IN_DEBUG_MODE,
+    LIGHT_GRAY_CSS_COLOR,
     LOCKED_FOR_TESTING,
     ORIGIN_POINT,
     OUTPUT_COMPONENT_CSS_SIZE,
@@ -11,6 +12,7 @@ import { keybinds } from "./keybinds";
 import { MenuManagerActions } from "./managers/MenuManager";
 import { ModalManager } from "./managers/ModalManager";
 import { SandboxManager } from "./managers/SandboxManager";
+import { SelectionManager } from "./managers/SelectionManager";
 import { StorageManager } from "./managers/StorageManager";
 import { TestingManager } from "./managers/TestingManager";
 import { ToastManager } from "./managers/ToastManager";
@@ -38,6 +40,8 @@ export const menu: MenuManagerActions = [
 
                 const component = new Component(Reflect.construct(chip, []), ORIGIN_POINT);
 
+                const selection = SelectionManager.selected.clone(true);
+
                 return SandboxManager.pushHistory(
                     () => {
                         Reified.active.add(component);
@@ -51,12 +55,16 @@ export const menu: MenuManagerActions = [
                                 x: e.clientX - parseFloat(width) / 2,
                                 y: e.clientY - parseFloat(height) / 2,
                             });
+
+                            SelectionManager.select(component);
                         }
                     },
                     () => {
                         Reified.active.delete(component);
 
                         component.detach();
+
+                        SelectionManager.selected = selection;
                     },
                 );
             },
@@ -73,18 +81,24 @@ export const menu: MenuManagerActions = [
                     y: e.clientY - INPUT_COMPONENT_CSS_SIZE / 2,
                 });
 
+                const selection = SelectionManager.selected.clone(true);
+
                 return SandboxManager.pushHistory(
                     () => {
                         Reified.active.add(input);
 
                         if (Reified.active.has(input)) {
                             input.attach();
+
+                            SelectionManager.select(input);
                         }
                     },
                     () => {
                         Reified.active.delete(input);
 
                         input.detach();
+
+                        SelectionManager.selected = selection;
                     },
                 );
             },
@@ -99,18 +113,24 @@ export const menu: MenuManagerActions = [
                     y: e.clientY - OUTPUT_COMPONENT_CSS_SIZE / 2,
                 });
 
+                const selection = SelectionManager.selected.clone(true);
+
                 return SandboxManager.pushHistory(
                     () => {
                         Reified.active.add(output);
 
                         if (Reified.active.has(output)) {
                             output.attach();
+
+                            SelectionManager.select(output);
                         }
                     },
                     () => {
                         Reified.active.delete(output);
 
                         output.detach();
+
+                        SelectionManager.selected = selection;
                     },
                 );
             },
@@ -242,6 +262,16 @@ export const menu: MenuManagerActions = [
                       label: "Test prompt",
                       callback: () => {
                           ModalManager.prompt("This is a prompt.");
+                      },
+                  },
+                  "test-toast": {
+                      label: "Test toast",
+                      callback: () => {
+                          ToastManager.toast({
+                              message: "This is a toast.",
+                              color: LIGHT_GRAY_CSS_COLOR,
+                              duration: 2500,
+                          });
                       },
                   },
               },

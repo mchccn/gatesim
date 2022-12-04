@@ -23,3 +23,8 @@ export const LOCKED_FOR_TESTING = () =>
     ModalManager.alert("The diagram is currently locked for testing. No changes can be made.");
 export const DELAY = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));
 export const GET_CANVAS_CTX = () => document.querySelector("canvas")!.getContext("2d")!;
+export const COUNTER_GENERATOR = function* (i = 0) {
+    while (true) yield i++;
+};
+export const SCUFFED_UUID = () =>
+    Date.now().toString(36) + Number(Date.now().toString().split("").reverse().join("")).toString(36);
