@@ -6,6 +6,7 @@ import {
     LOCKED_FOR_TESTING,
     ORIGIN_POINT,
     OUTPUT_COMPONENT_CSS_SIZE,
+    TOAST_DURATION,
 } from "./constants";
 import { fromFile, saveDiagram } from "./files";
 import { keybinds } from "./keybinds";
@@ -155,11 +156,17 @@ export const menu: MenuManagerActions = [
         "save-to": {
             label: "Save with name",
             callback: async () => {
-                const name = await ModalManager.prompt("What should be the name of this save?");
+                const save = await ModalManager.prompt("What should be the name of this save?");
 
-                if (typeof name !== "string") return;
+                if (typeof save !== "string") return;
 
-                await SandboxManager.saveTo(name);
+                await SandboxManager.saveTo(save);
+
+                const hrefAsUrl = new URL(location.href);
+
+                hrefAsUrl.searchParams.set("save", save);
+
+                history.pushState(undefined, "", hrefAsUrl);
             },
         },
         "load-from": {
@@ -175,6 +182,12 @@ export const menu: MenuManagerActions = [
                 SandboxManager.reset();
 
                 SandboxManager.setup({ keybinds, menu, save });
+
+                const hrefAsUrl = new URL(location.href);
+
+                hrefAsUrl.searchParams.set("save", save);
+
+                history.pushState(undefined, "", hrefAsUrl);
             },
         },
         "save-as": {
@@ -207,7 +220,7 @@ export const menu: MenuManagerActions = [
                     return ToastManager.toast({
                         message: "No file was provided.",
                         color: ACTIVATED_CSS_COLOR,
-                        duration: 2500,
+                        duration: TOAST_DURATION,
                     });
 
                 const reader = new FileReader();
@@ -224,7 +237,7 @@ export const menu: MenuManagerActions = [
                     return ToastManager.toast({
                         message: "Unable to read the file.",
                         color: ACTIVATED_CSS_COLOR,
-                        duration: 2500,
+                        duration: TOAST_DURATION,
                     });
 
                 const {
@@ -232,7 +245,12 @@ export const menu: MenuManagerActions = [
                     result: [components, wires],
                 } = fromFile(raw);
 
-                if (error) return ToastManager.toast({ message: error, color: ACTIVATED_CSS_COLOR, duration: 2500 });
+                if (error)
+                    return ToastManager.toast({
+                        message: error,
+                        color: ACTIVATED_CSS_COLOR,
+                        duration: TOAST_DURATION,
+                    });
 
                 SandboxManager.reset();
 
@@ -275,7 +293,7 @@ export const menu: MenuManagerActions = [
                           ToastManager.toast({
                               message: "This is a toast.",
                               color: LIGHT_GRAY_CSS_COLOR,
-                              duration: 2500,
+                              duration: TOAST_DURATION,
                           });
                       },
                   },
@@ -285,6 +303,25 @@ export const menu: MenuManagerActions = [
                       label: "Wipe storage",
                       callback: () => {
                           StorageManager.storage.clear();
+                      },
+                  },
+                  "wipe-save": {
+                      label: "Wipe named save",
+                      callback: async () => {
+                          const save = await ModalManager.prompt("");
+
+                          if (save) {
+                              if (!StorageManager.has("saves:" + save))
+                                  return ToastManager.toast({
+                                      message: "No saves exist with that name.",
+                                      color: ACTIVATED_CSS_COLOR,
+                                      duration: TOAST_DURATION,
+                                  });
+
+                              StorageManager.delete("saves:" + save);
+
+                              location.reload();
+                          }
                       },
                   },
               },

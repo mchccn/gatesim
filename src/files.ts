@@ -1,4 +1,4 @@
-import { ACTIVATED_CSS_COLOR, COUNTER_GENERATOR, IN_DEBUG_MODE } from "./constants";
+import { ACTIVATED_CSS_COLOR, COUNTER_GENERATOR, IN_DEBUG_MODE, TOAST_DURATION } from "./constants";
 import { ToastManager } from "./managers/ToastManager";
 import { Wiring } from "./managers/WiringManager";
 import { chips } from "./reified/chips";
@@ -132,7 +132,7 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
             ToastManager.toast({
                 message: "Unable to serialize diagram.",
                 color: ACTIVATED_CSS_COLOR,
-                duration: 2500,
+                duration: TOAST_DURATION,
             });
 
             throw new Error("Unknown Reified component type.");

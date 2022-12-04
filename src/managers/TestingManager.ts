@@ -43,7 +43,7 @@ export class TestingManager {
                 failed = true;
 
                 await ModalManager.alert(
-                    `Diagram failed to pass the test with inputs "${expectedOutputs
+                    `Diagram failed to pass the test with inputs "${givenInputs
                         .map((boolean) => +boolean)
                         .join(" ")}".`,
                 );

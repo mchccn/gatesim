@@ -1,5 +1,5 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import { ACTIVATED_CSS_COLOR, IS_MAC_OS } from "../constants";
+import { ACTIVATED_CSS_COLOR, IS_MAC_OS, TOAST_DURATION } from "../constants";
 import { fromFile, saveDiagram } from "../files";
 import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";
@@ -86,7 +86,7 @@ export class SelectionManager {
             return ToastManager.toast({
                 message: "Unable to paste diagram data.",
                 color: ACTIVATED_CSS_COLOR,
-                duration: 2500,
+                duration: TOAST_DURATION,
             });
 
         const mouse = { ...MouseManager.mouse };

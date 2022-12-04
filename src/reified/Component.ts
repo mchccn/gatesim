@@ -1,4 +1,4 @@
-import { ACTIVATED_CSS_COLOR, DELAY, LOCKED_FOR_TESTING } from "../constants";
+import { ACTIVATED_CSS_COLOR, DELAY, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
@@ -22,7 +22,9 @@ export class Component<I extends number, O extends number> extends Reified {
 
     constructor(
         chip: Chip<I, O>,
-        pos: { x: number; y: number } | ((comp: Component<I, O>) => { x: number; y: number }),
+        pos:
+            | { x: number; y: number; centered?: boolean }
+            | ((comp: Component<I, O>) => { x: number; y: number; centered?: boolean }),
     ) {
         super();
 
@@ -144,7 +146,7 @@ export class Component<I extends number, O extends number> extends Reified {
                                 return void ToastManager.toast({
                                     message: "This component is permanent and cannot be deleted.",
                                     color: ACTIVATED_CSS_COLOR,
-                                    duration: 2500,
+                                    duration: TOAST_DURATION,
                                 });
 
                             if (TestingManager.testing) return LOCKED_FOR_TESTING();

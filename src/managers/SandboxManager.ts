@@ -1,5 +1,5 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import { ACTIVATED_CSS_COLOR, IN_DEBUG_MODE } from "../constants";
+import { ACTIVATED_CSS_COLOR, IN_DEBUG_MODE, TOAST_DURATION } from "../constants";
 import { fromFile, saveDiagram } from "../files";
 import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";
@@ -107,7 +107,7 @@ export class SandboxManager {
                         ToastManager.toast({
                             message: "Exceeded total components limit.",
                             color: ACTIVATED_CSS_COLOR,
-                            duration: 2500,
+                            duration: TOAST_DURATION,
                         });
 
                         return false;
@@ -117,7 +117,7 @@ export class SandboxManager {
                         ToastManager.toast({
                             message: "Exceeded total inputs limit.",
                             color: ACTIVATED_CSS_COLOR,
-                            duration: 2500,
+                            duration: TOAST_DURATION,
                         });
 
                         return false;
@@ -127,7 +127,7 @@ export class SandboxManager {
                         ToastManager.toast({
                             message: "Exceeded total outputs limit.",
                             color: ACTIVATED_CSS_COLOR,
-                            duration: 2500,
+                            duration: TOAST_DURATION,
                         });
 
                         return false;
@@ -137,7 +137,7 @@ export class SandboxManager {
                         ToastManager.toast({
                             message: "Exceeded total chips limit.",
                             color: ACTIVATED_CSS_COLOR,
-                            duration: 2500,
+                            duration: TOAST_DURATION,
                         });
 
                         return false;
@@ -151,7 +151,7 @@ export class SandboxManager {
                         ToastManager.toast({
                             message: `Exceeded total '${item.chip.name}' limit.`,
                             color: ACTIVATED_CSS_COLOR,
-                            duration: 2500,
+                            duration: TOAST_DURATION,
                         });
 
                         return false;
@@ -168,7 +168,7 @@ export class SandboxManager {
                         ToastManager.toast({
                             message: "Exceeded total wirings limit.",
                             color: ACTIVATED_CSS_COLOR,
-                            duration: 2500,
+                            duration: TOAST_DURATION,
                         });
 
                         return false;
@@ -211,7 +211,7 @@ export class SandboxManager {
                     ToastManager.toast({
                         message: "Unable to read from saves.",
                         color: ACTIVATED_CSS_COLOR,
-                        duration: 2500,
+                        duration: TOAST_DURATION,
                     });
                 } else {
                     if (!this.#config.overrideSaveIfExists) {
@@ -317,7 +317,7 @@ export class SandboxManager {
             return void ToastManager.toast({
                 message: "Nothing to undo.",
                 color: ACTIVATED_CSS_COLOR,
-                duration: 2500,
+                duration: TOAST_DURATION,
             });
 
         const [redo, undo] = this.#history.pop()!;
@@ -332,7 +332,7 @@ export class SandboxManager {
             return void ToastManager.toast({
                 message: "Nothing to redo.",
                 color: ACTIVATED_CSS_COLOR,
-                duration: 2500,
+                duration: TOAST_DURATION,
             });
 
         const [command, undo] = this.#redos.pop()!;
@@ -354,11 +354,5 @@ export class SandboxManager {
             return;
 
         StorageManager.set("saves:" + this.#config.save, saveDiagram([...Reified.active], [...WiringManager.wires]));
-
-        const hrefAsUrl = new URL(location.href);
-
-        hrefAsUrl.searchParams.set("save", save);
-
-        history.pushState(undefined, "", hrefAsUrl);
     }
 }

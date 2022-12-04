@@ -1,4 +1,4 @@
-import { ACTIVATED_CSS_COLOR, LOCKED_FOR_TESTING } from "../constants";
+import { ACTIVATED_CSS_COLOR, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
@@ -9,7 +9,7 @@ import { html, Reified } from "./Reified";
 export class Input extends Reified {
     readonly element;
 
-    constructor(pos: { x: number; y: number } = { x: 0, y: 0 }) {
+    constructor(pos: { x: number; y: number; centered?: boolean } = { x: 0, y: 0 }) {
         super();
 
         this.element = html`<button class="board-input">I</button>`;
@@ -59,7 +59,7 @@ export class Input extends Reified {
                             return void ToastManager.toast({
                                 message: "This input is permanent and cannot be deleted.",
                                 color: ACTIVATED_CSS_COLOR,
-                                duration: 2500,
+                                duration: TOAST_DURATION,
                             });
 
                         if (TestingManager.testing) return LOCKED_FOR_TESTING();

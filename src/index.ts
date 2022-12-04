@@ -1,5 +1,5 @@
 import * as constants from "./constants";
-import { ACTIVATED_CSS_COLOR } from "./constants";
+import { ACTIVATED_CSS_COLOR, TOAST_DURATION } from "./constants";
 import { fromFile } from "./files";
 import { keybinds } from "./keybinds";
 import { SandboxManager } from "./managers/SandboxManager";
@@ -34,7 +34,7 @@ if (shouldLoadInline) {
         ToastManager.toast({
             message: "Diagram is not correctly encoded.",
             color: ACTIVATED_CSS_COLOR,
-            duration: 2500,
+            duration: TOAST_DURATION,
         });
 
         hrefAsUrl.searchParams.delete("inline");
@@ -58,7 +58,7 @@ if (shouldLoadInline) {
                 ToastManager.toast({
                     message: "No premades were found with that name.",
                     color: ACTIVATED_CSS_COLOR,
-                    duration: 2500,
+                    duration: TOAST_DURATION,
                 });
 
                 hrefAsUrl.searchParams.delete("premade");

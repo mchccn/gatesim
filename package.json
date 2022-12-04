@@ -6,7 +6,8 @@
     "scripts": {
         "watch": "tsc -w",
         "build": "webpack",
-        "dev": "webpack --watch"
+        "dev": "webpack --watch",
+        "deploy": "vercel --prod"
     },
     "devDependencies": {
         "ts-loader": "^9.4.1",

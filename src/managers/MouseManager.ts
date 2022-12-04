@@ -3,6 +3,8 @@ export class MouseManager {
 
     static readonly #mousedowns = new Set<(e: MouseEvent) => void>();
     static readonly #mouseups = new Set<(e: MouseEvent) => void>();
+    static readonly #touchstarts = new Set<(e: TouchEvent) => void>();
+    static readonly #touchends = new Set<(e: TouchEvent) => void>();
 
     static #mousemove = (e: MouseEvent) => {
         this.#mouse.x = e.clientX;
@@ -10,10 +12,16 @@ export class MouseManager {
     };
 
     static #mousedown = (e: MouseEvent) => {
+        this.#mouse.x = e.clientX;
+        this.#mouse.y = e.clientY;
+
         this.#mousedowns.forEach((l) => l.call(undefined, e));
     };
 
     static #mouseup = (e: MouseEvent) => {
+        this.#mouse.x = e.clientX;
+        this.#mouse.y = e.clientY;
+
         this.#mouseups.forEach((l) => l.call(undefined, e));
     };
 
@@ -25,11 +33,15 @@ export class MouseManager {
     static #touchstart = (e: TouchEvent) => {
         this.#mouse.x = e.touches[0].clientX;
         this.#mouse.y = e.touches[0].clientY;
+
+        this.#touchstarts.forEach((l) => l.call(undefined, e));
     };
 
     static #touchend = (e: TouchEvent) => {
         this.#mouse.x = e.changedTouches[0].clientX;
         this.#mouse.y = e.changedTouches[0].clientY;
+
+        this.#touchends.forEach((l) => l.call(undefined, e));
     };
 
     static start() {
@@ -73,6 +85,22 @@ export class MouseManager {
 
     static offMouseUp(handler: (e: MouseEvent) => void) {
         this.#mouseups.delete(handler);
+    }
+
+    static onTouchStart(handler: (e: TouchEvent) => void) {
+        this.#touchstarts.add(handler);
+    }
+
+    static onTouchEnd(handler: (e: TouchEvent) => void) {
+        this.#touchends.add(handler);
+    }
+
+    static offTouchStart(handler: (e: TouchEvent) => void) {
+        this.#touchstarts.delete(handler);
+    }
+
+    static offTouchEnd(handler: (e: TouchEvent) => void) {
+        this.#touchends.delete(handler);
     }
 
     static get mouse() {

@@ -28,3 +28,4 @@ export const COUNTER_GENERATOR = function* (i = 0) {
 };
 export const SCUFFED_UUID = () =>
     Date.now().toString(36) + Number(Date.now().toString().split("").reverse().join("")).toString(36);
+export const TOAST_DURATION = 2500;
