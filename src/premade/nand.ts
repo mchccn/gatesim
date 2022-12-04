@@ -8,7 +8,7 @@ import { Component } from "../reified/Component";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
 
-export const nands: Record<string, (ctx: { name: string }) => void> = {
+export const nand: Record<string, (ctx: { name: string }) => void> = {
     "nand:not": ({ name: save }) => {
         menu.splice(2, 0, {
             test: {
@@ -19,7 +19,7 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
                             [[true], [false]],
                             [[false], [true]],
                         ],
-                        { timeout: 250 },
+                        { timeout: 500 },
                     );
                 },
             },
@@ -31,9 +31,9 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
             save,
             initial: [
                 [
-                    new Input({ x: 100, y: 100 }),
-                    new Component(new NandGate(), { x: 300, y: 100 }),
-                    new Output({ x: 500, y: 100 }),
+                    new Input({ x: 100, y: 100, centered: true }),
+                    new Component(new NandGate(), { x: 300, y: 100, centered: true }),
+                    new Output({ x: 500, y: 100, centered: true }),
                 ].map((component) => component.permanent()),
                 [],
             ],
@@ -61,7 +61,7 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
                             [[false, true], [false]],
                             [[true, true], [true]],
                         ],
-                        { timeout: 500 },
+                        { timeout: 750 },
                     );
                 },
             },
@@ -73,11 +73,11 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
             save,
             initial: [
                 [
-                    new Input({ x: 100, y: 100 }),
-                    new Input({ x: 100, y: 200 }),
-                    new Component(new NandGate(), { x: 300, y: 100 }),
-                    new Component(new NandGate(), { x: 300, y: 200 }),
-                    new Output({ x: 500, y: 150 }),
+                    new Input({ x: 100, y: 100, centered: true }),
+                    new Input({ x: 100, y: 200, centered: true }),
+                    new Component(new NandGate(), { x: 300, y: 100, centered: true }),
+                    new Component(new NandGate(), { x: 300, y: 200, centered: true }),
+                    new Output({ x: 500, y: 150, centered: true }),
                 ].map((component) => component.permanent()),
                 [],
             ],
@@ -105,7 +105,7 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
                             [[false, true], [true]],
                             [[true, true], [true]],
                         ],
-                        { timeout: 750 },
+                        { timeout: 1000 },
                     );
                 },
             },
@@ -117,11 +117,11 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
             save,
             initial: [
                 [
-                    new Input({ x: 100, y: 100 }),
-                    new Input({ x: 100, y: 200 }),
-                    new Component(new NandGate(), { x: 300, y: 100 }),
-                    new Component(new NandGate(), { x: 300, y: 150 }),
-                    new Component(new NandGate(), { x: 300, y: 200 }),
+                    new Input({ x: 100, y: 100, centered: true }),
+                    new Input({ x: 100, y: 200, centered: true }),
+                    new Component(new NandGate(), { x: 300, y: 100, centered: true }),
+                    new Component(new NandGate(), { x: 300, y: 150, centered: true }),
+                    new Component(new NandGate(), { x: 300, y: 200, centered: true }),
                     new Output({ x: 600, y: 150 }),
                 ].map((component) => component.permanent()),
                 [],
@@ -150,7 +150,7 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
                             [[false, true], [true]],
                             [[true, true], [false]],
                         ],
-                        { timeout: 1000 },
+                        { timeout: 1250 },
                     );
                 },
             },
@@ -162,13 +162,13 @@ export const nands: Record<string, (ctx: { name: string }) => void> = {
             save,
             initial: [
                 [
-                    new Input({ x: 100, y: 100 }),
-                    new Input({ x: 100, y: 200 }),
-                    new Component(new NandGate(), { x: 300, y: 100 }),
-                    new Component(new NandGate(), { x: 300, y: 200 }),
-                    new Component(new NandGate(), { x: 500, y: 100 }),
-                    new Component(new NandGate(), { x: 500, y: 200 }),
-                    new Output({ x: 700, y: 150 }),
+                    new Input({ x: 100, y: 100, centered: true }),
+                    new Input({ x: 100, y: 200, centered: true }),
+                    new Component(new NandGate(), { x: 300, y: 100, centered: true }),
+                    new Component(new NandGate(), { x: 300, y: 200, centered: true }),
+                    new Component(new NandGate(), { x: 500, y: 100, centered: true }),
+                    new Component(new NandGate(), { x: 500, y: 200, centered: true }),
+                    new Output({ x: 700, y: 150, centered: true }),
                 ].map((component) => component.permanent()),
                 [],
             ],
