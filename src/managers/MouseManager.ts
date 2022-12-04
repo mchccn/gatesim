@@ -17,16 +17,37 @@ export class MouseManager {
         this.#mouseups.forEach((l) => l.call(undefined, e));
     };
 
+    static #touchmove = (e: TouchEvent) => {
+        this.#mouse.x = e.touches[0].clientX;
+        this.#mouse.y = e.touches[0].clientY;
+    };
+
+    static #touchstart = (e: TouchEvent) => {
+        this.#mouse.x = e.touches[0].clientX;
+        this.#mouse.y = e.touches[0].clientY;
+    };
+
+    static #touchend = (e: TouchEvent) => {
+        this.#mouse.x = e.changedTouches[0].clientX;
+        this.#mouse.y = e.changedTouches[0].clientY;
+    };
+
     static start() {
         document.addEventListener("mousemove", this.#mousemove);
         document.addEventListener("mousedown", this.#mousedown);
         document.addEventListener("mouseup", this.#mouseup);
+        document.addEventListener("touchmove", this.#touchmove);
+        document.addEventListener("touchstart", this.#touchstart);
+        document.addEventListener("touchend", this.#touchend);
     }
 
     static stop() {
         document.removeEventListener("mousemove", this.#mousemove);
         document.removeEventListener("mousedown", this.#mousedown);
         document.removeEventListener("mouseup", this.#mouseup);
+        document.removeEventListener("touchmove", this.#touchmove);
+        document.removeEventListener("touchstart", this.#touchstart);
+        document.removeEventListener("touchend", this.#touchend);
 
         this.#mouse = { x: 0, y: 0 };
     }
