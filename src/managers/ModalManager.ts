@@ -2,6 +2,8 @@ import { html } from "../reified/Reified";
 import { SandboxManager } from "./SandboxManager";
 
 export class ModalManager {
+    static #stack = new Array();
+
     static get container() {
         return document.querySelector<HTMLElement>(".modal-container")!;
     }
@@ -17,7 +19,6 @@ export class ModalManager {
             this.container.lastElementChild!.classList.remove("modal-inactive");
 
             if (this.container.lastElementChild!.classList.contains("modal-alert")) {
-                //
                 this.container.lastElementChild!.querySelector<HTMLElement>(".modal-ok")!.focus();
             }
         }
@@ -65,6 +66,18 @@ export class ModalManager {
             };
 
             document.addEventListener("keydown", esc);
+
+            const clickout = (e: MouseEvent) => {
+                const target = e.target as HTMLElement;
+
+                if (target !== this.container || this.container.lastElementChild !== alert) return;
+
+                this.container.removeEventListener("mousedown", clickout);
+
+                done();
+            };
+
+            this.container.addEventListener("mousedown", clickout);
 
             alert.querySelector<HTMLElement>(".modal-ok")!.addEventListener("click", done);
         });
@@ -120,6 +133,24 @@ export class ModalManager {
 
             document.addEventListener("keydown", esc);
 
+            const clickout = (e: MouseEvent) => {
+                const target = e.target as HTMLElement;
+
+                if (target !== this.container || this.container.lastElementChild !== confirm) return;
+
+                this.container.removeEventListener("mousedown", clickout);
+
+                confirm.remove();
+
+                this.#onModalResolved();
+
+                SandboxManager.watchedUnresolvedPromises.delete(finish);
+
+                return resolve(false);
+            };
+
+            this.container.addEventListener("mousedown", clickout);
+
             confirm.querySelector<HTMLElement>(".modal-cancel")!.addEventListener("click", handler(false));
 
             confirm.querySelector<HTMLElement>(".modal-ok")!.addEventListener("click", handler(true));
@@ -170,6 +201,20 @@ export class ModalManager {
             };
 
             document.addEventListener("keydown", esc);
+
+            const clickout = (e: MouseEvent) => {
+                const target = e.target as HTMLElement;
+
+                if (target !== this.container || this.container.lastElementChild !== prompt) return;
+
+                this.container.removeEventListener("mousedown", clickout);
+
+                done();
+
+                resolve(undefined);
+            };
+
+            this.container.addEventListener("mousedown", clickout);
 
             prompt.querySelector<HTMLElement>(".modal-input")!.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {

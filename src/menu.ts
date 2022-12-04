@@ -271,30 +271,32 @@ export const menu: MenuManagerActions = [
               {
                   "test-alert": {
                       label: "Test alert",
-                      callback: () => {
-                          ModalManager.alert("This is an alert.");
+                      callback: async () => {
+                          console.log(await ModalManager.alert("This is an alert."));
                       },
                   },
                   "test-confirm": {
                       label: "Test confirm",
-                      callback: () => {
-                          ModalManager.confirm("This is a confirmation.");
+                      callback: async () => {
+                          console.log(await ModalManager.confirm("This is a confirmation."));
                       },
                   },
                   "test-prompt": {
                       label: "Test prompt",
-                      callback: () => {
-                          ModalManager.prompt("This is a prompt.");
+                      callback: async () => {
+                          console.log(await ModalManager.prompt("This is a prompt."));
                       },
                   },
                   "test-toast": {
                       label: "Test toast",
-                      callback: () => {
-                          ToastManager.toast({
-                              message: "This is a toast.",
-                              color: LIGHT_GRAY_CSS_COLOR,
-                              duration: TOAST_DURATION,
-                          });
+                      callback: async () => {
+                          console.log(
+                              await ToastManager.toast({
+                                  message: "This is a toast.",
+                                  color: LIGHT_GRAY_CSS_COLOR,
+                                  duration: TOAST_DURATION,
+                              }),
+                          );
                       },
                   },
               },
