@@ -209,6 +209,7 @@ export class DraggingManager {
             target.closest("button.board-input"),
             target.closest("button.board-output"),
             target.closest("div.component"),
+            target.closest("div.display"),
             target.closest("div.contextmenu"),
         ].find((element) => element !== null)!;
 
@@ -335,6 +336,7 @@ export class DraggingManager {
             target.closest("button.board-input"),
             target.closest("button.board-output"),
             target.closest("div.component"),
+            target.closest("div.display"),
             target.closest("div.contextmenu"),
         ].find((element) => element !== null)!;
 

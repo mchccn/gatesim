@@ -19,26 +19,31 @@ import { ToastManager } from "./managers/ToastManager";
 import { WiringManager } from "./managers/WiringManager";
 import { chips } from "./reified/chips";
 import { Component } from "./reified/Component";
+import { Display } from "./reified/Display";
 import { Input } from "./reified/Input";
 import { Output } from "./reified/Output";
 import { Reified } from "./reified/Reified";
 
 export const menu: MenuManagerActions = [
     {
-        "insert-chip": {
-            label: "Insert chip",
+        "insert-component": {
+            label: "Insert component",
             callback: async (e) => {
                 if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
-                const name = await ModalManager.prompt("Enter the chip's name:");
+                const name = await ModalManager.prompt("Enter the component's name:");
 
                 if (typeof name !== "string") return;
 
                 const chip = chips.get(name.toUpperCase());
 
-                if (!chip) return ModalManager.alert("No chip was found with that name.");
+                const component = chip
+                    ? new Component(Reflect.construct(chip, []), ORIGIN_POINT)
+                    : name.toUpperCase() === "DISPLAY"
+                    ? new Display()
+                    : undefined;
 
-                const component = new Component(Reflect.construct(chip, []), ORIGIN_POINT);
+                if (!component) return ModalManager.alert("No component was found with that name.");
 
                 const selection = SelectionManager.selected.clone(true);
 

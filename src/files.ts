@@ -3,6 +3,7 @@ import { ToastManager } from "./managers/ToastManager";
 import { Wiring } from "./managers/WiringManager";
 import { chips } from "./reified/chips";
 import { Component } from "./reified/Component";
+import { Display } from "./reified/Display";
 import { Input } from "./reified/Input";
 import { Output } from "./reified/Output";
 import { Reified } from "./reified/Reified";
@@ -34,6 +35,16 @@ export type SerializedDiagram = {
               name: string;
               inputs: { id: number; activated: boolean }[];
               outputs: { id: number; activated: boolean }[];
+              x: number;
+              y: number;
+          }
+        | {
+              reified: number;
+              permanent: boolean;
+              type: "DISPLAY";
+              inputs: { id: number; activated: boolean }[];
+              outputs: { id: number; activated: boolean }[];
+              radix: number;
               x: number;
               y: number;
           }
@@ -97,6 +108,27 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
                 };
             }
 
+            if (component instanceof Display) {
+                return {
+                    reified,
+                    permanent: component.permanence,
+                    type: "DISPLAY",
+                    inputs: component.inputs.map((i) => {
+                        ids.set(i, id.next().value!);
+
+                        return { id: ids.get(i)!, activated: i.classList.contains("activated") };
+                    }),
+                    outputs: component.outputs.map((o) => {
+                        ids.set(o, id.next().value!);
+
+                        return { id: ids.get(o)!, activated: o.classList.contains("activated") };
+                    }),
+                    radix: component.radix,
+                    x: parseFloat(component.element.style.left),
+                    y: parseFloat(component.element.style.top),
+                };
+            }
+
             ToastManager.toast({
                 message: "Unable to serialize diagram.",
                 color: ACTIVATED_CSS_COLOR,
@@ -145,6 +177,24 @@ export function fromFile(
                 elements.set(raw.id, output.element);
 
                 return raw.permanent ? output.permanent() : output;
+            }
+
+            if (raw.type === "DISPLAY") {
+                const display = new Display(raw, raw.inputs.length, raw.radix);
+
+                display.inputs.forEach((input, index) => {
+                    input.classList.toggle("activated", raw.inputs[index].activated);
+
+                    elements.set(raw.inputs[index].id, input);
+                });
+
+                display.outputs.forEach((output, index) => {
+                    output.classList.toggle("activated", raw.outputs[index].activated);
+
+                    elements.set(raw.outputs[index].id, output);
+                });
+
+                return raw.permanent ? display.permanent() : display;
             }
 
             const component = new Component(new (chips.get(raw.name)!)(), raw);
@@ -198,7 +248,7 @@ function validate(data: unknown): asserts data is SerializedDiagram {
 
         if (!("type" in component)) throw new Error("Components data is missing a type.");
 
-        if (typeof component.type !== "string" || !["INPUT", "OUTPUT", "COMPONENT"].includes(component.type))
+        if (typeof component.type !== "string" || !["INPUT", "OUTPUT", "COMPONENT", "DISPLAY"].includes(component.type))
             throw new Error("Invalid component type.");
 
         if (!("x" in component)) throw new Error("Components data is missing a x coordinate.");
@@ -271,11 +321,48 @@ function validate(data: unknown): asserts data is SerializedDiagram {
 
                 break;
             }
+            case "DISPLAY": {
+                if (!("radix" in component)) throw new Error("Display data is missing display radix.");
+
+                if (typeof component.radix !== "number") throw new Error("Display radix must be a number.");
+
+                if (!("inputs" in component)) throw new Error("Display data is missing inputs.");
+
+                if (!Array.isArray(component.inputs)) throw new Error("Display inputs data must be an array.");
+
+                if (!("outputs" in component)) throw new Error("Display data is missing outputs.");
+
+                if (!Array.isArray(component.outputs)) throw new Error("Display outputs data must be an array.");
+
+                for (const input of component.inputs as unknown[]) {
+                    if (!input || typeof input !== "object") throw new Error("Input data must be an object");
+
+                    if (!("id" in input)) throw new Error("Input data is missing id.");
+
+                    if (typeof input.id !== "number") throw new Error("Input data id must be a number.");
+
+                    if (!("activated" in input)) throw new Error("Input data is missing activation status.");
+
+                    if (typeof input.activated !== "boolean") throw new Error("Activation status must be a boolean.");
+                }
+
+                for (const output of component.outputs as unknown[]) {
+                    if (!output || typeof output !== "object") throw new Error("Input data must be an object");
+
+                    if (!("id" in output)) throw new Error("Input data is missing id.");
+
+                    if (typeof output.id !== "number") throw new Error("Input data id must be a number.");
+
+                    if (!("activated" in output)) throw new Error("Input data is missing activation status.");
+
+                    if (typeof output.activated !== "boolean") throw new Error("Activation status must be a boolean.");
+                }
+            }
         }
     }
 
     const ids = data.components.flatMap<number>((component) =>
-        component.type === "COMPONENT"
+        component.type === "COMPONENT" || component.type === "DISPLAY"
             ? [
                   ...component.inputs.map(({ id }: { id: number }) => id),
                   ...component.outputs.map(({ id }: { id: number }) => id),

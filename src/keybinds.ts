@@ -3,6 +3,7 @@ import { SandboxManager } from "./managers/SandboxManager";
 import { SelectionManager } from "./managers/SelectionManager";
 import { Wiring, WiringManager } from "./managers/WiringManager";
 import { Component } from "./reified/Component";
+import { Display } from "./reified/Display";
 import { Input } from "./reified/Input";
 import { Output } from "./reified/Output";
 import { Reified } from "./reified/Reified";
@@ -107,7 +108,7 @@ export const keybinds: Record<string, (e: KeyboardEvent) => void> = {
                         });
 
                         component.element.classList.remove("activated");
-                    } else if (component instanceof Component) {
+                    } else if (component instanceof Component || component instanceof Display) {
                         WiringManager.wires.forEach((wire) => {
                             if (
                                 component.inputs.some((i) => wire.to === i) ||

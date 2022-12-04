@@ -1,7 +1,8 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import { ACTIVATED_CSS_COLOR } from "../constants";
+import { ACTIVATED_CSS_COLOR, IN_DEBUG_MODE } from "../constants";
 import { fromFile, saveDiagram } from "../files";
 import { Component } from "../reified/Component";
+import { Display } from "../reified/Display";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
 import { html, Reified } from "../reified/Reified";
@@ -46,6 +47,7 @@ const calculateReifiedTotals = (set: Set<Reified>) =>
                 map.chipsTotal++;
 
                 map.chips.set(item.chip.name, (map.chips.get(item.chip.name) ?? 0) + 1);
+            } else if (item instanceof Display) {
             } else {
                 throw new Error("Unknown component type.");
             }
@@ -204,6 +206,8 @@ export class SandboxManager {
                 if (error) {
                     StorageManager.delete("saves:" + this.#config.save);
 
+                    if (IN_DEBUG_MODE) console.error("Failed to read from saves:", error);
+
                     ToastManager.toast({
                         message: "Unable to read from saves.",
                         color: ACTIVATED_CSS_COLOR,
@@ -249,6 +253,14 @@ export class SandboxManager {
 
             if (check) this.#config.ifStateChecked?.();
         }, this.#config.checkInterval ?? 50) as never;
+    }
+
+    static manualSave() {
+        if (typeof this.#config.save !== "undefined")
+            StorageManager.set(
+                "saves:" + this.#config.save,
+                saveDiagram([...Reified.active], [...WiringManager.wires]),
+            );
     }
 
     static reset() {
@@ -342,5 +354,11 @@ export class SandboxManager {
             return;
 
         StorageManager.set("saves:" + this.#config.save, saveDiagram([...Reified.active], [...WiringManager.wires]));
+
+        const hrefAsUrl = new URL(location.href);
+
+        hrefAsUrl.searchParams.set("save", save);
+
+        history.pushState(undefined, "", hrefAsUrl);
     }
 }

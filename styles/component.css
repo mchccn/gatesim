@@ -1,3 +1,4 @@
+.display,
 .component {
     position: absolute;
 
@@ -11,7 +12,7 @@
     width: fit-content;
 
     min-height: 40px;
-    min-width: 120px;
+    min-width: 100px;
 
     background-color: white;
 
@@ -19,6 +20,7 @@
     border-radius: 4px;
 }
 
+.display:hover,
 .component:hover {
     cursor: grab;
 }
@@ -71,6 +73,7 @@
     color: #ff7777;
 }
 
+.display-content,
 .component-name {
     height: 100%;
     width: 100%;
@@ -81,6 +84,8 @@
     font-family: sans-serif;
     font-weight: 900;
     font-size: 1.5rem;
+
+    padding: 0 8px;
 
     color: #333333;
 

@@ -99,7 +99,12 @@ export class WiringManager {
             const from = wire.from.getBoundingClientRect();
             const to = wire.to.getBoundingClientRect();
 
-            wire.to.classList.toggle("activated", wire.from.classList.contains("activated"));
+            const sources = [...this.wires].filter((w) => w.to === wire.to);
+
+            wire.to.classList.toggle(
+                "activated",
+                sources.some((w) => w.from.classList.contains("activated")),
+            );
 
             ctx.strokeStyle = wire.from.classList.contains("activated") ? ACTIVATED_CSS_COLOR : LIGHT_GRAY_CSS_COLOR;
 

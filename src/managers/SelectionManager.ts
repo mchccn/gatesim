@@ -2,6 +2,7 @@ import { WatchedSet } from "../augments/WatchedSet";
 import { ACTIVATED_CSS_COLOR, IS_MAC_OS } from "../constants";
 import { fromFile, saveDiagram } from "../files";
 import { Component } from "../reified/Component";
+import { Display } from "../reified/Display";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
 import { overlappedBounds, Reified } from "../reified/Reified";
@@ -21,6 +22,7 @@ export class SelectionManager {
             target.closest("button.board-input"),
             target.closest("button.board-output"),
             target.closest("div.component"),
+            target.closest("div.display"),
         ].find((element) => element !== null)!;
 
         const reified = [...Reified.active].find((component) => component.element === element);
@@ -52,7 +54,7 @@ export class SelectionManager {
 
                             if (component instanceof Output) return false;
 
-                            if (component instanceof Component)
+                            if (component instanceof Component || component instanceof Display)
                                 return component.outputs.some((output) => wiring.from === output);
 
                             throw new Error("Unknown component type.");
@@ -62,7 +64,7 @@ export class SelectionManager {
 
                             if (component instanceof Output) return wiring.to === component.element;
 
-                            if (component instanceof Component)
+                            if (component instanceof Component || component instanceof Display)
                                 return component.inputs.some((input) => wiring.to === input);
 
                             throw new Error("Unknown component type.");

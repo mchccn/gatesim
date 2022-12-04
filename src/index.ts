@@ -10,7 +10,7 @@ import { loadStyles } from "./styles";
 
 Object.assign(globalThis, constants);
 
-await loadStyles(); 
+await loadStyles();
 
 const hrefAsUrl = new URL(location.href);
 
