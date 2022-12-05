@@ -84,4 +84,28 @@ export class KeybindsManager {
 
         this.deafen();
     }
+
+    static expand(chord: string): string[] {
+        const [key, ...rest] = chord.split("+");
+
+        if (key === "Shift")
+            return this.expand(rest.join("+")).flatMap((keys) => [`ShiftLeft+${keys}`, `ShiftRight+${keys}`]);
+
+        if (key === "Control")
+            return this.expand(rest.join("+")).flatMap((keys) => [`ControlLeft+${keys}`, `ControlRight+${keys}`]);
+
+        if (key === "Alt")
+            return this.expand(rest.join("+")).flatMap((keys) => [`AltLeft+${keys}`, `AltRight+${keys}`]);
+
+        if (key === "Meta")
+            return this.expand(rest.join("+")).flatMap((keys) => [`MetaLeft+${keys}`, `MetaRight+${keys}`]);
+
+        if (key.length === 1 && key === key.toUpperCase()) return [[`Key${key}`, ...rest].join("+")];
+
+        return [chord];
+    }
+
+    static assign(chord: string, run: (e: KeyboardEvent) => void) {
+        return Object.fromEntries(this.expand(chord).map((keys) => [keys, run]));
+    }
 }

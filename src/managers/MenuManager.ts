@@ -10,7 +10,11 @@ export type MenuManagerContext = {
     };
 };
 
-export type MenuManagerActions = Array<Record<string, { label: string; callback: (e: MouseEvent) => void }>>;
+export type MenuManagerActions = Array<
+    Record<string, { label: string; keybind?: string; callback: (e: MouseEvent) => void }>
+>;
+
+export type MenuManagerAction = MenuManagerActions[number];
 
 export class MenuManager {
     static readonly #elements = new Map<HTMLElement, MenuManagerContext>();
@@ -18,17 +22,7 @@ export class MenuManager {
     static #opened: MouseEvent;
 
     static use(element: HTMLElement, actions: MenuManagerActions) {
-        const menu = html`
-            <div class="contextmenu">
-                ${actions
-                    .map((record) =>
-                        Object.entries(record)
-                            .map(([name, { label }]) => `<button class="${name}">${label}</button>`)
-                            .join(""),
-                    )
-                    .join('<div class="br"></div>')}
-            </div>
-        `;
+        const menu = html`<div class="contextmenu"></div>`;
 
         const clicks = new Map();
 
@@ -38,7 +32,14 @@ export class MenuManager {
             menu.innerHTML = actions
                 .map((record) =>
                     Object.entries(record)
-                        .map(([name, { label }]) => `<button class="${name}">${label}</button>`)
+                        .map(([name, { label, keybind }]) =>
+                            keybind
+                                ? `<button class="${name}">${label}<p class="menu-keybind">${keybind
+                                      .split(" ")
+                                      .map((key) => `<span>${key}</span>`)
+                                      .join("")}</p></button>`
+                                : `<button class="${name}">${label}</button>`,
+                        )
                         .join(""),
                 )
                 .join('<div class="br"></div>');

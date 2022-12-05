@@ -17,6 +17,8 @@ export class DraggingManager {
 
     static #positions: { x: number; y: number }[] | undefined;
 
+    static snapToGrid = false;
+
     static watch(element: HTMLElement, target = element) {
         element.dataset.watched = "true";
 

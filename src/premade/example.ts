@@ -1,7 +1,7 @@
-import { keybinds } from "../keybinds";
+import { keybinds } from "../keybinds/keybinds";
 import { SandboxManager } from "../managers/SandboxManager";
 import { Wiring } from "../managers/WiringManager";
-import { menu } from "../menu";
+import { menu } from "../menu/menu";
 import { AndGate, OrGate, XorGate } from "../reified/chips";
 import { Component } from "../reified/Component";
 import { Input } from "../reified/Input";

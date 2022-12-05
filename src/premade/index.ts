@@ -1,6 +1,6 @@
-import { keybinds } from "../keybinds";
+import { keybinds } from "../keybinds/keybinds";
 import { SandboxManager } from "../managers/SandboxManager";
-import { menu } from "../menu";
+import { menu } from "../menu/menu";
 import { example } from "./example";
 import { nand } from "./nand";
 
