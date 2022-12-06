@@ -1,4 +1,5 @@
-import { LOCKED_FOR_TESTING } from "../constants";
+import { IS_MAC_OS, LOCKED_FOR_TESTING } from "../constants";
+import { KeybindsManager } from "../managers/KeybindsManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { SelectionManager } from "../managers/SelectionManager";
 import { TestingManager } from "../managers/TestingManager";
@@ -10,10 +11,22 @@ import { Output } from "../reified/Output";
 import { Reified } from "../reified/Reified";
 
 export const backspace = {
+    ...KeybindsManager.assign("Control+X", () => {
+        if (IS_MAC_OS) return;
+
+        backspace.Backspace();
+    }),
+    ...KeybindsManager.assign("Meta+X", () => {
+        if (!IS_MAC_OS) return;
+
+        backspace.Backspace();
+    }),
     Backspace: () => {
         if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
-        const selected = SelectionManager.selected.clone();
+        if (!SelectionManager.selected.size) return;
+
+        const selected = SelectionManager.selected.clone(true);
         const deleted: [from: Element, to: Element][] = [];
 
         return SandboxManager.pushHistory(
@@ -74,7 +87,7 @@ export const backspace = {
 
                 WiringManager.wires.addAll(deleted.splice(0, deleted.length).map(([from, to]) => new Wiring(from, to)));
 
-                SelectionManager.selected = selected;
+                SelectionManager.selected = selected.clone(true);
             },
         );
     },

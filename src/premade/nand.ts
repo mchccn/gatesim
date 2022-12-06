@@ -1,8 +1,8 @@
+import { menu } from "../contextmenu/menu";
 import { keybinds } from "../keybinds/keybinds";
 import { ModalManager } from "../managers/ModalManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
-import { menu } from "../menu/menu";
 import { NandGate } from "../reified/chips";
 import { Component } from "../reified/Component";
 import { Input } from "../reified/Input";

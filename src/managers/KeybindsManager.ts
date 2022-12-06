@@ -17,21 +17,26 @@ export class KeybindsManager {
                     let keys = chord.split("+");
 
                     const checkShift = keys.includes("ShiftLeft") || keys.includes("ShiftRight");
-                    const checkMeta = keys.includes("MetaLeft") || keys.includes("MetaRight");
-                    const checkAlt = keys.includes("AltLeft") || keys.includes("AltRight");
                     const checkCtrl = keys.includes("ControlLeft") || keys.includes("ControlRight");
+                    const checkAlt = keys.includes("AltLeft") || keys.includes("AltRight");
+                    const checkMeta = keys.includes("MetaLeft") || keys.includes("MetaRight");
+
+                    if (!checkShift && e.shiftKey) return false;
+                    if (!checkCtrl && e.ctrlKey) return false;
+                    if (!checkAlt && e.altKey) return false;
+                    if (!checkMeta && e.metaKey) return false;
 
                     if (checkShift) keys = keys.filter((key) => key !== "ShiftLeft" && key !== "ShiftRight");
-                    if (checkMeta) keys = keys.filter((key) => key !== "MetaLeft" && key !== "MetaRight");
-                    if (checkAlt) keys = keys.filter((key) => key !== "AltLeft" && key !== "AltRight");
                     if (checkCtrl) keys = keys.filter((key) => key !== "ControlLeft" && key !== "ControlRight");
+                    if (checkAlt) keys = keys.filter((key) => key !== "AltLeft" && key !== "AltRight");
+                    if (checkMeta) keys = keys.filter((key) => key !== "MetaLeft" && key !== "MetaRight");
 
                     return (
-                        keys.every((key) => this.#keymap.get(key)) &&
                         (checkShift ? e.shiftKey : true) &&
-                        (checkMeta ? e.metaKey : true) &&
+                        (checkCtrl ? e.ctrlKey : true) &&
                         (checkAlt ? e.altKey : true) &&
-                        (checkCtrl ? e.ctrlKey : true)
+                        (checkMeta ? e.metaKey : true) &&
+                        keys.every((key) => this.#keymap.get(key))
                     );
                 }) ?? [];
 

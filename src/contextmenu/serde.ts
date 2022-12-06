@@ -1,4 +1,4 @@
-import { ACTIVATED_CSS_COLOR, IS_MAC_OS, TOAST_DURATION } from "../constants";
+import { ACTIVATED_CSS_COLOR, IS_MAC_OS, LIGHT_GRAY_CSS_COLOR, TOAST_DURATION } from "../constants";
 import { fromFile, saveDiagram } from "../files";
 import { keybinds } from "../keybinds/keybinds";
 import { MenuManagerAction } from "../managers/MenuManager";
@@ -13,13 +13,19 @@ import { menu } from "./menu";
 export const serde = {
     "copy-url": {
         label: "Copy link",
-        keybind: IS_MAC_OS ? "⌘ L" : "Ctrl L",
-        callback: () => {
+        keybind: IS_MAC_OS ? "⌘ K" : "Ctrl K",
+        callback: async () => {
             const hrefAsUrl = new URL(location.href);
 
             hrefAsUrl.searchParams.set("inline", btoa(saveDiagram([...Reified.active], [...WiringManager.wires])));
 
-            navigator.clipboard.writeText(hrefAsUrl.href);
+            await navigator.clipboard.writeText(hrefAsUrl.href);
+
+            return ToastManager.toast({
+                message: "Copied diagram link to clipboard.",
+                color: LIGHT_GRAY_CSS_COLOR,
+                duration: TOAST_DURATION,
+            });
         },
     },
     "save-to": {

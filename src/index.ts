@@ -1,10 +1,10 @@
 import * as constants from "./constants";
 import { ACTIVATED_CSS_COLOR, TOAST_DURATION } from "./constants";
+import { menu } from "./contextmenu/menu";
 import { fromFile } from "./files";
 import { keybinds } from "./keybinds/keybinds";
 import { SandboxManager } from "./managers/SandboxManager";
 import { ToastManager } from "./managers/ToastManager";
-import { menu } from "./menu/menu";
 import { premade } from "./premade";
 import { loadStyles } from "./styles";
 
