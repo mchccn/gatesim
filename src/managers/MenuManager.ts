@@ -32,6 +32,10 @@ export class MenuManager {
         const setup = (actions: MenuManagerActions) => {
             clicks.clear();
 
+            const keys = actions.flatMap((record) => Object.keys(record));
+
+            if (keys.length !== new Set(keys).size) throw new Error("Duplicate keys in menu actions.");
+
             menu.innerHTML = actions
                 .map((record) =>
                     Object.entries(record)
@@ -51,12 +55,12 @@ export class MenuManager {
                 Object.keys(record).forEach((key) => {
                     const click = record[key].callback.bind(undefined);
 
-                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("click", () => click(this.#opened));
-                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("contextmenu", () =>
-                        click(this.#opened),
-                    );
+                    const listener = () => click(this.#opened);
 
-                    clicks.set(key, clicks);
+                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("click", listener);
+                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("contextmenu", listener);
+
+                    clicks.set(key, listener);
                 });
             });
         };

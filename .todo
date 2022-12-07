@@ -5,9 +5,20 @@
     -   tri-state buffer
     -   switches
     -   clocks
+    -   pre-made components
+        -   full adder
+        -   d-latch
 
 -   ability to rotate components
 
 -   snap to grid dragging
 
 -   dark mode
+
+-   settings icon
+
+-   undo/redo icon
+
+-   dark mode icon
+
+-   splash/landing with instructions
