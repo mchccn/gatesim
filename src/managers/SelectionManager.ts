@@ -79,7 +79,7 @@ export class SelectionManager {
     static readonly #paste = async () => {
         const {
             error,
-            result: [components, wirings],
+            result: [, components, wirings],
         } = fromFile(await navigator.clipboard.readText());
 
         if (error)

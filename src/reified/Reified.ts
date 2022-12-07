@@ -81,4 +81,11 @@ export abstract class Reified {
     get permanence() {
         return this.PERMANENT;
     }
+
+    get pos() {
+        return {
+            x: parseFloat(this.element.style.left),
+            y: parseFloat(this.element.style.top),
+        };
+    }
 }

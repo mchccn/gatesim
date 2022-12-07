@@ -120,7 +120,7 @@ export const serde = {
 
             const {
                 error,
-                result: [components, wires],
+                result: [settings, components, wires],
             } = fromFile(raw);
 
             if (error)
@@ -138,7 +138,10 @@ export const serde = {
                 save: "sandbox",
                 initial: [components!, wires!],
                 overrideSaveIfExists: true,
+                settings: {},
             });
+
+            SandboxManager.applyRawSettings(settings!);
 
             StorageManager.set("saves:" + "sandbox", saveDiagram([...Reified.active], [...WiringManager.wires]));
         },

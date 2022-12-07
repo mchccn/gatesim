@@ -1,4 +1,5 @@
 import { ACTIVATED_CSS_COLOR, COUNTER_GENERATOR, IN_DEBUG_MODE, TOAST_DURATION } from "./constants";
+import { DraggingManager } from "./managers/DraggingManager";
 import { ToastManager } from "./managers/ToastManager";
 import { Wiring } from "./managers/WiringManager";
 import { chips } from "./reified/chips";
@@ -9,6 +10,9 @@ import { Output } from "./reified/Output";
 import { Reified } from "./reified/Reified";
 
 export type SerializedDiagram = {
+    settings: {
+        ["DraggingManager.snapToGrid"]: boolean;
+    };
     components: (
         | {
               reified: number;
@@ -58,6 +62,9 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
     const ids = new Map<Element, number>();
 
     const data: SerializedDiagram = {
+        settings: {
+            ["DraggingManager.snapToGrid"]: DraggingManager.snapToGrid,
+        },
         components: components.map((component, reified) => {
             if (component instanceof Input) {
                 ids.set(component.element, id.next().value!);
@@ -150,7 +157,9 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
 
 export function fromFile(
     file: string,
-): { error: string; result: [] } | { error: undefined; result: [components: Reified[], wires: Wiring[]] } {
+):
+    | { error: string; result: [] }
+    | { error: undefined; result: [settings: SerializedDiagram["settings"], components: Reified[], wires: Wiring[]] } {
     try {
         const data = JSON.parse(file);
 
@@ -216,7 +225,7 @@ export function fromFile(
 
         const wires = data.wires.map(({ from, to }) => new Wiring(elements.get(from)!, elements.get(to)!));
 
-        return { result: [reified, wires], error: undefined };
+        return { result: [data.settings, reified, wires], error: undefined };
     } catch (e) {
         if (e instanceof Error) return { error: e.message, result: [] };
 
@@ -227,13 +236,20 @@ export function fromFile(
 function validate(data: unknown): asserts data is SerializedDiagram {
     if (!data || typeof data !== "object") throw new Error("Data is not an object.");
 
-    if (!("components" in data)) throw new Error("Data is missing components.");
+    if (!("settings" in data)) throw new Error("Data is missing project settings.");
 
-    if (!("wires" in data)) throw new Error("Data is missing wires.");
+    if (typeof data.settings !== "object" || !data.settings) throw new Error("Project settings should be an object.");
+
+    if (!("components" in data)) throw new Error("Data is missing components.");
 
     if (!Array.isArray(data.components)) throw new Error("Components data is not an array.");
 
+    if (!("wires" in data)) throw new Error("Data is missing wires.");
+
     if (!Array.isArray(data.wires)) throw new Error("Wires data is not an array.");
+
+    if (!("DraggingManager.snapToGrid" in data.settings))
+        throw new Error("Missing setting 'DraggingManager.snapToGrid'.");
 
     for (const component of data.components as unknown[]) {
         if (!component || typeof component !== "object") throw new Error("Component data must an object.");

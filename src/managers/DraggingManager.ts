@@ -1,3 +1,4 @@
+import { GRID_SIZE } from "../constants";
 import { MouseManager } from "./MouseManager";
 import { SandboxManager } from "./SandboxManager";
 import { SelectionManager } from "./SelectionManager";
@@ -43,10 +44,7 @@ export class DraggingManager {
                 this.#mouse.ox = e.clientX - rect.left + body.left;
                 this.#mouse.oy = e.clientY - rect.top + body.top;
             } else {
-                this.#positions = [...SelectionManager.selected].map((target) => ({
-                    x: parseFloat(target.element.style.left),
-                    y: parseFloat(target.element.style.top),
-                }));
+                this.#positions = [...SelectionManager.selected].map((target) => target.pos);
 
                 const topleft = [...SelectionManager.selected].sort((a, b) => {
                     const ax = parseFloat(a.element.style.left);
@@ -92,10 +90,7 @@ export class DraggingManager {
                 this.#mouse.ox = touch.clientX - rect.left + body.left;
                 this.#mouse.oy = touch.clientY - rect.top + body.top;
             } else {
-                this.#positions = [...SelectionManager.selected].map((target) => ({
-                    x: parseFloat(target.element.style.left),
-                    y: parseFloat(target.element.style.top),
-                }));
+                this.#positions = [...SelectionManager.selected].map((target) => target.pos);
 
                 const topleft = [...SelectionManager.selected].sort((a, b) => {
                     const ax = parseFloat(a.element.style.left);
@@ -180,20 +175,46 @@ export class DraggingManager {
         this.#mouse.y = e.clientY;
 
         if (this.#dragged) {
-            if (SelectionManager.selected.size <= 1) {
-                this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
-                this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
-            } else if (this.#topleft) {
-                const topleft = this.#topleft.getBoundingClientRect();
+            if (DraggingManager.snapToGrid) {
+                if (SelectionManager.selected.size <= 1) {
+                    this.#dragged.style.left =
+                        Math.floor((this.#mouse.x - this.#mouse.ox) / GRID_SIZE) * GRID_SIZE + "px";
+                    this.#dragged.style.top =
+                        Math.floor((this.#mouse.y - this.#mouse.oy) / GRID_SIZE) * GRID_SIZE + "px";
+                } else if (this.#topleft) {
+                    const topleft = this.#topleft.getBoundingClientRect();
 
-                SelectionManager.selected.forEach((component) => {
-                    const offset = component.element.getBoundingClientRect();
+                    SelectionManager.selected.forEach((component) => {
+                        const offset = component.element.getBoundingClientRect();
 
-                    component.move({
-                        x: this.#mouse.x - this.#mouse.ox + offset.left - topleft.left,
-                        y: this.#mouse.y - this.#mouse.oy + offset.top - topleft.top,
+                        component.move({
+                            x:
+                                Math.floor((this.#mouse.x - this.#mouse.ox) / GRID_SIZE) * GRID_SIZE +
+                                offset.left -
+                                topleft.left,
+                            y:
+                                Math.floor((this.#mouse.y - this.#mouse.oy) / GRID_SIZE) * GRID_SIZE +
+                                offset.top -
+                                topleft.top,
+                        });
                     });
-                });
+                }
+            } else {
+                if (SelectionManager.selected.size <= 1) {
+                    this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
+                    this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
+                } else if (this.#topleft) {
+                    const topleft = this.#topleft.getBoundingClientRect();
+
+                    SelectionManager.selected.forEach((component) => {
+                        const offset = component.element.getBoundingClientRect();
+
+                        component.move({
+                            x: this.#mouse.x - this.#mouse.ox + offset.left - topleft.left,
+                            y: this.#mouse.y - this.#mouse.oy + offset.top - topleft.top,
+                        });
+                    });
+                }
             }
         }
     };
@@ -238,42 +259,75 @@ export class DraggingManager {
                 const target = this.#dragged;
                 const mouse = this.#mouse;
                 const original = this.#original!;
+                const size = GRID_SIZE;
 
                 if (mouse.x !== mouse.ix || mouse.y !== mouse.iy)
-                    SandboxManager.pushHistory(
-                        () => {
-                            target.style.left = mouse.x - mouse.ox - 1 + "px";
-                            target.style.top = mouse.y - mouse.oy - 1 + "px";
-                        },
-                        () => {
-                            target.style.left = original.x - 1 + "px";
-                            target.style.top = original.y - 1 + "px";
-                        },
-                    );
+                    if (DraggingManager.snapToGrid)
+                        SandboxManager.pushHistory(
+                            () => {
+                                target.style.left = Math.floor((mouse.x - mouse.ox - 1) / size) * size + "px";
+                                target.style.top = Math.floor((mouse.y - mouse.oy - 1) / size) * size + "px";
+                            },
+                            () => {
+                                target.style.left = Math.floor((original.x - 1) / size) * size + "px";
+                                target.style.top = Math.floor((original.y - 1) / size) * size + "px";
+                            },
+                        );
+                    else
+                        SandboxManager.pushHistory(
+                            () => {
+                                target.style.left = mouse.x - mouse.ox - 1 + "px";
+                                target.style.top = mouse.y - mouse.oy - 1 + "px";
+                            },
+                            () => {
+                                target.style.left = original.x - 1 + "px";
+                                target.style.top = original.y - 1 + "px";
+                            },
+                        );
             } else if (this.#topleft) {
                 const mouse = this.#mouse;
                 const targets = [...SelectionManager.selected];
                 const positions = this.#positions!;
                 const topleft = this.#topleft.getBoundingClientRect();
+                const size = GRID_SIZE;
 
                 if (mouse.x !== mouse.ix || mouse.y !== mouse.iy)
-                    SandboxManager.pushHistory(
-                        () => {
-                            targets.forEach((component) => {
-                                const offset = component.element.getBoundingClientRect();
+                    if (DraggingManager.snapToGrid)
+                        SandboxManager.pushHistory(
+                            () => {
+                                targets.forEach((component) => {
+                                    const offset = component.element.getBoundingClientRect();
 
-                                component.move({
-                                    x: mouse.x - mouse.ox + offset.left - topleft.left,
-                                    y: mouse.y - mouse.oy + offset.top - topleft.top,
+                                    component.move({
+                                        x: Math.floor((mouse.x - mouse.ox) / size) * size + offset.left - topleft.left,
+                                        y: Math.floor((mouse.y - mouse.oy) / size) * size + offset.top - topleft.top,
+                                    });
                                 });
-                            });
-                        },
-                        () => {
-                            targets.forEach((component, i) => {
-                                component.move(positions[i]);
-                            });
-                        },
-                    );
+                            },
+                            () => {
+                                targets.forEach((component, i) => {
+                                    component.move(positions[i]);
+                                });
+                            },
+                        );
+                    else
+                        SandboxManager.pushHistory(
+                            () => {
+                                targets.forEach((component) => {
+                                    const offset = component.element.getBoundingClientRect();
+
+                                    component.move({
+                                        x: mouse.x - mouse.ox + offset.left - topleft.left,
+                                        y: mouse.y - mouse.oy + offset.top - topleft.top,
+                                    });
+                                });
+                            },
+                            () => {
+                                targets.forEach((component, i) => {
+                                    component.move(positions[i]);
+                                });
+                            },
+                        );
             }
         }
 
@@ -305,20 +359,46 @@ export class DraggingManager {
         this.#mouse.y = touch.clientY;
 
         if (this.#dragged) {
-            if (SelectionManager.selected.size <= 1) {
-                this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
-                this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
-            } else {
-                const topleft = this.#topleft!.getBoundingClientRect();
+            if (DraggingManager.snapToGrid) {
+                if (SelectionManager.selected.size <= 1) {
+                    this.#dragged.style.left =
+                        Math.floor((this.#mouse.x - this.#mouse.ox) / GRID_SIZE) * GRID_SIZE + "px";
+                    this.#dragged.style.top =
+                        Math.floor((this.#mouse.y - this.#mouse.oy) / GRID_SIZE) * GRID_SIZE + "px";
+                } else if (this.#topleft) {
+                    const topleft = this.#topleft.getBoundingClientRect();
 
-                SelectionManager.selected.forEach((component) => {
-                    const offset = component.element.getBoundingClientRect();
+                    SelectionManager.selected.forEach((component) => {
+                        const offset = component.element.getBoundingClientRect();
 
-                    component.move({
-                        x: this.#mouse.x - this.#mouse.ox + offset.left - topleft.left,
-                        y: this.#mouse.y - this.#mouse.oy + offset.top - topleft.top,
+                        component.move({
+                            x:
+                                Math.floor((this.#mouse.x - this.#mouse.ox) / GRID_SIZE) * GRID_SIZE +
+                                offset.left -
+                                topleft.left,
+                            y:
+                                Math.floor((this.#mouse.y - this.#mouse.oy) / GRID_SIZE) * GRID_SIZE +
+                                offset.top -
+                                topleft.top,
+                        });
                     });
-                });
+                }
+            } else {
+                if (SelectionManager.selected.size <= 1) {
+                    this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
+                    this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
+                } else if (this.#topleft) {
+                    const topleft = this.#topleft.getBoundingClientRect();
+
+                    SelectionManager.selected.forEach((component) => {
+                        const offset = component.element.getBoundingClientRect();
+
+                        component.move({
+                            x: this.#mouse.x - this.#mouse.ox + offset.left - topleft.left,
+                            y: this.#mouse.y - this.#mouse.oy + offset.top - topleft.top,
+                        });
+                    });
+                }
             }
         }
     };
@@ -367,42 +447,75 @@ export class DraggingManager {
                 const target = this.#dragged;
                 const mouse = this.#mouse;
                 const original = this.#original!;
+                const size = GRID_SIZE;
 
                 if (mouse.x !== mouse.ix || mouse.y !== mouse.iy)
-                    SandboxManager.pushHistory(
-                        () => {
-                            target.style.left = mouse.x - mouse.ox + "px";
-                            target.style.top = mouse.y - mouse.oy + "px";
-                        },
-                        () => {
-                            target.style.left = original.x - 1 + "px";
-                            target.style.top = original.y - 1 + "px";
-                        },
-                    );
-            } else {
+                    if (DraggingManager.snapToGrid)
+                        SandboxManager.pushHistory(
+                            () => {
+                                target.style.left = Math.floor((mouse.x - mouse.ox - 1) / size) * size + "px";
+                                target.style.top = Math.floor((mouse.y - mouse.oy - 1) / size) * size + "px";
+                            },
+                            () => {
+                                target.style.left = Math.floor((original.x - 1) / size) * size + "px";
+                                target.style.top = Math.floor((original.y - 1) / size) * size + "px";
+                            },
+                        );
+                    else
+                        SandboxManager.pushHistory(
+                            () => {
+                                target.style.left = mouse.x - mouse.ox - 1 + "px";
+                                target.style.top = mouse.y - mouse.oy - 1 + "px";
+                            },
+                            () => {
+                                target.style.left = original.x - 1 + "px";
+                                target.style.top = original.y - 1 + "px";
+                            },
+                        );
+            } else if (this.#topleft) {
                 const mouse = this.#mouse;
                 const targets = [...SelectionManager.selected];
                 const positions = this.#positions!;
-                const topleft = this.#topleft!.getBoundingClientRect();
+                const topleft = this.#topleft.getBoundingClientRect();
+                const size = GRID_SIZE;
 
                 if (mouse.x !== mouse.ix || mouse.y !== mouse.iy)
-                    SandboxManager.pushHistory(
-                        () => {
-                            targets.forEach((component) => {
-                                const offset = component.element.getBoundingClientRect();
+                    if (DraggingManager.snapToGrid)
+                        SandboxManager.pushHistory(
+                            () => {
+                                targets.forEach((component) => {
+                                    const offset = component.element.getBoundingClientRect();
 
-                                component.move({
-                                    x: mouse.x - mouse.ox + offset.left - topleft.left,
-                                    y: mouse.y - mouse.oy + offset.top - topleft.top,
+                                    component.move({
+                                        x: Math.floor((mouse.x - mouse.ox) / size) * size + offset.left - topleft.left,
+                                        y: Math.floor((mouse.y - mouse.oy) / size) * size + offset.top - topleft.top,
+                                    });
                                 });
-                            });
-                        },
-                        () => {
-                            targets.forEach((component, i) => {
-                                component.move(positions[i]);
-                            });
-                        },
-                    );
+                            },
+                            () => {
+                                targets.forEach((component, i) => {
+                                    component.move(positions[i]);
+                                });
+                            },
+                        );
+                    else
+                        SandboxManager.pushHistory(
+                            () => {
+                                targets.forEach((component) => {
+                                    const offset = component.element.getBoundingClientRect();
+
+                                    component.move({
+                                        x: mouse.x - mouse.ox + offset.left - topleft.left,
+                                        y: mouse.y - mouse.oy + offset.top - topleft.top,
+                                    });
+                                });
+                            },
+                            () => {
+                                targets.forEach((component, i) => {
+                                    component.move(positions[i]);
+                                });
+                            },
+                        );
             }
         }
 

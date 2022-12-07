@@ -22,12 +22,14 @@ if (shouldLoadInline) {
 
         const {
             error,
-            result: [components, wirings],
+            result: [settings, components, wirings],
         } = fromFile(inlined);
 
         if (error) throw new Error(error);
 
         SandboxManager.setup({ keybinds, menu, initial: [components!, wirings!] });
+
+        SandboxManager.applyRawSettings(settings!);
     } catch {
         SandboxManager.setup({ keybinds, menu, save: "sandbox" });
 

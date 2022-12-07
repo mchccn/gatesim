@@ -1,6 +1,6 @@
 import { WatchedSet } from "../augments/WatchedSet";
 import { ACTIVATED_CSS_COLOR, IN_DEBUG_MODE, TOAST_DURATION } from "../constants";
-import { fromFile, saveDiagram } from "../files";
+import { fromFile, saveDiagram, SerializedDiagram } from "../files";
 import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";
 import { Input } from "../reified/Input";
@@ -34,6 +34,7 @@ type SandboxConfig = {
     checkInterval?: number;
     checkState?: (reified: WatchedSet<Reified>, wirings: WatchedSet<Wiring>) => boolean;
     ifStateChecked?: () => void;
+    settings?: { snapToGrid?: boolean };
 };
 
 const calculateReifiedTotals = (set: Set<Reified>) =>
@@ -201,7 +202,7 @@ export class SandboxManager {
             if (file) {
                 const {
                     error,
-                    result: [components, wires],
+                    result: [settings, components, wires],
                 } = fromFile(file);
 
                 if (error) {
@@ -217,6 +218,8 @@ export class SandboxManager {
                 } else {
                     if (!this.#config.overrideSaveIfExists) {
                         this.clear();
+
+                        this.applyRawSettings(settings!);
 
                         Reified.active = createReifiedActive(components!);
 
@@ -341,6 +344,14 @@ export class SandboxManager {
         this.#history.push([command, undo]);
 
         return command.call(undefined);
+    }
+
+    static applySettings(settings: SandboxConfig["settings"] & {}) {
+        DraggingManager.snapToGrid = settings.snapToGrid ?? false;
+    }
+
+    static applyRawSettings(settings: SerializedDiagram["settings"]) {
+        DraggingManager.snapToGrid = settings["DraggingManager.snapToGrid"];
     }
 
     static async saveTo(save: string) {

@@ -99,15 +99,8 @@ export class KeybindsManager {
         this.deafen();
     }
 
-    static {
-        console.log(this.expand("Control+Shift+Z"));
-        console.log(this.expand("Z+Control+Shift"));
-        console.log(this.expand("I+O"));
-        console.log(this.expand("A"));
-        console.log(this.expand("Meta+Z+Shift"));
-    }
-
-    static expand(chord: string): string[] {
+    static expand<S extends string>(chord: S): ExpandChord<S>[];
+    static expand(chord: string) {
         const [key, ...rest] = chord.split("+");
 
         if (key === "Shift" || key === "Control" || key === "Alt" || key === "Meta")
@@ -126,20 +119,21 @@ export class KeybindsManager {
         return [chord];
     }
 
-    static assign<S extends string, R extends (e: KeyboardEvent) => void>(chord: S, run: R) {
+    static assign<S extends string, R extends (e: KeyboardEvent) => void>(chord: S, run: R): AssignChord<S, R>;
+    static assign(chord: string, run: (e: KeyboardEvent) => void) {
         return Object.fromEntries(
             this.expand(chord)
-                .map((keys) => [keys, run])
+                .map<[Stringifiable, (e: KeyboardEvent) => void]>((keys) => [keys, run])
                 .concat([[chord, run]]),
-        ) as AssignChord<S, R>;
+        );
     }
 }
 
-type Split<
-    S extends string,
-    D extends string = "",
-    R extends readonly unknown[] = [],
-> = S extends `${infer A}${D}${infer B}` ? Split<B, D, [...R, A]> : [...R, S];
+type Split<S extends string, D extends string = "", R extends readonly unknown[] = []> = S extends ""
+    ? R
+    : S extends `${infer A}${D}${infer B}`
+    ? Split<B, D, [...R, A]>
+    : [...R, S];
 
 type Stringifiable = string | number | bigint | boolean | null | undefined;
 
