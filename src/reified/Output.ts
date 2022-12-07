@@ -1,4 +1,4 @@
-import { ACTIVATED_CSS_COLOR, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
+import { ACTIVATED_CSS_COLOR, IS_MAC_OS, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
@@ -14,10 +14,11 @@ export class Output extends Reified {
     };
 
     readonly #contextmenu = () => {
-        SandboxManager.queueNewContext((prev) => [
+        SandboxManager.queueNewContext(() => [
             {
                 "delete-output": {
                     label: "Delete output",
+                    keybind: IS_MAC_OS ? "⌘ X" : "Ctrl X",
                     callback: () => {
                         if (this.PERMANENT)
                             return void ToastManager.toast({
@@ -60,6 +61,7 @@ export class Output extends Reified {
                 },
                 "delete-connections": {
                     label: "Delete connections",
+                    keybind: IS_MAC_OS ? "⬆ ⌘ X" : "Ctrl Shift X",
                     callback: () => {
                         if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
@@ -86,7 +88,6 @@ export class Output extends Reified {
                     },
                 },
             },
-            ...prev.slice(2),
         ]);
     };
 

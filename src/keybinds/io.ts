@@ -8,7 +8,7 @@ import { Output } from "../reified/Output";
 import { Reified } from "../reified/Reified";
 
 export const io = {
-    KeyI: () => {
+    ["KeyI"]: () => {
         if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
         const input = new Input({
@@ -37,7 +37,7 @@ export const io = {
             },
         );
     },
-    KeyO: () => {
+    ["KeyO"]: () => {
         if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
         const output = new Output({

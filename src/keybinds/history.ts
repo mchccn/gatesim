@@ -2,33 +2,33 @@ import { IS_MAC_OS } from "../constants";
 import { KeybindsManager } from "../managers/KeybindsManager";
 import { SandboxManager } from "../managers/SandboxManager";
 
-const undo = (e: KeyboardEvent) => {
+const undo = () => {
     SandboxManager.popHistory();
 };
 
-const redo = (e: KeyboardEvent) => {
+const redo = () => {
     SandboxManager.redoHistory();
 };
 
 export const history = {
-    ...KeybindsManager.assign("Control+Shift+Z", (e) => {
+    ...KeybindsManager.assign("Control+Shift+Z", () => {
         if (IS_MAC_OS) return;
 
-        redo(e);
+        redo();
     }),
-    ...KeybindsManager.assign("Meta+Shift+Z", (e) => {
+    ...KeybindsManager.assign("Meta+Shift+Z", () => {
         if (!IS_MAC_OS) return;
 
-        redo(e);
+        redo();
     }),
-    ...KeybindsManager.assign("Control+Z", (e) => {
+    ...KeybindsManager.assign("Control+Z", () => {
         if (IS_MAC_OS) return;
 
-        undo(e);
+        undo();
     }),
-    ...KeybindsManager.assign("Meta+Z", (e) => {
+    ...KeybindsManager.assign("Meta+Z", () => {
         if (!IS_MAC_OS) return;
 
-        undo(e);
+        undo();
     }),
 } satisfies Record<string, (e: KeyboardEvent) => void>;

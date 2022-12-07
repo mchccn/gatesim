@@ -4,7 +4,7 @@ import { SandboxManager } from "../managers/SandboxManager";
 import { ToastManager } from "../managers/ToastManager";
 
 export const behavior = {
-    KeyG: async () => {
+    ["KeyG"]: async () => {
         //
         return SandboxManager.pushHistory(
             () => {

@@ -2,8 +2,6 @@ import { html } from "../reified/Reified";
 import { SandboxManager } from "./SandboxManager";
 
 export class ModalManager {
-    static #stack = new Array();
-
     static get container() {
         return document.querySelector<HTMLElement>(".modal-container")!;
     }

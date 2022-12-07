@@ -98,11 +98,11 @@ export class Display extends Reified {
             this.#mouseups.set(input, () => input.blur());
 
             this.#contextmenus.set(input, () => {
-                SandboxManager.queueNewContext((prev) => [
+                SandboxManager.queueNewContext(() => [
                     {
                         "delete-connections": {
                             label: "Delete connections",
-                            keybind: IS_MAC_OS ? "⌘ X" : "Ctrl X",
+                            keybind: IS_MAC_OS ? "⬆ ⌘ X" : "Ctrl Shift X",
                             callback: () => {
                                 if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
@@ -129,7 +129,6 @@ export class Display extends Reified {
                             },
                         },
                     },
-                    ...prev.slice(2),
                 ]);
             });
         });
@@ -138,7 +137,7 @@ export class Display extends Reified {
             this.#mouseups.set(output, () => output.blur());
 
             this.#contextmenus.set(output, () => {
-                SandboxManager.queueNewContext((prev) => [
+                SandboxManager.queueNewContext(() => [
                     {
                         "create-connection": {
                             label: "Create connection",
@@ -152,6 +151,7 @@ export class Display extends Reified {
                         },
                         "delete-connections": {
                             label: "Delete connections",
+                            keybind: IS_MAC_OS ? "⬆ ⌘ X" : "Ctrl Shift X",
                             callback: () => {
                                 if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
@@ -178,13 +178,12 @@ export class Display extends Reified {
                             },
                         },
                     },
-                    ...prev.slice(2),
                 ]);
             });
         });
 
         this.#contextmenus.set(this.display, () => {
-            SandboxManager.queueNewContext((prev) => [
+            SandboxManager.queueNewContext(() => [
                 {
                     "set-bits": {
                         label: "Set bits",
@@ -335,6 +334,7 @@ export class Display extends Reified {
                 {
                     "delete-component": {
                         label: "Delete component",
+                        keybind: IS_MAC_OS ? "⌘ X" : "Ctrl X",
                         callback: () => {
                             if (this.PERMANENT)
                                 return void ToastManager.toast({
@@ -382,6 +382,7 @@ export class Display extends Reified {
                     },
                     "delete-connections": {
                         label: "Delete connections",
+                        keybind: IS_MAC_OS ? "⬆ ⌘ X" : "Ctrl Shift X",
                         callback: () => {
                             if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
@@ -413,7 +414,6 @@ export class Display extends Reified {
                         },
                     },
                 },
-                ...prev.slice(2),
             ]);
         });
     }

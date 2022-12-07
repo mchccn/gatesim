@@ -183,8 +183,8 @@ export class DraggingManager {
             if (SelectionManager.selected.size <= 1) {
                 this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
                 this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
-            } else {
-                const topleft = this.#topleft!.getBoundingClientRect();
+            } else if (this.#topleft) {
+                const topleft = this.#topleft.getBoundingClientRect();
 
                 SelectionManager.selected.forEach((component) => {
                     const offset = component.element.getBoundingClientRect();
@@ -250,11 +250,11 @@ export class DraggingManager {
                             target.style.top = original.y - 1 + "px";
                         },
                     );
-            } else {
+            } else if (this.#topleft) {
                 const mouse = this.#mouse;
                 const targets = [...SelectionManager.selected];
                 const positions = this.#positions!;
-                const topleft = this.#topleft!.getBoundingClientRect();
+                const topleft = this.#topleft.getBoundingClientRect();
 
                 if (mouse.x !== mouse.ix || mouse.y !== mouse.iy)
                     SandboxManager.pushHistory(

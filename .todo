@@ -4,7 +4,10 @@
 
     -   tri-state buffer
     -   switches
-    -   buttons
     -   clocks
 
+-   ability to rotate components
+
 -   snap to grid dragging
+
+-   dark mode

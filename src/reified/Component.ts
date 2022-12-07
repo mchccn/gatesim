@@ -52,10 +52,11 @@ export class Component<I extends number, O extends number> extends Reified {
             this.#mouseups.set(input, () => input.blur());
 
             this.#contextmenus.set(input, () => {
-                SandboxManager.queueNewContext((prev) => [
+                SandboxManager.queueNewContext(() => [
                     {
                         "delete-connections": {
                             label: "Delete connections",
+                            keybind: IS_MAC_OS ? "⬆ ⌘ X" : "Ctrl Shift X",
                             callback: () => {
                                 if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
@@ -82,7 +83,6 @@ export class Component<I extends number, O extends number> extends Reified {
                             },
                         },
                     },
-                    ...prev.slice(2),
                 ]);
             });
         });
@@ -91,7 +91,7 @@ export class Component<I extends number, O extends number> extends Reified {
             this.#mouseups.set(output, () => output.blur());
 
             this.#contextmenus.set(output, () => {
-                SandboxManager.queueNewContext((prev) => [
+                SandboxManager.queueNewContext(() => [
                     {
                         "create-connection": {
                             label: "Create connection",
@@ -105,6 +105,7 @@ export class Component<I extends number, O extends number> extends Reified {
                         },
                         "delete-connections": {
                             label: "Delete connections",
+                            keybind: IS_MAC_OS ? "⬆ ⌘ X" : "Ctrl Shift X",
                             callback: () => {
                                 if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
@@ -131,13 +132,12 @@ export class Component<I extends number, O extends number> extends Reified {
                             },
                         },
                     },
-                    ...prev.slice(2),
                 ]);
             });
         });
 
         this.#contextmenus.set(this.name, () => {
-            SandboxManager.queueNewContext((prev) => [
+            SandboxManager.queueNewContext(() => [
                 {
                     "delete-component": {
                         label: "Delete component",
@@ -189,6 +189,7 @@ export class Component<I extends number, O extends number> extends Reified {
                     },
                     "delete-connections": {
                         label: "Delete connections",
+                        keybind: IS_MAC_OS ? "⬆ ⌘ X" : "Ctrl Shift X",
                         callback: () => {
                             if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
@@ -220,7 +221,6 @@ export class Component<I extends number, O extends number> extends Reified {
                         },
                     },
                 },
-                ...prev.slice(2),
             ]);
         });
 
@@ -230,13 +230,7 @@ export class Component<I extends number, O extends number> extends Reified {
     }
 
     async update() {
-        const out = this.chip.evaluate(
-            this.inputs.map((i) => {
-                if (this.chip.name === "AND") console.log([...WiringManager.wires].filter((wire) => wire.to === i));
-
-                return i.classList.contains("activated");
-            }),
-        );
+        const out = this.chip.evaluate(this.inputs.map((i) => i.classList.contains("activated")));
 
         await DELAY(100 + Math.random() * 50 - 25);
 

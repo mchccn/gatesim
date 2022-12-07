@@ -99,27 +99,69 @@ export class KeybindsManager {
         this.deafen();
     }
 
+    static {
+        console.log(this.expand("Control+Shift+Z"));
+        console.log(this.expand("Z+Control+Shift"));
+        console.log(this.expand("I+O"));
+        console.log(this.expand("A"));
+        console.log(this.expand("Meta+Z+Shift"));
+    }
+
     static expand(chord: string): string[] {
         const [key, ...rest] = chord.split("+");
 
-        if (key === "Shift")
-            return this.expand(rest.join("+")).flatMap((keys) => [`ShiftLeft+${keys}`, `ShiftRight+${keys}`]);
+        if (key === "Shift" || key === "Control" || key === "Alt" || key === "Meta")
+            return rest.length
+                ? this.expand(rest.join("+")).flatMap((keys) => [
+                      [`${key}Left`, keys].join("+"),
+                      [`${key}Right`, keys].join("+"),
+                  ])
+                : [`${key}Left`, `${key}Right`];
 
-        if (key === "Control")
-            return this.expand(rest.join("+")).flatMap((keys) => [`ControlLeft+${keys}`, `ControlRight+${keys}`]);
-
-        if (key === "Alt")
-            return this.expand(rest.join("+")).flatMap((keys) => [`AltLeft+${keys}`, `AltRight+${keys}`]);
-
-        if (key === "Meta")
-            return this.expand(rest.join("+")).flatMap((keys) => [`MetaLeft+${keys}`, `MetaRight+${keys}`]);
-
-        if (key.length === 1 && key === key.toUpperCase()) return [[`Key${key}`, ...rest].join("+")];
+        if (key.length === 1 && key === key.toUpperCase())
+            return rest.length
+                ? this.expand(rest.join("+")).flatMap((keys) => [[`Key${key}`, keys].join("+")])
+                : [`Key${key}`];
 
         return [chord];
     }
 
-    static assign(chord: string, run: (e: KeyboardEvent) => void) {
-        return Object.fromEntries(this.expand(chord).map((keys) => [keys, run]));
+    static assign<S extends string, R extends (e: KeyboardEvent) => void>(chord: S, run: R) {
+        return Object.fromEntries(
+            this.expand(chord)
+                .map((keys) => [keys, run])
+                .concat([[chord, run]]),
+        ) as AssignChord<S, R>;
     }
 }
+
+type Split<
+    S extends string,
+    D extends string = "",
+    R extends readonly unknown[] = [],
+> = S extends `${infer A}${D}${infer B}` ? Split<B, D, [...R, A]> : [...R, S];
+
+type Stringifiable = string | number | bigint | boolean | null | undefined;
+
+type Join<A, S extends string = "", R extends string = ""> = A extends [infer X extends Stringifiable, ...infer Y]
+    ? Join<Y, S, R extends "" ? X : `${R}${S}${X}`>
+    : R;
+
+type ExpandChord<S extends string, A extends string[] = Split<S, "+">> = Join<
+    {
+        [K in keyof A]: A[K] extends "Shift" | "Control" | "Alt" | "Meta"
+            ? `${A[K]}${"Left" | "Right"}`
+            : Split<A[K]>["length"] extends 1
+            ? A[K] extends Uppercase<A[K]>
+                ? `Key${A[K]}`
+                : A[K]
+            : A[K];
+    },
+    "+"
+>;
+
+type AssignChord<S extends string, R> = {
+    [_ in S]: R;
+} & {
+    [K in ExpandChord<S> & PropertyKey]: R;
+};
