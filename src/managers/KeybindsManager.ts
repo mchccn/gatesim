@@ -1,4 +1,5 @@
 import { IS_MAC_OS } from "../constants";
+import { SandboxManager } from "./SandboxManager";
 
 export class KeybindsManager {
     static #keymap = new Map<string, boolean>();
@@ -12,7 +13,7 @@ export class KeybindsManager {
             this.#keymap = new Map([...this.#keymap.entries()].filter(([key]) => !key.startsWith("Key")));
 
         if (document.activeElement === document.body) {
-            const [, runs] =
+            const [chord, runs] =
                 this.#keychords.find(([chord]) => {
                     let keys = chord.split("+");
 
@@ -40,7 +41,15 @@ export class KeybindsManager {
                     );
                 }) ?? [];
 
-            if (runs) runs.forEach((run) => run.call(undefined, e));
+            if (runs) {
+                SandboxManager.killMenu();
+
+                runs.forEach((run) => run.call(undefined, e));
+
+                chord!.split("+").forEach((key) => {
+                    if (key.startsWith("Key")) this.#keymap.delete(key);
+                });
+            }
         }
     };
 

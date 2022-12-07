@@ -30,7 +30,7 @@ export class NewWireContext {
                             () => {
                                 for (const wire of WiringManager.wires) {
                                     if (wire.from === from && wire.to === target) {
-                                        WiringManager.wires.delete(wire);
+                                        wire.destroy();
 
                                         break;
                                     }
@@ -54,6 +54,12 @@ export class Wiring {
 
     constructor(readonly from: Element, readonly to: Element) {
         this.#observer = new MutationObserver(() => {
+            if (!WiringManager.wires.has(this)) {
+                if (![...WiringManager.wires].some((wire) => wire.to === this.to)) to.classList.remove("activated");
+
+                return this.destroy();
+            }
+
             to.classList.toggle("activated", from.classList.contains("activated"));
         });
 

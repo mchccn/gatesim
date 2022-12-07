@@ -21,7 +21,10 @@ export class MenuManager {
 
     static #opened: MouseEvent;
 
-    static use(element: HTMLElement, actions: MenuManagerActions) {
+    static use(
+        element: HTMLElement,
+        actions: MenuManagerActions,
+    ): [queueNewContext: (newContext: (prev: MenuManagerActions) => MenuManagerActions) => void, killMenu: () => void] {
         const menu = html`<div class="contextmenu"></div>`;
 
         const clicks = new Map();
@@ -120,6 +123,13 @@ export class MenuManager {
         return [
             (newContext: (prev: MenuManagerActions) => MenuManagerActions) => {
                 context = newContext.call(undefined, [...actions]);
+            },
+            () => {
+                setup(getActions());
+
+                menu.style.left = "0px";
+                menu.style.top = "0px";
+                menu.style.display = "none";
             },
         ];
     }

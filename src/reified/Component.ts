@@ -1,4 +1,4 @@
-import { ACTIVATED_CSS_COLOR, DELAY, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
+import { ACTIVATED_CSS_COLOR, DELAY, IS_MAC_OS, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
@@ -141,6 +141,7 @@ export class Component<I extends number, O extends number> extends Reified {
                 {
                     "delete-component": {
                         label: "Delete component",
+                        keybind: IS_MAC_OS ? "⌘ X" : "Ctrl X",
                         callback: () => {
                             if (this.PERMANENT)
                                 return void ToastManager.toast({
@@ -229,7 +230,13 @@ export class Component<I extends number, O extends number> extends Reified {
     }
 
     async update() {
-        const out = this.chip.evaluate(this.inputs.map((i) => i.classList.contains("activated")));
+        const out = this.chip.evaluate(
+            this.inputs.map((i) => {
+                if (this.chip.name === "AND") console.log([...WiringManager.wires].filter((wire) => wire.to === i));
+
+                return i.classList.contains("activated");
+            }),
+        );
 
         await DELAY(100 + Math.random() * 50 - 25);
 

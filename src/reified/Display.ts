@@ -1,4 +1,4 @@
-import { ACTIVATED_CSS_COLOR, DELAY, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
+import { ACTIVATED_CSS_COLOR, DELAY, IS_MAC_OS, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { ModalManager } from "../managers/ModalManager";
 import { SandboxManager } from "../managers/SandboxManager";
@@ -102,6 +102,7 @@ export class Display extends Reified {
                     {
                         "delete-connections": {
                             label: "Delete connections",
+                            keybind: IS_MAC_OS ? "⌘ X" : "Ctrl X",
                             callback: () => {
                                 if (TestingManager.testing) return LOCKED_FOR_TESTING();
 

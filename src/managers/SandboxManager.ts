@@ -64,6 +64,7 @@ const calculateReifiedTotals = (set: Set<Reified>) =>
 
 export class SandboxManager {
     static queueNewContext: ReturnType<typeof MenuManager["use"]>[0];
+    static killMenu: ReturnType<typeof MenuManager["use"]>[1];
 
     static watchedUnresolvedPromises = new Set<() => void>();
 
@@ -179,7 +180,7 @@ export class SandboxManager {
                 .addAll(wirings);
 
         if (typeof this.#config.menu !== "undefined")
-            [this.queueNewContext] = MenuManager.use(Reified.root, this.#config.menu);
+            [this.queueNewContext, this.killMenu] = MenuManager.use(Reified.root, this.#config.menu);
 
         if (typeof this.#config.keybinds !== "undefined")
             Object.entries(this.#config.keybinds).forEach(([chord, run]) => KeybindsManager.onKeyChord(chord, run));
