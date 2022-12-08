@@ -268,6 +268,8 @@ export class Display extends Reified {
                                     this.update();
 
                                     SandboxManager.forceSave();
+
+                                    DraggingManager.snapToGridBasedUpdate();
                                 },
                                 () => {
                                     this.#bits = previous;
@@ -297,6 +299,8 @@ export class Display extends Reified {
                                     this.update();
 
                                     SandboxManager.forceSave();
+
+                                    DraggingManager.snapToGridBasedUpdate();
                                 },
                             );
                         },

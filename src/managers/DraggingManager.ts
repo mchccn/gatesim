@@ -28,21 +28,26 @@ export class DraggingManager {
     static set snapToGrid(value: boolean) {
         this.#snapToGrid = value;
 
-        this.#snapToGridBasedUpdate();
+        this.snapToGridBasedUpdate();
 
         SandboxManager.forceSave();
     }
 
-    static #snapToGridBasedUpdate({ forceClear = false }: { forceClear?: boolean } = { forceClear: false }) {
+    static snapToGridBasedUpdate({ forceClear = false }: { forceClear?: boolean } = { forceClear: false }) {
         if (this.snapToGrid && !forceClear) {
             setTimeout(() => {
                 Reified.active.forEach((component) => {
-                    const style = getComputedStyle(component.element);
-                    const width = parseFloat(style.width);
-                    const height = parseFloat(style.height);
+                    component.element.style.minWidth = "";
+                    component.element.style.minHeight = "";
 
-                    component.element.style.minWidth = Math.ceil(width / GRID_SIZE) * GRID_SIZE + "px";
-                    component.element.style.minHeight = Math.ceil(height / GRID_SIZE) * GRID_SIZE + "px";
+                    setTimeout(() => {
+                        const style = getComputedStyle(component.element);
+                        const width = parseFloat(style.width);
+                        const height = parseFloat(style.height);
+
+                        component.element.style.minWidth = Math.ceil(width / GRID_SIZE) * GRID_SIZE + "px";
+                        component.element.style.minHeight = Math.ceil(height / GRID_SIZE) * GRID_SIZE + "px";
+                    });
                 });
             });
 
@@ -194,7 +199,7 @@ export class DraggingManager {
     }
 
     static listen() {
-        this.#snapToGridBasedUpdate();
+        this.snapToGridBasedUpdate();
 
         document.body.addEventListener("mousemove", this.#mousemove);
         window.addEventListener("mousedown", this.#mousedown);
@@ -205,7 +210,7 @@ export class DraggingManager {
     }
 
     static deafen() {
-        this.#snapToGridBasedUpdate({ forceClear: true });
+        this.snapToGridBasedUpdate({ forceClear: true });
 
         document.body.removeEventListener("mousemove", this.#mousemove);
         window.removeEventListener("mousedown", this.#mousedown);
