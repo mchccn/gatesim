@@ -1,5 +1,6 @@
 import { ACTIVATED_CSS_COLOR, DELAY, IS_MAC_OS, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
+import { KeybindsManager } from "../managers/KeybindsManager";
 import { ModalManager } from "../managers/ModalManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
@@ -17,6 +18,7 @@ export class Display extends Reified {
     readonly #observers = new Map<Element, MutationObserver>();
     readonly #mouseups = new Map<Element, () => void>();
     readonly #contextmenus = new Map<Element, () => void>();
+    readonly #clicks = new Map<Element, () => void>();
 
     #bits;
     #radix;
@@ -141,6 +143,7 @@ export class Display extends Reified {
                     {
                         "create-connection": {
                             label: "Create connection",
+                            keybind: "Q",
                             callback: () => {
                                 if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
@@ -179,6 +182,10 @@ export class Display extends Reified {
                         },
                     },
                 ]);
+            });
+
+            this.#clicks.set(output, () => {
+                if (KeybindsManager.isKeyDown("KeyQ")) NewWireContext.from = output;
             });
         });
 
@@ -434,6 +441,8 @@ export class Display extends Reified {
             output.addEventListener("mouseup", this.#mouseups.get(output)!);
 
             output.addEventListener("contextmenu", this.#contextmenus.get(output)!);
+
+            output.addEventListener("click", this.#clicks.get(output)!);
         });
 
         this.display.addEventListener("contextmenu", this.#contextmenus.get(this.display)!);
@@ -442,7 +451,11 @@ export class Display extends Reified {
     #destroyListeners() {
         this.#observers.forEach((o) => o.disconnect());
 
+        this.#mouseups.forEach((listener, element) => element.removeEventListener("mouseup", listener));
+
         this.#contextmenus.forEach((listener, element) => element.removeEventListener("contextmenu", listener));
+
+        this.#clicks.forEach((listener, element) => element.removeEventListener("click", listener));
 
         this.display.removeEventListener("contextmenu", this.#contextmenus.get(this.display)!);
     }

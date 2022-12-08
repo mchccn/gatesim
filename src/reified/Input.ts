@@ -1,5 +1,6 @@
 import { ACTIVATED_CSS_COLOR, IS_MAC_OS, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
+import { KeybindsManager } from "../managers/KeybindsManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
@@ -27,6 +28,8 @@ export class Input extends Reified {
     };
 
     readonly #click = (e: MouseEvent) => {
+        if (KeybindsManager.isKeyDown("KeyQ")) return (NewWireContext.from = this.element);
+
         if (Math.hypot(e.clientX - +this.element.dataset.x!, e.clientY - +this.element.dataset.y!) > 2) return;
 
         if (TestingManager.testing) return LOCKED_FOR_TESTING();
@@ -48,6 +51,7 @@ export class Input extends Reified {
             {
                 "create-connection": {
                     label: "Create connection",
+                    keybind: "Q",
                     callback: () => {
                         NewWireContext.from = this.element;
                     },

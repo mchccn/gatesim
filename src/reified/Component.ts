@@ -1,5 +1,6 @@
 import { ACTIVATED_CSS_COLOR, DELAY, IS_MAC_OS, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
+import { KeybindsManager } from "../managers/KeybindsManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
@@ -17,6 +18,7 @@ export class Component<I extends number, O extends number> extends Reified {
     readonly #observers = new Map<Element, MutationObserver>();
     readonly #mouseups = new Map<Element, () => void>();
     readonly #contextmenus = new Map<Element, () => void>();
+    readonly #clicks = new Map<Element, () => void>();
 
     readonly chip: Chip<I, O>;
 
@@ -95,6 +97,7 @@ export class Component<I extends number, O extends number> extends Reified {
                     {
                         "create-connection": {
                             label: "Create connection",
+                            keybind: "Q",
                             callback: () => {
                                 if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
@@ -133,6 +136,10 @@ export class Component<I extends number, O extends number> extends Reified {
                         },
                     },
                 ]);
+            });
+
+            this.#clicks.set(output, () => {
+                if (KeybindsManager.isKeyDown("KeyQ")) NewWireContext.from = output;
             });
         });
 
@@ -259,6 +266,8 @@ export class Component<I extends number, O extends number> extends Reified {
             output.addEventListener("mouseup", this.#mouseups.get(output)!);
 
             output.addEventListener("contextmenu", this.#contextmenus.get(output)!);
+
+            output.addEventListener("click", this.#clicks.get(output)!);
         });
 
         this.name.addEventListener("contextmenu", this.#contextmenus.get(this.name)!);
@@ -273,7 +282,11 @@ export class Component<I extends number, O extends number> extends Reified {
 
         this.#observers.forEach((o) => o.disconnect());
 
+        this.#mouseups.forEach((listener, element) => element.removeEventListener("mouseup", listener));
+
         this.#contextmenus.forEach((listener, element) => element.removeEventListener("contextmenu", listener));
+
+        this.#clicks.forEach((listener, element) => element.removeEventListener("click", listener));
 
         this.name.removeEventListener("contextmenu", this.#contextmenus.get(this.name)!);
 
