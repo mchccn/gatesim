@@ -15,6 +15,7 @@ import { MouseManager } from "./MouseManager";
 import { SelectionManager } from "./SelectionManager";
 import { StorageManager } from "./StorageManager";
 import { ToastManager } from "./ToastManager";
+import { UndoRedoManager } from "./UndoRedoManager";
 import { Wiring, WiringManager } from "./WiringManager";
 
 type SandboxConfig = {
@@ -92,6 +93,8 @@ export class SandboxManager {
         document.body.appendChild(html`<canvas></canvas>`);
         document.body.appendChild(html`<div class="toasts-container"></div>`);
         document.body.appendChild(html`<button class="darkmode"></button>`);
+        document.body.appendChild(html`<button class="undo"></button>`);
+        document.body.appendChild(html`<button class="redo"></button>`);
 
         MouseManager.start();
         KeybindsManager.listen();
@@ -100,6 +103,7 @@ export class SandboxManager {
         WiringManager.start();
 
         DarkmodeManager.listen();
+        UndoRedoManager.listen();
 
         const createReifiedActive = (components: Reified[]) =>
             new WatchedSet<Reified>()
@@ -289,6 +293,7 @@ export class SandboxManager {
         WiringManager.stop();
 
         DarkmodeManager.stop();
+        UndoRedoManager.stop();
 
         MenuManager.remove(Reified.root);
 
