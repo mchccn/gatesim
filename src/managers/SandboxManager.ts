@@ -6,6 +6,7 @@ import { Display } from "../reified/Display";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
 import { html, Reified } from "../reified/Reified";
+import { DarkmodeManager } from "./DarkmodeManager";
 import { DraggingManager } from "./DraggingManager";
 import { KeybindsManager } from "./KeybindsManager";
 import { MenuManager, MenuManagerActions } from "./MenuManager";
@@ -90,12 +91,15 @@ export class SandboxManager {
         document.body.appendChild(html`<div class="reified-root"></div>`);
         document.body.appendChild(html`<canvas></canvas>`);
         document.body.appendChild(html`<div class="toasts-container"></div>`);
+        document.body.appendChild(html`<button class="darkmode"></button>`);
 
         MouseManager.start();
         KeybindsManager.listen();
         DraggingManager.listen();
         SelectionManager.listen();
         WiringManager.start();
+
+        DarkmodeManager.listen();
 
         const createReifiedActive = (components: Reified[]) =>
             new WatchedSet<Reified>()
@@ -283,6 +287,8 @@ export class SandboxManager {
         DraggingManager.reset();
         SelectionManager.reset();
         WiringManager.stop();
+
+        DarkmodeManager.stop();
 
         MenuManager.remove(Reified.root);
 
