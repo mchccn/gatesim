@@ -263,7 +263,7 @@ export class SandboxManager {
         }, this.#config.checkInterval ?? 50) as never;
     }
 
-    static manualSave() {
+    static forceSave() {
         if (typeof this.#config.save !== "undefined")
             StorageManager.set(
                 "saves:" + this.#config.save,

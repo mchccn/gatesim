@@ -1,4 +1,5 @@
-import { GRID_SIZE } from "../constants";
+import { EVEN_LIGHTER_GRAY_CSS_COLOR, GRID_SIZE } from "../constants";
+import { Reified } from "../reified/Reified";
 import { MouseManager } from "./MouseManager";
 import { SandboxManager } from "./SandboxManager";
 import { SelectionManager } from "./SelectionManager";
@@ -18,7 +19,47 @@ export class DraggingManager {
 
     static #positions: { x: number; y: number }[] | undefined;
 
-    static snapToGrid = false;
+    static #snapToGrid = false;
+
+    static get snapToGrid() {
+        return this.#snapToGrid;
+    }
+
+    static set snapToGrid(value: boolean) {
+        this.#snapToGrid = value;
+
+        this.#snapToGridBasedUpdate();
+
+        SandboxManager.forceSave();
+    }
+
+    static #snapToGridBasedUpdate({ forceClear = false }: { forceClear?: boolean } = { forceClear: false }) {
+        if (this.snapToGrid && !forceClear) {
+            setTimeout(() => {
+                Reified.active.forEach((component) => {
+                    const style = getComputedStyle(component.element);
+                    const width = parseFloat(style.width);
+                    const height = parseFloat(style.height);
+
+                    component.element.style.minWidth = Math.ceil(width / GRID_SIZE) * GRID_SIZE + "px";
+                    component.element.style.minHeight = Math.ceil(height / GRID_SIZE) * GRID_SIZE + "px";
+                });
+            });
+
+            document.body.style.backgroundSize = GRID_SIZE + "px " + GRID_SIZE + "px";
+            document.body.style.backgroundImage = `linear-gradient(to right, ${EVEN_LIGHTER_GRAY_CSS_COLOR} 1px, transparent 1px), linear-gradient(to bottom, ${EVEN_LIGHTER_GRAY_CSS_COLOR} 1px, transparent 1px)`;
+        } else {
+            setTimeout(() => {
+                Reified.active.forEach((component) => {
+                    component.element.style.minWidth = "";
+                    component.element.style.minHeight = "";
+                });
+            });
+
+            document.body.style.backgroundSize = "";
+            document.body.style.background = "";
+        }
+    }
 
     static watch(element: HTMLElement, target = element) {
         element.dataset.watched = "true";
@@ -153,6 +194,8 @@ export class DraggingManager {
     }
 
     static listen() {
+        this.#snapToGridBasedUpdate();
+
         document.body.addEventListener("mousemove", this.#mousemove);
         window.addEventListener("mousedown", this.#mousedown);
         window.addEventListener("mouseup", this.#mouseup);
@@ -162,6 +205,8 @@ export class DraggingManager {
     }
 
     static deafen() {
+        this.#snapToGridBasedUpdate({ forceClear: true });
+
         document.body.removeEventListener("mousemove", this.#mousemove);
         window.removeEventListener("mousedown", this.#mousedown);
         window.removeEventListener("mouseup", this.#mouseup);

@@ -36,5 +36,6 @@ export const ROUND_TO_NEAREST = (x: number, n: number) => Math.round(x / n) * n;
 
 export const ACTIVATED_CSS_COLOR = "#ff2626";
 export const LIGHT_GRAY_CSS_COLOR = "#dedede";
+export const EVEN_LIGHTER_GRAY_CSS_COLOR = "#efefef";
 export const TOAST_DURATION = 2500;
-export const GRID_SIZE = 10;
+export const GRID_SIZE = 15;

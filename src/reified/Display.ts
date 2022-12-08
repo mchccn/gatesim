@@ -267,7 +267,7 @@ export class Display extends Reified {
 
                                     this.update();
 
-                                    SandboxManager.manualSave();
+                                    SandboxManager.forceSave();
                                 },
                                 () => {
                                     this.#bits = previous;
@@ -296,7 +296,7 @@ export class Display extends Reified {
 
                                     this.update();
 
-                                    SandboxManager.manualSave();
+                                    SandboxManager.forceSave();
                                 },
                             );
                         },
@@ -325,14 +325,14 @@ export class Display extends Reified {
 
                                     this.update();
 
-                                    SandboxManager.manualSave();
+                                    SandboxManager.forceSave();
                                 },
                                 () => {
                                     this.#radix = previous;
 
                                     this.update();
 
-                                    SandboxManager.manualSave();
+                                    SandboxManager.forceSave();
                                 },
                             );
                         },

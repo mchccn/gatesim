@@ -36,10 +36,11 @@ export class DarkmodeManager {
                 bottom: 16px;
                 width: 40px;
                 height: 40px;
-                border: none;
                 font-size: 18px;
+                border: none;
                 border-radius: 50%;
                 cursor: pointer;
+                user-select: none;
             }
         `;
 

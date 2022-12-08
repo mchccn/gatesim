@@ -2,12 +2,8 @@
 
 -   add more components
 
-    -   tri-state buffer
-    -   switches
+    -   tri-state buffer/switches
     -   clocks
-    -   pre-made components
-        -   full adder
-        -   d-latch
 
 -   ability to rotate components
 
