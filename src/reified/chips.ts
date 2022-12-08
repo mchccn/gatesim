@@ -140,7 +140,46 @@ export class BufferGate extends Chip<1, 1> {
 }
 
 type StaticMembers<T> = { [K in keyof T]: T[K] };
+type ExtendedChip<I extends number = number, O extends number = number> = StaticMembers<typeof Chip<I, O>> & {
+    new (): Chip<I, O>;
+};
 
-export const chips = new Map<string, StaticMembers<typeof Chip<number, number>> & { new (): Chip<number, number> }>(
-    [AndGate, OrGate, NotGate, NandGate, NorGate, XorGate, XnorGate, BufferGate].map((gate) => [gate.NAME, gate]),
-);
+export const gates = [AndGate, OrGate, NotGate, NandGate, NorGate, XorGate, XnorGate, BufferGate] as const;
+
+export const chips = new Map<string, ExtendedChip>(gates.map((gate) => [gate.NAME, gate]));
+
+chips.set("BUF", BufferGate);
+
+export class HalfAdderGate extends Chip<2, 2> {
+    static readonly NAME = "HALFADDER";
+    static readonly INPUTS = 2;
+    static readonly OUTPUTS = 2;
+
+    constructor() {
+        super("HADD", 2, 2);
+    }
+
+    output([a, b]: [boolean, boolean]): [boolean, boolean] {
+        return [!!(+a ^ +b), a && b];
+    }
+}
+
+chips.set(HalfAdderGate.NAME, HalfAdderGate);
+chips.set("HADD", HalfAdderGate);
+
+export class FullAdderGate extends Chip<3, 2> {
+    static readonly NAME = "FULLADDER";
+    static readonly INPUTS = 3;
+    static readonly OUTPUTS = 2;
+
+    constructor() {
+        super("FADD", 3, 2);
+    }
+
+    output([a, b, c]: [boolean, boolean, boolean]): [boolean, boolean] {
+        return [!!(+!!(+a ^ +b) ^ +c), (!!(+a ^ +b) && c) || (a && b)];
+    }
+}
+
+chips.set(FullAdderGate.NAME, FullAdderGate);
+chips.set("FADD", FullAdderGate);
