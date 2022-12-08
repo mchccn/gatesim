@@ -1,3 +1,4 @@
+export default /* css */ `
 .contextmenu {
     position: absolute;
 
@@ -71,3 +72,4 @@
 .contextmenu > button:hover > .menu-keybind {
     color: #bbbbbb;
 }
+`;

@@ -1,5 +1,3 @@
-import { LIGHT_GRAY_CSS_COLOR } from "../constants";
-import { css } from "../reified/Reified";
 import { SandboxManager } from "./SandboxManager";
 
 export class UndoRedoManager {
@@ -22,34 +20,6 @@ export class UndoRedoManager {
     static listen() {
         this.#undoElement.innerText = "UNDO";
         this.#redoElement.innerText = "REDO";
-
-        this.#undoElement.style.cssText = css`
-            & {
-                color: ${LIGHT_GRAY_CSS_COLOR};
-                left: ${64}px;
-                bottom: 24px;
-                position: absolute;
-                font-size: 16px;
-                border: none;
-                background: transparent;
-                cursor: pointer;
-                user-select: none;
-            }
-        `;
-
-        this.#redoElement.style.cssText = css`
-            & {
-                color: ${LIGHT_GRAY_CSS_COLOR};
-                left: ${122}px;
-                bottom: 24px;
-                position: absolute;
-                font-size: 16px;
-                border: none;
-                background: transparent;
-                cursor: pointer;
-                user-select: none;
-            }
-        `;
 
         this.#undoElement.addEventListener("click", this.#undoListener);
         this.#redoElement.addEventListener("click", this.#redoListener);

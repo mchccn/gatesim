@@ -6,7 +6,7 @@ import { keybinds } from "./keybinds/keybinds";
 import { SandboxManager } from "./managers/SandboxManager";
 import { ToastManager } from "./managers/ToastManager";
 import { premade } from "./premade";
-import { loadStyles } from "./styles";
+import { loadStyles } from "./styling/loader";
 
 Object.assign(globalThis, constants);
 

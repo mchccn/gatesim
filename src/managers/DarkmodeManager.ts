@@ -1,4 +1,3 @@
-import { css } from "../reified/Reified";
 import { StorageManager } from "./StorageManager";
 
 export class DarkmodeManager {
@@ -28,21 +27,6 @@ export class DarkmodeManager {
         this.#enabled = this.#enabled;
 
         this.#element.innerText = this.#enabled ? "🌕" : "🌑";
-
-        this.#element.style.cssText = css`
-            & {
-                position: absolute;
-                left: 16px;
-                bottom: 16px;
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
-                border: none;
-                border-radius: 50%;
-                cursor: pointer;
-                user-select: none;
-            }
-        `;
 
         this.#element.addEventListener("click", this.#listener);
     }

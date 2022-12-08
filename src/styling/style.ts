@@ -1,3 +1,4 @@
+export default /* css */ `
 *,
 *::before,
 *::after {
@@ -24,9 +25,6 @@ body {
     width: 100vw;
 
     position: absolute;
-
-    border: 1px solid #dedede;
-    border-radius: 4px;
 }
 
 canvas {
@@ -39,3 +37,4 @@ canvas {
     width: 100vw;
     height: 100vh;
 }
+`;

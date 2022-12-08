@@ -1,3 +1,4 @@
+export default /* css */ `
 .board-input,
 .board-output {
     position: absolute;
@@ -44,3 +45,4 @@
 
     color: #eeeeee;
 }
+`;

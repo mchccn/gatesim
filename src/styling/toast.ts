@@ -1,3 +1,4 @@
+export default /* css */ `
 .toasts-container {
     position: absolute;
 
@@ -88,3 +89,4 @@
         opacity: 0;
     }
 }
+`;

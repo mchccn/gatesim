@@ -12,24 +12,6 @@ export function html(...args: [string] | [TemplateStringsArray, ...unknown[]]) {
     return new DOMParser().parseFromString(html, "text/html").body.childNodes[0];
 }
 
-export function css(template: TemplateStringsArray, ...values: unknown[]): string;
-export function css(css: string): string;
-export function css(...args: [string] | [TemplateStringsArray, ...unknown[]]) {
-    const [template, ...values] = args;
-
-    const css =
-        typeof template === "string" ? template : template.reduce((html, text, i) => html + text + values[i] ?? "", "");
-
-    return (
-        css
-            .match(/^.*\&.*\{(?<css>.+)\}.*$/s)
-            ?.groups?.css.trim()
-            .split("\n")
-            .map((line) => line.trim())
-            .join(" ") ?? css
-    );
-}
-
 export function overlappedBounds(rect: DOMRect, from: { x: number; y: number }, to: { x: number; y: number }) {
     const bounds = {
         x: Math.min(from.x, to.x),

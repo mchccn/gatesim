@@ -1,3 +1,4 @@
+export default /* css */ `
 .display,
 .component {
     position: absolute;
@@ -91,3 +92,4 @@
 
     user-select: none;
 }
+`;

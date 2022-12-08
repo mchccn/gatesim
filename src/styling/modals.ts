@@ -1,3 +1,4 @@
+export default /* css */ `
 .modal-container {
     position: absolute;
 
@@ -110,3 +111,4 @@
     border: 1px solid #dedede;
     border-radius: 2px;
 }
+`;
