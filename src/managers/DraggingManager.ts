@@ -1,5 +1,6 @@
-import { EVEN_LIGHTER_GRAY_CSS_COLOR, GRID_SIZE } from "../constants";
+import { EVEN_DARKER_GRAY_CSS_COLOR, EVEN_LIGHTER_GRAY_CSS_COLOR, GRID_SIZE } from "../constants";
 import { Reified } from "../reified/Reified";
+import { DarkmodeManager } from "./DarkmodeManager";
 import { MouseManager } from "./MouseManager";
 import { SandboxManager } from "./SandboxManager";
 import { SelectionManager } from "./SelectionManager";
@@ -52,7 +53,12 @@ export class DraggingManager {
             });
 
             document.body.style.backgroundSize = GRID_SIZE + "px " + GRID_SIZE + "px";
-            document.body.style.backgroundImage = `linear-gradient(to right, ${EVEN_LIGHTER_GRAY_CSS_COLOR} 1px, transparent 1px), linear-gradient(to bottom, ${EVEN_LIGHTER_GRAY_CSS_COLOR} 1px, transparent 1px)`;
+
+            if (DarkmodeManager.enabled) {
+                document.body.style.backgroundImage = `linear-gradient(to right, ${EVEN_DARKER_GRAY_CSS_COLOR} 1px, transparent 1px), linear-gradient(to bottom, ${EVEN_DARKER_GRAY_CSS_COLOR} 1px, transparent 1px)`;
+            } else {
+                document.body.style.backgroundImage = `linear-gradient(to right, ${EVEN_LIGHTER_GRAY_CSS_COLOR} 1px, transparent 1px), linear-gradient(to bottom, ${EVEN_LIGHTER_GRAY_CSS_COLOR} 1px, transparent 1px)`;
+            }
         } else {
             setTimeout(() => {
                 Reified.active.forEach((component) => {
@@ -78,17 +84,17 @@ export class DraggingManager {
 
             const rect = this.#dragged.getBoundingClientRect();
 
-            const body = this.#dragged.parentElement?.getBoundingClientRect() ?? new DOMRect();
-
             this.#mouse.x = e.clientX;
             this.#mouse.y = e.clientY;
 
             this.#mouse.ix = e.clientX;
             this.#mouse.iy = e.clientY;
 
+            if (!SelectionManager.isSelected(element)) SelectionManager.selected.clear();
+
             if (SelectionManager.selected.size <= 1) {
-                this.#mouse.ox = e.clientX - rect.left + body.left;
-                this.#mouse.oy = e.clientY - rect.top + body.top;
+                this.#mouse.ox = e.clientX - rect.left;
+                this.#mouse.oy = e.clientY - rect.top;
             } else {
                 this.#positions = [...SelectionManager.selected].map((target) => target.pos);
 
@@ -124,8 +130,6 @@ export class DraggingManager {
 
             const rect = this.#dragged.getBoundingClientRect();
 
-            const body = this.#dragged.parentElement?.getBoundingClientRect() ?? new DOMRect();
-
             this.#mouse.x = touch.clientX;
             this.#mouse.y = touch.clientY;
 
@@ -133,8 +137,8 @@ export class DraggingManager {
             this.#mouse.iy = touch.clientY;
 
             if (SelectionManager.selected.size <= 1) {
-                this.#mouse.ox = touch.clientX - rect.left + body.left;
-                this.#mouse.oy = touch.clientY - rect.top + body.top;
+                this.#mouse.ox = touch.clientX - rect.left;
+                this.#mouse.oy = touch.clientY - rect.top;
             } else {
                 this.#positions = [...SelectionManager.selected].map((target) => target.pos);
 

@@ -101,7 +101,7 @@ export class SelectionManager {
                     components!.forEach((component) => {
                         component.attach();
 
-                        if (component instanceof Component) {
+                        if (component instanceof Component || component instanceof Display) {
                             component.inputs.forEach((input) => input.classList.remove("activated"));
 
                             setTimeout(() => component.update(), 0);
@@ -166,6 +166,8 @@ export class SelectionManager {
         Reified.active.forEach((component) => (component.element.style.zIndex = "100"));
 
         reified.element.style.zIndex = "1000";
+
+        return this;
     }
 
     static selectAllIn(from: { x: number; y: number }, to: { x: number; y: number }) {
@@ -180,6 +182,8 @@ export class SelectionManager {
         Reified.active.forEach((component) => (component.element.style.zIndex = "100"));
 
         reified.forEach((component) => (component.element.style.zIndex = "1000"));
+
+        return this;
     }
 
     static addSelection(reified: Reified) {
@@ -188,23 +192,48 @@ export class SelectionManager {
         Reified.active.forEach((component) => (component.element.style.zIndex = "100"));
 
         reified.element.style.zIndex = "1000";
+
+        return this;
+    }
+
+    static isSelected(element: HTMLElement) {
+        return [...this.selected].some((component) => {
+            if (component instanceof Input) return element === component.element;
+
+            if (component instanceof Output) return element === component.element;
+
+            if (component instanceof Component || component instanceof Display)
+                return (
+                    component.inputs.some((input) => element === input) ||
+                    component.outputs.some((output) => element === output) ||
+                    element === component.element
+                );
+
+            throw new Error("Unknown component type.");
+        });
     }
 
     static listen() {
         document.body.addEventListener("mousedown", this.#mousedown);
         document.addEventListener("copy", this.#copy);
         document.addEventListener("paste", this.#paste);
+
+        return this;
     }
 
     static deafen() {
         document.body.removeEventListener("mousedown", this.#mousedown);
         document.removeEventListener("copy", this.#copy);
         document.removeEventListener("paste", this.#paste);
+
+        return this;
     }
 
     static reset() {
         this.selected.clear();
 
         this.deafen();
+
+        return this;
     }
 }
