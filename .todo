@@ -1,10 +1,5 @@
 -   add more puzzles/exercises
 
--   add more components
-
-    -   tri-state buffer/switches
-    -   clocks
-
 -   ability to rotate components
 
 -   settings icon
@@ -12,7 +7,5 @@
     -   some constants will be settings
 
 -   splash/landing with instructions
-
--   add play-events testing
 
 -   "A" keybind on drag to bring open circle menu thing
