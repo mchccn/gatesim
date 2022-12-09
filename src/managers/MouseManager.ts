@@ -51,6 +51,8 @@ export class MouseManager {
         document.addEventListener("touchmove", this.#touchmove);
         document.addEventListener("touchstart", this.#touchstart);
         document.addEventListener("touchend", this.#touchend);
+
+        return this;
     }
 
     static stop() {
@@ -62,6 +64,8 @@ export class MouseManager {
         document.removeEventListener("touchend", this.#touchend);
 
         this.#mouse = { x: 0, y: 0 };
+
+        return this;
     }
 
     static reset() {
@@ -69,38 +73,56 @@ export class MouseManager {
 
         this.#mousedowns.clear();
         this.#mouseups.clear();
+
+        return this;
     }
 
     static onMouseDown(handler: (e: MouseEvent) => void) {
         this.#mousedowns.add(handler);
+
+        return this;
     }
 
     static onMouseUp(handler: (e: MouseEvent) => void) {
         this.#mouseups.add(handler);
+
+        return this;
     }
 
     static offMouseDown(handler: (e: MouseEvent) => void) {
         this.#mousedowns.delete(handler);
+
+        return this;
     }
 
     static offMouseUp(handler: (e: MouseEvent) => void) {
         this.#mouseups.delete(handler);
+
+        return this;
     }
 
     static onTouchStart(handler: (e: TouchEvent) => void) {
         this.#touchstarts.add(handler);
+
+        return this;
     }
 
     static onTouchEnd(handler: (e: TouchEvent) => void) {
         this.#touchends.add(handler);
+
+        return this;
     }
 
     static offTouchStart(handler: (e: TouchEvent) => void) {
         this.#touchstarts.delete(handler);
+
+        return this;
     }
 
     static offTouchEnd(handler: (e: TouchEvent) => void) {
         this.#touchends.delete(handler);
+
+        return this;
     }
 
     static get mouse() {

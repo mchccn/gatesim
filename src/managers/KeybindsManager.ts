@@ -67,12 +67,16 @@ export class KeybindsManager {
         document.addEventListener("keydown", this.#keydown);
         document.addEventListener("keyup", this.#keyup);
         document.addEventListener("blur", this.#blur);
+
+        return this;
     }
 
     static deafen() {
         document.removeEventListener("keydown", this.#keydown);
         document.removeEventListener("keyup", this.#keyup);
         document.removeEventListener("blur", this.#blur);
+
+        return this;
     }
 
     static onKeyChord(chord: string, run: (e: KeyboardEvent) => void) {
@@ -97,6 +101,8 @@ export class KeybindsManager {
         this.#keychords = [];
 
         this.deafen();
+
+        return this;
     }
 
     static expand<S extends string>(chord: S): ExpandChord<S>[];

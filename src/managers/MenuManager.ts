@@ -154,5 +154,7 @@ export class MenuManager {
         });
 
         menu.remove();
+
+        return this;
     }
 }

@@ -102,7 +102,8 @@ export class SandboxManager {
         SelectionManager.listen();
         WiringManager.start();
 
-        DarkmodeManager.listen();
+        DarkmodeManager.listen().onChange(() => DraggingManager.snapToGridBasedUpdate());
+
         UndoRedoManager.listen();
 
         const createReifiedActive = (components: Reified[]) =>
@@ -277,6 +278,8 @@ export class SandboxManager {
 
             if (check) this.#config.ifStateChecked?.();
         }, this.#config.checkInterval ?? 50) as never;
+
+        return this;
     }
 
     static forceSave() {
@@ -285,6 +288,8 @@ export class SandboxManager {
                 "saves:" + this.#config.save,
                 saveDiagram([...Reified.active], [...WiringManager.wires]),
             );
+
+        return this;
     }
 
     static reset() {
@@ -321,6 +326,8 @@ export class SandboxManager {
 
         this.#history = [];
         this.#redos = [];
+
+        return this;
     }
 
     static clear() {
@@ -329,6 +336,8 @@ export class SandboxManager {
         WiringManager.wires.forEach((wire) => wire.destroy());
 
         SelectionManager.selected.clear();
+
+        return this;
     }
 
     static pushHistory(command: () => void, undo: () => void) {
@@ -337,44 +346,60 @@ export class SandboxManager {
         command.call(undefined);
 
         this.#history.push([command, undo]);
+
+        return this;
     }
 
     static popHistory() {
-        if (!this.#history.length)
-            return void ToastManager.toast({
+        if (!this.#history.length) {
+            ToastManager.toast({
                 message: "Nothing to undo.",
                 color: ACTIVATED_CSS_COLOR,
                 duration: TOAST_DURATION,
             });
 
+            return this;
+        }
+
         const [redo, undo] = this.#history.pop()!;
 
         this.#redos.push([redo, undo]);
 
-        return undo.call(undefined);
+        undo.call(undefined);
+
+        return this;
     }
 
     static redoHistory() {
-        if (!this.#redos.length)
-            return void ToastManager.toast({
+        if (!this.#redos.length) {
+            ToastManager.toast({
                 message: "Nothing to redo.",
                 color: ACTIVATED_CSS_COLOR,
                 duration: TOAST_DURATION,
             });
 
+            return this;
+        }
+
         const [command, undo] = this.#redos.pop()!;
 
         this.#history.push([command, undo]);
 
-        return command.call(undefined);
+        command.call(undefined);
+
+        return this;
     }
 
     static applySettings(settings: SandboxConfig["settings"] & {}) {
         DraggingManager.snapToGrid = settings.snapToGrid ?? false;
+
+        return this;
     }
 
     static applyRawSettings(settings: SerializedDiagram["settings"]) {
         DraggingManager.snapToGrid = settings["DraggingManager.snapToGrid"];
+
+        return this;
     }
 
     static async saveTo(save: string) {
@@ -389,5 +414,7 @@ export class SandboxManager {
             return;
 
         StorageManager.set("saves:" + this.#config.save, saveDiagram([...Reified.active], [...WiringManager.wires]));
+
+        return this;
     }
 }

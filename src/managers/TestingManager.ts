@@ -62,6 +62,8 @@ export class TestingManager {
         WiringManager.wires.unlock();
 
         this.#testing = false;
+
+        return this;
     }
 
     static get testing() {

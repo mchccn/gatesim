@@ -172,7 +172,7 @@ export class WiringManager {
 
             ctx.lineJoin = "miter";
 
-            ctx.strokeRect(rect.left - 10, rect.top - 10, rect.width + 10 + 10, rect.height + 10 + 10);
+            ctx.strokeRect(rect.left - 15, rect.top - 15, rect.width + 15 + 15, rect.height + 15 + 15);
         });
     }
 

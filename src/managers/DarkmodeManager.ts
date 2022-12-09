@@ -1,6 +1,8 @@
 import { StorageManager } from "./StorageManager";
 
 export class DarkmodeManager {
+    static readonly #changes = new Set<() => void>();
+
     static readonly #key = "settings.darkmode";
 
     static get #enabled() {
@@ -12,15 +14,39 @@ export class DarkmodeManager {
 
         this.#element.innerText = value ? "🌕" : "🌑";
 
+        this.#changes.forEach((run) => run.call(undefined));
+
         document.body.classList.toggle("darkmode", value);
+    }
+
+    static get enabled() {
+        return this.#enabled;
     }
 
     static get #element() {
         return document.querySelector<HTMLElement>("button.darkmode")!;
     }
 
+    static onChange(run: () => void) {
+        this.#changes.add(run);
+
+        return this;
+    }
+
+    static offChange(run: () => void) {
+        this.#changes.delete(run);
+
+        return this;
+    }
+
     static #listener = () => {
         this.#enabled = !this.#enabled;
+
+        this.#element.style.transition = "none";
+
+        setTimeout(() => {
+            this.#element.style.transition = "";
+        });
     };
 
     static listen() {
@@ -29,10 +55,14 @@ export class DarkmodeManager {
         this.#element.innerText = this.#enabled ? "🌕" : "🌑";
 
         this.#element.addEventListener("click", this.#listener);
+
+        return this;
     }
 
     static stop() {
         this.#element.removeEventListener("click", this.#listener);
+
+        return this;
     }
 
     static toggle(value?: boolean) {
