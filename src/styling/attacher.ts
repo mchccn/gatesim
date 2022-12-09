@@ -1,6 +1,8 @@
-export const loadStyles = async () => {
+export const attachStyles = async () => {
     const css = await Promise.all(
-        ["style", "component", "io", "contextmenu", "toast", "modals", "buttons"].map((name) => import(`./${name}.ts`)),
+        ["style", "component", "io", "contextmenu", "toast", "modals", "buttons", "darkmode"].map(
+            (name) => import(`./${name}.ts`),
+        ),
     ).then((css) => css.map((_) => _.default).join(""));
 
     const style = document.createElement("style");

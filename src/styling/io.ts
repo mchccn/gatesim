@@ -1,48 +1,50 @@
-export default /* css */ `
-.board-input,
-.board-output {
-    position: absolute;
+import { css } from "../reified/Reified";
 
-    z-index: 20;
+export default css`
+    .board-input,
+    .board-output {
+        position: absolute;
 
-    display: grid;
-    place-items: center;
+        z-index: 20;
 
-    color: #333333;
+        display: grid;
+        place-items: center;
 
-    font-family: serif;
-    font-weight: 900;
-    font-size: 16px;
+        color: #333333;
 
-    height: 24px;
-    width: 24px;
+        font-family: serif;
+        font-weight: 900;
+        font-size: 16px;
 
-    user-select: none;
+        height: 24px;
+        width: 24px;
 
-    padding: 0;
+        user-select: none;
 
-    border: 1px solid #dedede;
-}
+        padding: 0;
 
-.board-input {
-    border-radius: 50%;
-}
+        border: 1px solid #dedede;
+    }
 
-.board-output {
-    border-radius: 4px;
-}
+    .board-input {
+        border-radius: 50%;
+    }
 
-.board-input:hover {
-    cursor: pointer;
-}
+    .board-output {
+        border-radius: 4px;
+    }
 
-.board-output:hover {
-    cursor: grab;   
-}
+    .board-input:hover {
+        cursor: pointer;
+    }
 
-.activated {
-    background-color: #ff2626;
+    .board-output:hover {
+        cursor: grab;
+    }
 
-    color: #eeeeee;
-}
+    .activated {
+        background-color: #ff2626;
+
+        color: #eeeeee;
+    }
 `;

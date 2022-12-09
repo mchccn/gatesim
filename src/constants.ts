@@ -35,9 +35,17 @@ export const SCUFFED_UUID = () =>
 export const ROUND_TO_NEAREST = (x: number, n: number) => Math.round(x / n) * n;
 
 export const ACTIVATED_CSS_COLOR = "#ff2626";
+export const BRIGHT_ACTIVATED_CSS_COLOR = "#ffaaaa";
+export const EVEN_DARKER_GRAY_CSS_COLOR = "#0a0a0c";
+export const DARKER_GRAY_CSS_COLOR = "#16161f";
+export const DARK_GRAY_CSS_COLOR = "#1c1c24";
+export const KINDA_DARK_GRAY_CSS_COLOR = "#24242e";
+export const NOT_REALLY_DARK_GRAY_CSS_COLOR = "#2e2e3f";
+export const ONLY_A_HINT_OF_DARK_GRAY_CSS_COLOR = "#3c3c4f";
 export const SUPER_GRAY_CSS_COLOR = "#bbbbbb";
-export const KINDA_GRAY_CSS_COLOR = "#cdcdcd";
+export const KINDA_LIGHT_GRAY_CSS_COLOR = "#cdcdcd";
 export const LIGHT_GRAY_CSS_COLOR = "#dedede";
+export const LIGHTER_GRAY_CSS_COLOR = "#eaeaea";
 export const EVEN_LIGHTER_GRAY_CSS_COLOR = "#efefef";
 export const TOAST_DURATION = 2500;
 export const GRID_SIZE = 15;

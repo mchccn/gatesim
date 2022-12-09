@@ -7,9 +7,20 @@ export function html(...args: [string] | [TemplateStringsArray, ...unknown[]]) {
     const [template, ...values] = args;
 
     const html =
-        typeof template === "string" ? template : template.reduce((html, text, i) => html + text + values[i] ?? "", "");
+        typeof template === "string" ? template : template.reduce((html, s, i) => html + s + (values[i] ?? ""), "");
 
     return new DOMParser().parseFromString(html, "text/html").body.childNodes[0];
+}
+
+export function css(template: TemplateStringsArray, ...values: unknown[]): string;
+export function css(css: string): string;
+export function css(...args: [string] | [TemplateStringsArray, ...unknown[]]) {
+    const [template, ...values] = args;
+
+    const css =
+        typeof template === "string" ? template : template.reduce((css, s, i) => css + s + (values[i] ?? ""), "");
+
+    return css;
 }
 
 export function overlappedBounds(rect: DOMRect, from: { x: number; y: number }, to: { x: number; y: number }) {

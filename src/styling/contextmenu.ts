@@ -1,75 +1,77 @@
-export default /* css */ `
-.contextmenu {
-    position: absolute;
+import { css } from "../reified/Reified";
 
-    z-index: 100;
+export default css`
+    .contextmenu {
+        position: absolute;
 
-    display: flex;
-    flex-direction: column;
+        z-index: 100;
 
-    width: 200px;
+        display: flex;
+        flex-direction: column;
 
-    border: 1px solid #dedede;
-    border-radius: 4px;
+        width: 200px;
 
-    background-color: #fefefe;
+        border: 1px solid #dedede;
+        border-radius: 4px;
 
-    user-select: none;
+        background-color: #fefefe;
 
-    box-shadow: 1px 1px 4px #dedede;
-}
+        user-select: none;
 
-.contextmenu > .br {
-    display: block;
+        box-shadow: 1px 1px 4px #dedede;
+    }
 
-    width: 100%;
+    .contextmenu > .br {
+        display: block;
 
-    border-bottom: 1px solid #dedede;
-}
+        width: 100%;
 
-.contextmenu > button {
-    text-align: left;
+        border-bottom: 1px solid #dedede;
+    }
 
-    background: transparent;
+    .contextmenu > button {
+        text-align: left;
 
-    border: none;
+        background: transparent;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+        border: none;
 
-    padding: 8px 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-    color: #999999;
-}
+        padding: 8px 8px;
 
-.contextmenu > button:hover {
-    cursor: pointer;
+        color: #999999;
+    }
 
-    color: #333333;
+    .contextmenu > button:hover {
+        cursor: pointer;
 
-    background: #f0f0f0;
-}
+        color: #333333;
 
-.menu-keybind {
-    color: #dddddd;
+        background: #f0f0f0;
+    }
 
-    display: flex;
-    align-items: center;
+    .menu-keybind {
+        color: #dddddd;
 
-    gap: 2px;
-}
+        display: flex;
+        align-items: center;
 
-.menu-keybind > span {
-    display: grid;
+        gap: 2px;
+    }
 
-    place-items: center;
+    .menu-keybind > span {
+        display: grid;
 
-    min-height: 20px;
-    min-width: 14px;
-}
+        place-items: center;
 
-.contextmenu > button:hover > .menu-keybind {
-    color: #bbbbbb;
-}
+        min-height: 20px;
+        min-width: 14px;
+    }
+
+    .contextmenu > button:hover > .menu-keybind {
+        color: #bbbbbb;
+    }
 `;

@@ -6,11 +6,11 @@ import { keybinds } from "./keybinds/keybinds";
 import { SandboxManager } from "./managers/SandboxManager";
 import { ToastManager } from "./managers/ToastManager";
 import { premade } from "./premade";
-import { loadStyles } from "./styling/loader";
+import { attachStyles } from "./styling/attacher";
 
 Object.assign(globalThis, constants);
 
-await loadStyles();
+await attachStyles();
 
 const hrefAsUrl = new URL(location.href);
 

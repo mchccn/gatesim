@@ -1,40 +1,42 @@
-export default /* css */ `
-*,
-*::before,
-*::after {
-    margin: 0;
-    box-sizing: border-box;
-}
+import { css } from "../reified/Reified";
 
-html {
-    height: 100%;
+export default css`
+    *,
+    *::before,
+    *::after {
+        margin: 0;
+        box-sizing: border-box;
+    }
 
-    overflow: hidden;
+    html {
+        height: 100%;
 
-    overscroll-behavior: none;
-}
+        overflow: hidden;
 
-body {
-    height: 100%;
-}
+        overscroll-behavior: none;
+    }
 
-.reified-root {
-    z-index: 0;
+    body {
+        height: 100%;
+    }
 
-    height: 100vh;
-    width: 100vw;
+    .reified-root {
+        z-index: 0;
 
-    position: absolute;
-}
+        height: 100vh;
+        width: 100vw;
 
-canvas {
-    position: absolute;
+        position: absolute;
+    }
 
-    pointer-events: none;
+    canvas {
+        position: absolute;
 
-    z-index: -100;
+        pointer-events: none;
 
-    width: 100vw;
-    height: 100vh;
-}
+        z-index: -100;
+
+        width: 100vw;
+        height: 100vh;
+    }
 `;

@@ -1,95 +1,97 @@
-export default /* css */ `
-.display,
-.component {
-    position: absolute;
+import { css } from "../reified/Reified";
 
-    z-index: 10;
+export default css`
+    .display,
+    .component {
+        position: absolute;
 
-    display: grid;
-    place-items: center;
-    grid-template-columns: 6px auto 6px;
+        z-index: 10;
 
-    height: fit-content;
-    width: fit-content;
+        display: grid;
+        place-items: center;
+        grid-template-columns: 6px auto 6px;
 
-    min-height: 40px;
-    min-width: 100px;
+        height: fit-content;
+        width: fit-content;
 
-    background-color: white;
+        min-height: 40px;
+        min-width: 100px;
 
-    border: 1px solid #dedede;
-    border-radius: 4px;
-}
+        background-color: white;
 
-.display:hover,
-.component:hover {
-    cursor: grab;
-}
+        border: 1px solid #dedede;
+        border-radius: 4px;
+    }
 
-.component-inputs,
-.component-outputs {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
+    .display:hover,
+    .component:hover {
+        cursor: grab;
+    }
 
-    height: 100%;
+    .component-inputs,
+    .component-outputs {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
 
-    gap: 4px;
-}
+        height: 100%;
 
-.component-input-button,
-.component-output-button {
-    display: grid;
-    place-items: center;
+        gap: 4px;
+    }
 
-    font-family: serif;
-    font-weight: 900;
-    font-size: 12px;
+    .component-input-button,
+    .component-output-button {
+        display: grid;
+        place-items: center;
 
-    color: #cccccc;
+        font-family: serif;
+        font-weight: 900;
+        font-size: 12px;
 
-    height: 16px;
-    width: 16px;
+        color: #cccccc;
 
-    padding: 0;
+        height: 16px;
+        width: 16px;
 
-    user-select: none;
+        padding: 0;
 
-    border: 1px solid #dedede;
-}
+        user-select: none;
 
-.component-input-button {
-    margin-left: -6px;
+        border: 1px solid #dedede;
+    }
 
-    border-radius: 50%;
-}
+    .component-input-button {
+        margin-left: -6px;
 
-.component-output-button {
-    margin-right: -6px;
+        border-radius: 50%;
+    }
 
-    border-radius: 2px;
-}
+    .component-output-button {
+        margin-right: -6px;
 
-.component-input-button.activated {
-    color: #ff7777;
-}
+        border-radius: 2px;
+    }
 
-.display-content,
-.component-name {
-    height: 100%;
-    width: 100%;
+    .component-input-button.activated {
+        color: #ff7777;
+    }
 
-    display: grid;
-    place-items: center;
+    .display-content,
+    .component-name {
+        height: 100%;
+        width: 100%;
 
-    font-family: sans-serif;
-    font-weight: 900;
-    font-size: 1.5rem;
+        display: grid;
+        place-items: center;
 
-    padding: 0 8px;
+        font-family: sans-serif;
+        font-weight: 900;
+        font-size: 1.5rem;
 
-    color: #333333;
+        padding: 0 8px;
 
-    user-select: none;
-}
+        color: #333333;
+
+        user-select: none;
+    }
 `;
