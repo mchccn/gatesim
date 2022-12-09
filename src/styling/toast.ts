@@ -22,7 +22,7 @@ export default css`
     }
 
     .toast {
-        animation: forwards linear 0.5s toast-fade-out;
+        animation: forwards linear 0.5s fade-out;
 
         position: relative;
 
@@ -82,7 +82,7 @@ export default css`
         color: black;
     }
 
-    @keyframes toast-fade-out {
+    @keyframes fade-out {
         from {
             opacity: 1;
         }

@@ -55,3 +55,4 @@ export const LIGHTER_GRAY_CSS_COLOR = "#eaeaea";
 export const EVEN_LIGHTER_GRAY_CSS_COLOR = "#efefef";
 export const TOAST_DURATION = 2500;
 export const GRID_SIZE = 15;
+export const QUICKPICK_SIZE = 50;

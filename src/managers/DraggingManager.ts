@@ -1,7 +1,9 @@
 import { EVEN_DARKER_GRAY_CSS_COLOR, EVEN_LIGHTER_GRAY_CSS_COLOR, GRID_SIZE } from "../constants";
 import { Reified } from "../reified/Reified";
 import { DarkmodeManager } from "./DarkmodeManager";
+import { KeybindsManager } from "./KeybindsManager";
 import { MouseManager } from "./MouseManager";
+import { QuickPickManager } from "./QuickPickManager";
 import { SandboxManager } from "./SandboxManager";
 import { SelectionManager } from "./SelectionManager";
 
@@ -291,8 +293,45 @@ export class DraggingManager {
         ].find((element) => element !== null)!;
 
         if (!isOnInvalidTarget && e.button === 0) {
-            this.#downpos.x = e.clientX;
-            this.#downpos.y = e.clientY;
+            if (KeybindsManager.isKeyDown("KeyA")) {
+                console.log("YES");
+
+                QuickPickManager.activate(e, [
+                    {
+                        label: "one",
+                        callback() {
+                            console.log(1);
+                        },
+                    },
+                    {
+                        label: "two",
+                        callback() {
+                            console.log(2);
+                        },
+                    },
+                    {
+                        label: "three",
+                        callback() {
+                            console.log(3);
+                        },
+                    },
+                    {
+                        label: "four",
+                        callback() {
+                            console.log(4);
+                        },
+                    },
+                    {
+                        label: "five",
+                        callback() {
+                            console.log(5);
+                        },
+                    },
+                ]);
+            } else {
+                this.#downpos.x = e.clientX;
+                this.#downpos.y = e.clientY;
+            }
         }
 
         this.#mouse.down = true;
