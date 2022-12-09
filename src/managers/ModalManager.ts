@@ -237,4 +237,63 @@ export class ModalManager {
             });
         });
     }
+
+    static async popup(content: string | Element) {
+        this.#onModalMount();
+
+        const popup = html`
+            <div class="modal modal-alert modal-popup">
+                <div class="modal-message">${typeof content === "string" ? content : content.outerHTML}</div>
+                <div class="button-container">
+                    <button class="modal-ok">Ok</button>
+                </div>
+            </div>
+        `;
+
+        this.container.appendChild(popup);
+
+        popup.querySelector<HTMLElement>(".modal-ok")!.focus();
+
+        return new Promise<void>((resolve) => {
+            const finish = () => resolve(undefined);
+
+            SandboxManager.watchedUnresolvedPromises.add(finish);
+
+            const done = () => {
+                popup.remove();
+
+                this.#onModalResolved();
+
+                SandboxManager.watchedUnresolvedPromises.delete(finish);
+
+                return finish();
+            };
+
+            const esc = (e: KeyboardEvent) => {
+                if (e.code === "Escape") {
+                    e.preventDefault();
+
+                    document.removeEventListener("keydown", esc);
+
+                    done();
+                }
+            };
+
+            document.addEventListener("keydown", esc);
+
+            const clickout = (e: MouseEvent) => {
+                const target = e.target as HTMLElement;
+
+                if (target !== this.container || this.container.lastElementChild !== popup) return;
+
+                this.container.removeEventListener("mousedown", clickout);
+
+                done();
+            };
+
+            this.container.addEventListener("mousedown", clickout);
+
+            popup.querySelector<HTMLElement>(".modal-ok")!.addEventListener("click", done);
+        });
+    }
 }

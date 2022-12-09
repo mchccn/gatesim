@@ -1,5 +1,5 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import { ACTIVATED_CSS_COLOR, GRID_SIZE, IN_DEBUG_MODE, TOAST_DURATION } from "../constants";
+import { ACTIVATED_CSS_COLOR, GRID_SIZE, IN_DEBUG_MODE, LIGHT_GRAY_CSS_COLOR, TOAST_DURATION } from "../constants";
 import { fromFile, saveDiagram, SerializedDiagram } from "../files";
 import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";
@@ -278,6 +278,13 @@ export class SandboxManager {
 
             if (check) this.#config.ifStateChecked?.();
         }, this.#config.checkInterval ?? 50) as never;
+
+        if (!StorageManager.get("usedhelp"))
+            ToastManager.toast({
+                message: "Press '?' for help.",
+                color: LIGHT_GRAY_CSS_COLOR,
+                duration: TOAST_DURATION,
+            });
 
         return this;
     }

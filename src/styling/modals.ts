@@ -27,7 +27,7 @@ export default css`
 
     .modal-confirm,
     .modal-alert {
-        width: 400px;
+        min-width: 400px;
         min-height: 80px;
 
         background-color: #efefef;
@@ -112,5 +112,21 @@ export default css`
 
         border: 1px solid #dedede;
         border-radius: 2px;
+    }
+
+    .modal-popup {
+        width: 600px;
+        max-width: 600px;
+    }
+
+    .modal-popup .modal-message {
+        height: 450px;
+        max-height: 450px;
+
+        overflow-y: scroll;
+
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
     }
 `;
