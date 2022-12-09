@@ -1,3 +1,4 @@
+import { ACTIVATED_CSS_COLOR } from "../constants";
 import { css } from "../reified/Reified";
 
 export default css`
@@ -43,7 +44,7 @@ export default css`
     }
 
     .activated {
-        background-color: #ff2626;
+        background-color: ${ACTIVATED_CSS_COLOR};
 
         color: #eeeeee;
     }

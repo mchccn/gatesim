@@ -72,7 +72,8 @@ export default css`
         border-radius: 2px;
     }
 
-    .component-input-button.activated {
+    .component-input-button.activated,
+    .component-output-button.activated {
         color: #ff7777;
     }
 

@@ -1,5 +1,13 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import { ACTIVATED_CSS_COLOR, GET_CANVAS_CTX, LIGHT_GRAY_CSS_COLOR, LOCKED_FOR_TESTING } from "../constants";
+import {
+    ACTIVATED_CSS_COLOR,
+    DARK_ACTIVATED_CSS_COLOR,
+    GET_ACTIVATED_COLOR,
+    GET_CANVAS_CTX,
+    GET_GRAY_COLOR,
+    LOCKED_FOR_TESTING,
+} from "../constants";
+import { DarkmodeManager } from "./DarkmodeManager";
 import { DraggingManager } from "./DraggingManager";
 import { MouseManager } from "./MouseManager";
 import { SandboxManager } from "./SandboxManager";
@@ -112,7 +120,7 @@ export class WiringManager {
                 sources.some((w) => w.from.classList.contains("activated")),
             );
 
-            ctx.strokeStyle = wire.from.classList.contains("activated") ? ACTIVATED_CSS_COLOR : LIGHT_GRAY_CSS_COLOR;
+            ctx.strokeStyle = wire.from.classList.contains("activated") ? GET_ACTIVATED_COLOR() : GET_GRAY_COLOR();
 
             ctx.lineWidth = 5;
 
@@ -129,8 +137,8 @@ export class WiringManager {
             const from = NewWireContext.from.getBoundingClientRect();
 
             ctx.strokeStyle = NewWireContext.from.classList.contains("activated")
-                ? ACTIVATED_CSS_COLOR
-                : LIGHT_GRAY_CSS_COLOR;
+                ? GET_ACTIVATED_COLOR()
+                : GET_GRAY_COLOR();
 
             ctx.lineWidth = 5;
 
@@ -149,7 +157,7 @@ export class WiringManager {
             MouseManager.mouse.x !== -1 &&
             MouseManager.mouse.y !== -1
         ) {
-            ctx.strokeStyle = ACTIVATED_CSS_COLOR;
+            ctx.strokeStyle = DarkmodeManager.enabled ? DARK_ACTIVATED_CSS_COLOR : ACTIVATED_CSS_COLOR;
 
             ctx.lineWidth = 2.5;
 
@@ -166,7 +174,7 @@ export class WiringManager {
         SelectionManager.selected.forEach((component) => {
             const rect = component.element.getBoundingClientRect();
 
-            ctx.strokeStyle = ACTIVATED_CSS_COLOR;
+            ctx.strokeStyle = DarkmodeManager.enabled ? DARK_ACTIVATED_CSS_COLOR : ACTIVATED_CSS_COLOR;
 
             ctx.lineWidth = 1;
 

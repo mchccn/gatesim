@@ -7,8 +7,6 @@
 
 -   ability to rotate components
 
--   dark mode stylings
-
 -   settings icon
 
     -   some constants will be settings
@@ -16,3 +14,5 @@
 -   splash/landing with instructions
 
 -   add play-events testing
+
+-   "A" keybind on drag to bring open circle menu thing

@@ -1,3 +1,4 @@
+import { DarkmodeManager } from "./managers/DarkmodeManager";
 import { ModalManager } from "./managers/ModalManager";
 
 declare global {
@@ -34,9 +35,14 @@ export const SCUFFED_UUID = () =>
 
 export const ROUND_TO_NEAREST = (x: number, n: number) => Math.round(x / n) * n;
 
+export const GET_ACTIVATED_COLOR = () => (DarkmodeManager.enabled ? DARK_ACTIVATED_CSS_COLOR : ACTIVATED_CSS_COLOR);
+export const GET_GRAY_COLOR = () =>
+    DarkmodeManager.enabled ? ONLY_A_HINT_OF_DARK_GRAY_CSS_COLOR : LIGHT_GRAY_CSS_COLOR;
+
 export const ACTIVATED_CSS_COLOR = "#ff2626";
-export const BRIGHT_ACTIVATED_CSS_COLOR = "#ffaaaa";
+export const DARK_ACTIVATED_CSS_COLOR = "#dd1111";
 export const EVEN_DARKER_GRAY_CSS_COLOR = "#0a0a0c";
+export const SLIGHTLY_DARKER_GRAY_CSS_COLOR = "#101012";
 export const DARKER_GRAY_CSS_COLOR = "#16161f";
 export const DARK_GRAY_CSS_COLOR = "#1c1c24";
 export const KINDA_DARK_GRAY_CSS_COLOR = "#24242e";
