@@ -1,4 +1,6 @@
-import { EVEN_DARKER_GRAY_CSS_COLOR, EVEN_LIGHTER_GRAY_CSS_COLOR, GRID_SIZE } from "../constants";
+import { EVEN_DARKER_GRAY_CSS_COLOR, EVEN_LIGHTER_GRAY_CSS_COLOR, GRID_SIZE, ORIGIN_POINT } from "../constants";
+import { gates } from "../reified/chips";
+import { Component } from "../reified/Component";
 import { Reified } from "../reified/Reified";
 import { DarkmodeManager } from "./DarkmodeManager";
 import { KeybindsManager } from "./KeybindsManager";
@@ -294,40 +296,43 @@ export class DraggingManager {
 
         if (!isOnInvalidTarget && e.button === 0) {
             if (KeybindsManager.isKeyDown("KeyA")) {
-                console.log("YES");
+                QuickPickManager.activate(
+                    e,
+                    gates.map((gate) => ({
+                        label: gate.NAME,
+                        callback(e) {
+                            const component = new Component(Reflect.construct(gate, []), ORIGIN_POINT);
 
-                QuickPickManager.activate(e, [
-                    {
-                        label: "one",
-                        callback() {
-                            console.log(1);
+                            const selection = SelectionManager.selected.clone(true);
+
+                            return SandboxManager.pushHistory(
+                                () => {
+                                    Reified.active.add(component);
+
+                                    if (Reified.active.has(component)) {
+                                        component.attach();
+
+                                        const { width, height } = getComputedStyle(component.element);
+
+                                        component.move({
+                                            x: e.clientX - parseFloat(width) / 2,
+                                            y: e.clientY - parseFloat(height) / 2,
+                                        });
+
+                                        SelectionManager.select(component);
+                                    }
+                                },
+                                () => {
+                                    Reified.active.delete(component);
+
+                                    component.detach();
+
+                                    SelectionManager.selected = selection;
+                                },
+                            );
                         },
-                    },
-                    {
-                        label: "two",
-                        callback() {
-                            console.log(2);
-                        },
-                    },
-                    {
-                        label: "three",
-                        callback() {
-                            console.log(3);
-                        },
-                    },
-                    {
-                        label: "four",
-                        callback() {
-                            console.log(4);
-                        },
-                    },
-                    {
-                        label: "five",
-                        callback() {
-                            console.log(5);
-                        },
-                    },
-                ]);
+                    })),
+                );
             } else {
                 this.#downpos.x = e.clientX;
                 this.#downpos.y = e.clientY;

@@ -1,15 +1,14 @@
 import { WatchedSet } from "../augments/WatchedSet";
 import {
-    ACTIVATED_CSS_COLOR,
-    DARK_ACTIVATED_CSS_COLOR,
     GET_ACTIVATED_COLOR,
-    GET_CANVAS_CTX,
+    GET_BACKGROUND_CANVAS_CTX,
+    GET_FOREGROUND_CANVAS_CTX,
     GET_GRAY_COLOR,
     LOCKED_FOR_TESTING,
 } from "../constants";
-import { DarkmodeManager } from "./DarkmodeManager";
 import { DraggingManager } from "./DraggingManager";
 import { MouseManager } from "./MouseManager";
+import { QuickPickManager } from "./QuickPickManager";
 import { SandboxManager } from "./SandboxManager";
 import { SelectionManager } from "./SelectionManager";
 import { TestingManager } from "./TestingManager";
@@ -97,10 +96,14 @@ export class WiringManager {
     static wires = new WatchedSet<Wiring>();
 
     static update() {
-        const ctx = GET_CANVAS_CTX();
+        const bg = GET_BACKGROUND_CANVAS_CTX();
+        const fg = GET_FOREGROUND_CANVAS_CTX();
 
-        ctx.canvas.width = window.innerWidth;
-        ctx.canvas.height = window.innerHeight;
+        bg.canvas.width = window.innerWidth;
+        bg.canvas.height = window.innerHeight;
+
+        fg.canvas.width = window.innerWidth;
+        fg.canvas.height = window.innerHeight;
 
         this.wires.forEach((wire) => {
             if (wire.destroyed) {
@@ -120,35 +123,35 @@ export class WiringManager {
                 sources.some((w) => w.from.classList.contains("activated")),
             );
 
-            ctx.strokeStyle = wire.from.classList.contains("activated") ? GET_ACTIVATED_COLOR() : GET_GRAY_COLOR();
+            bg.strokeStyle = wire.from.classList.contains("activated") ? GET_ACTIVATED_COLOR() : GET_GRAY_COLOR();
 
-            ctx.lineWidth = 5;
+            bg.lineWidth = 5;
 
-            ctx.lineJoin = "round";
+            bg.lineJoin = "round";
 
-            ctx.beginPath();
-            ctx.moveTo(from.x + from.width / 2, from.y + from.height / 2);
-            ctx.lineTo(to.x + to.width / 2, to.y + to.height / 2);
-            ctx.closePath();
-            ctx.stroke();
+            bg.beginPath();
+            bg.moveTo(from.x + from.width / 2, from.y + from.height / 2);
+            bg.lineTo(to.x + to.width / 2, to.y + to.height / 2);
+            bg.closePath();
+            bg.stroke();
         });
 
         if (NewWireContext.from) {
             const from = NewWireContext.from.getBoundingClientRect();
 
-            ctx.strokeStyle = NewWireContext.from.classList.contains("activated")
+            bg.strokeStyle = NewWireContext.from.classList.contains("activated")
                 ? GET_ACTIVATED_COLOR()
                 : GET_GRAY_COLOR();
 
-            ctx.lineWidth = 5;
+            bg.lineWidth = 5;
 
-            ctx.lineJoin = "round";
+            bg.lineJoin = "round";
 
-            ctx.beginPath();
-            ctx.moveTo(from.x + from.width / 2, from.y + from.height / 2);
-            ctx.lineTo(MouseManager.mouse.x, MouseManager.mouse.y);
-            ctx.closePath();
-            ctx.stroke();
+            bg.beginPath();
+            bg.moveTo(from.x + from.width / 2, from.y + from.height / 2);
+            bg.lineTo(MouseManager.mouse.x, MouseManager.mouse.y);
+            bg.closePath();
+            bg.stroke();
         }
 
         if (
@@ -157,13 +160,13 @@ export class WiringManager {
             MouseManager.mouse.x !== -1 &&
             MouseManager.mouse.y !== -1
         ) {
-            ctx.strokeStyle = DarkmodeManager.enabled ? DARK_ACTIVATED_CSS_COLOR : ACTIVATED_CSS_COLOR;
+            fg.strokeStyle = GET_ACTIVATED_COLOR();
 
-            ctx.lineWidth = 2.5;
+            fg.lineWidth = 2.5;
 
-            ctx.lineJoin = "miter";
+            fg.lineJoin = "miter";
 
-            ctx.strokeRect(
+            fg.strokeRect(
                 DraggingManager.downpos.x,
                 DraggingManager.downpos.y,
                 MouseManager.mouse.x - DraggingManager.downpos.x,
@@ -174,14 +177,39 @@ export class WiringManager {
         SelectionManager.selected.forEach((component) => {
             const rect = component.element.getBoundingClientRect();
 
-            ctx.strokeStyle = DarkmodeManager.enabled ? DARK_ACTIVATED_CSS_COLOR : ACTIVATED_CSS_COLOR;
+            fg.strokeStyle = GET_ACTIVATED_COLOR();
 
-            ctx.lineWidth = 1;
+            fg.lineWidth = 1;
 
-            ctx.lineJoin = "miter";
+            fg.lineJoin = "miter";
 
-            ctx.strokeRect(rect.left - 15, rect.top - 15, rect.width + 15 + 15, rect.height + 15 + 15);
+            fg.strokeRect(rect.left - 15, rect.top - 15, rect.width + 15 + 15, rect.height + 15 + 15);
         });
+
+        if (QuickPickManager.line) {
+            const [from, to] = QuickPickManager.line;
+
+            fg.fillStyle = GET_GRAY_COLOR();
+            fg.strokeStyle = GET_GRAY_COLOR();
+
+            fg.lineWidth = 1;
+
+            fg.beginPath();
+            fg.arc(from.clientX, from.clientY, 2, 0, Math.PI * 2);
+            fg.closePath();
+            fg.fill();
+
+            fg.beginPath();
+            fg.moveTo(from.clientX, from.clientY);
+            fg.lineTo(to.clientX, to.clientY);
+            fg.closePath();
+            fg.stroke();
+
+            fg.beginPath();
+            fg.arc(to.clientX, to.clientY, 2, 0, Math.PI * 2);
+            fg.closePath();
+            fg.fill();
+        }
     }
 
     static start() {

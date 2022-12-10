@@ -24,7 +24,11 @@ export const LOCKED_FOR_TESTING = () =>
 
 export const DELAY = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));
 
-export const GET_CANVAS_CTX = () => document.querySelector("canvas")!.getContext("2d")!;
+export const GET_BACKGROUND_CANVAS_CTX = () =>
+    document.querySelector<HTMLCanvasElement>("canvas.background-canvas")!.getContext("2d")!;
+
+export const GET_FOREGROUND_CANVAS_CTX = () =>
+    document.querySelector<HTMLCanvasElement>("canvas.foreground-canvas")!.getContext("2d")!;
 
 export const COUNTER_GENERATOR = function* (i = 0) {
     while (true) yield i++;
@@ -55,4 +59,4 @@ export const LIGHTER_GRAY_CSS_COLOR = "#eaeaea";
 export const EVEN_LIGHTER_GRAY_CSS_COLOR = "#efefef";
 export const TOAST_DURATION = 2500;
 export const GRID_SIZE = 15;
-export const QUICKPICK_SIZE = 50;
+export const QUICKPICK_SIZE = 75;

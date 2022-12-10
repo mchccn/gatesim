@@ -90,7 +90,8 @@ export class SandboxManager {
 
         document.body.appendChild(html`<div class="modal-container modal-inactive"></div>`);
         document.body.appendChild(html`<div class="reified-root"></div>`);
-        document.body.appendChild(html`<canvas></canvas>`);
+        document.body.appendChild(html`<canvas class="background-canvas"></canvas>`);
+        document.body.appendChild(html`<canvas class="foreground-canvas"></canvas>`);
         document.body.appendChild(html`<div class="toasts-container"></div>`);
         document.body.appendChild(html`<button class="darkmode"></button>`);
         document.body.appendChild(html`<button class="undo"></button>`);

@@ -122,4 +122,8 @@ export default css`
     body.darkmode .close-toast {
         color: ${KINDA_LIGHT_GRAY_CSS_COLOR};
     }
+
+    body.darkmode .quickpick-item {
+        color: ${KINDA_LIGHT_GRAY_CSS_COLOR};
+    }
 `;

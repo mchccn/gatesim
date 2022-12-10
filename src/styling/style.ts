@@ -29,14 +29,21 @@ export default css`
         position: absolute;
     }
 
-    canvas {
+    .background-canvas,
+    .foreground-canvas {
         position: absolute;
 
         pointer-events: none;
 
-        z-index: -100;
-
         width: 100vw;
         height: 100vh;
+    }
+
+    .background-canvas {
+        z-index: -100;
+    }
+
+    .foreground-canvas {
+        z-index: 100;
     }
 `;

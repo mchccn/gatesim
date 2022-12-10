@@ -126,7 +126,7 @@ export class XnorGate extends Chip<2, 1> {
 }
 
 export class BufferGate extends Chip<1, 1> {
-    static readonly NAME = "BUFFER";
+    static readonly NAME = "BUF";
     static readonly INPUTS = 1;
     static readonly OUTPUTS = 1;
 
@@ -148,7 +148,8 @@ export const gates = [AndGate, OrGate, NotGate, NandGate, NorGate, XorGate, Xnor
 
 export const chips = new Map<string, ExtendedChip>(gates.map((gate) => [gate.NAME, gate]));
 
-chips.set("BUF", BufferGate);
+chips.set("BUFF", BufferGate);
+chips.set("BUFFER", BufferGate);
 
 export class HalfAdderGate extends Chip<2, 2> {
     static readonly NAME = "HALFADDER";

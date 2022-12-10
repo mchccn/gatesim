@@ -1,9 +1,16 @@
-import { LIGHT_GRAY_CSS_COLOR } from "../constants";
 import { css } from "../reified/Reified";
 
 export default css`
     .quickpick-item {
         position: absolute;
+
+        font-family: sans-serif;
+
+        opacity: 0;
+
+        transition-duration: 0.2s;
+        transition-timing-function: ease;
+        transition-property: top, left;
 
         animation: forwards ease 0.2s fade-in;
 
@@ -13,8 +20,7 @@ export default css`
     .quickpick-circle {
         position: absolute;
 
-        border: 1px solid ${LIGHT_GRAY_CSS_COLOR};
-        border-radius: 50%;
+        animation: forwards ease 0.2s fade-in;
     }
 
     @keyframes fade-in {
