@@ -1,5 +1,6 @@
 import { GET_GRAY_COLOR, QUICKPICK_SIZE } from "../constants";
 import { html } from "../reified/Reified";
+import { CanvasManager } from "./CanvasManager";
 
 export type QuickPickContext = {
     listeners: {
@@ -13,7 +14,7 @@ export type QuickPickActions = {
 }[];
 
 export class QuickPickManager {
-    static line: [from: MouseEvent, to: MouseEvent] | undefined;
+    static #line: [from: MouseEvent, to: MouseEvent] | undefined;
 
     static async activate(event: MouseEvent, actions: QuickPickActions) {
         const quickpick = html`<div class="quickpick"></div>`;
@@ -91,9 +92,9 @@ export class QuickPickManager {
 
         document.body.appendChild(quickpick);
 
-        const mousemove = (e: MouseEvent) => {
-            this.line = [event, e];
-        };
+        this.#line = [event, event];
+
+        const mousemove = (e: MouseEvent) => (this.#line = [event, e]);
 
         document.body.addEventListener("mousemove", mousemove);
 
@@ -115,7 +116,7 @@ export class QuickPickManager {
 
                 document.body.removeEventListener("mousemove", mousemove);
 
-                this.line = undefined;
+                this.#line = undefined;
             },
             { once: true },
         );
@@ -127,9 +128,40 @@ export class QuickPickManager {
 
                 document.body.removeEventListener("mousemove", mousemove);
 
-                this.line = undefined;
+                this.#line = undefined;
             },
             { once: true },
         );
+    }
+
+    static render({ fg }: { fg: CanvasRenderingContext2D }) {
+        if (this.#line) {
+            const [from, to] = this.#line;
+
+            fg.fillStyle = GET_GRAY_COLOR();
+            fg.strokeStyle = GET_GRAY_COLOR();
+
+            fg.lineWidth = 1;
+
+            fg.beginPath();
+            fg.arc(from.clientX, from.clientY, 2, 0, Math.PI * 2);
+            fg.closePath();
+            fg.fill();
+
+            fg.beginPath();
+            fg.moveTo(from.clientX, from.clientY);
+            fg.lineTo(to.clientX, to.clientY);
+            fg.closePath();
+            fg.stroke();
+
+            fg.beginPath();
+            fg.arc(to.clientX, to.clientY, 2, 0, Math.PI * 2);
+            fg.closePath();
+            fg.fill();
+        }
+    }
+
+    static init() {
+        CanvasManager.addJob(this.render.bind(this));
     }
 }

@@ -6,12 +6,14 @@ import { Display } from "../reified/Display";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
 import { html, Reified } from "../reified/Reified";
+import { CanvasManager } from "./CanvasManager";
 import { DarkmodeManager } from "./DarkmodeManager";
 import { DraggingManager } from "./DraggingManager";
 import { KeybindsManager } from "./KeybindsManager";
 import { MenuManager, MenuManagerActions } from "./MenuManager";
 import { ModalManager } from "./ModalManager";
 import { MouseManager } from "./MouseManager";
+import { QuickPickManager } from "./QuickPickManager";
 import { SelectionManager } from "./SelectionManager";
 import { StorageManager } from "./StorageManager";
 import { ToastManager } from "./ToastManager";
@@ -101,7 +103,10 @@ export class SandboxManager {
         KeybindsManager.listen();
         DraggingManager.listen();
         SelectionManager.listen();
-        WiringManager.start();
+        WiringManager.init();
+        QuickPickManager.init();
+
+        CanvasManager.start();
 
         DarkmodeManager.listen().onChange(() => DraggingManager.snapToGridBasedUpdate());
 
@@ -315,7 +320,8 @@ export class SandboxManager {
         KeybindsManager.reset();
         DraggingManager.reset();
         SelectionManager.reset();
-        WiringManager.stop();
+
+        CanvasManager.stop();
 
         DarkmodeManager.stop();
         UndoRedoManager.stop();

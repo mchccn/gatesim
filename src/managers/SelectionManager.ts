@@ -1,11 +1,12 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import { ACTIVATED_CSS_COLOR, IS_MAC_OS, TOAST_DURATION } from "../constants";
+import { ACTIVATED_CSS_COLOR, GET_ACTIVATED_COLOR, IS_MAC_OS, TOAST_DURATION } from "../constants";
 import { fromFile, saveDiagram } from "../files";
 import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
 import { overlappedBounds, Reified } from "../reified/Reified";
+import { CanvasManager } from "./CanvasManager";
 import { KeybindsManager } from "./KeybindsManager";
 import { MouseManager } from "./MouseManager";
 import { SandboxManager } from "./SandboxManager";
@@ -213,7 +214,23 @@ export class SelectionManager {
         });
     }
 
+    static render({ fg }: { fg: CanvasRenderingContext2D }) {
+        SelectionManager.selected.forEach((component) => {
+            const rect = component.element.getBoundingClientRect();
+
+            fg.strokeStyle = GET_ACTIVATED_COLOR();
+
+            fg.lineWidth = 1;
+
+            fg.lineJoin = "miter";
+
+            fg.strokeRect(rect.left - 15, rect.top - 15, rect.width + 15 + 15, rect.height + 15 + 15);
+        });
+    }
+
     static listen() {
+        CanvasManager.addJob(this.render.bind(this));
+
         document.body.addEventListener("mousedown", this.#mousedown);
         document.addEventListener("copy", this.#copy);
         document.addEventListener("paste", this.#paste);

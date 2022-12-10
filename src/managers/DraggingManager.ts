@@ -1,7 +1,14 @@
-import { EVEN_DARKER_GRAY_CSS_COLOR, EVEN_LIGHTER_GRAY_CSS_COLOR, GRID_SIZE, ORIGIN_POINT } from "../constants";
+import {
+    EVEN_DARKER_GRAY_CSS_COLOR,
+    EVEN_LIGHTER_GRAY_CSS_COLOR,
+    GET_ACTIVATED_COLOR,
+    GRID_SIZE,
+    ORIGIN_POINT,
+} from "../constants";
 import { gates } from "../reified/chips";
 import { Component } from "../reified/Component";
 import { Reified } from "../reified/Reified";
+import { CanvasManager } from "./CanvasManager";
 import { DarkmodeManager } from "./DarkmodeManager";
 import { KeybindsManager } from "./KeybindsManager";
 import { MouseManager } from "./MouseManager";
@@ -206,8 +213,32 @@ export class DraggingManager {
         this.deafen();
     }
 
+    static render({ fg }: { fg: CanvasRenderingContext2D }) {
+        if (
+            DraggingManager.downpos.x !== -1 &&
+            DraggingManager.downpos.y !== -1 &&
+            MouseManager.mouse.x !== -1 &&
+            MouseManager.mouse.y !== -1
+        ) {
+            fg.strokeStyle = GET_ACTIVATED_COLOR();
+
+            fg.lineWidth = 2.5;
+
+            fg.lineJoin = "miter";
+
+            fg.strokeRect(
+                DraggingManager.downpos.x,
+                DraggingManager.downpos.y,
+                MouseManager.mouse.x - DraggingManager.downpos.x,
+                MouseManager.mouse.y - DraggingManager.downpos.y,
+            );
+        }
+    }
+
     static listen() {
         this.snapToGridBasedUpdate();
+
+        CanvasManager.addJob(this.render.bind(this));
 
         document.body.addEventListener("mousemove", this.#mousemove);
         window.addEventListener("mousedown", this.#mousedown);

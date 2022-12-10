@@ -1,16 +1,8 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import {
-    GET_ACTIVATED_COLOR,
-    GET_BACKGROUND_CANVAS_CTX,
-    GET_FOREGROUND_CANVAS_CTX,
-    GET_GRAY_COLOR,
-    LOCKED_FOR_TESTING,
-} from "../constants";
-import { DraggingManager } from "./DraggingManager";
+import { GET_ACTIVATED_COLOR, GET_GRAY_COLOR, LOCKED_FOR_TESTING } from "../constants";
+import { CanvasManager } from "./CanvasManager";
 import { MouseManager } from "./MouseManager";
-import { QuickPickManager } from "./QuickPickManager";
 import { SandboxManager } from "./SandboxManager";
-import { SelectionManager } from "./SelectionManager";
 import { TestingManager } from "./TestingManager";
 
 export class NewWireContext {
@@ -91,20 +83,9 @@ export class Wiring {
 }
 
 export class WiringManager {
-    static #rAF = -1;
-
     static wires = new WatchedSet<Wiring>();
 
-    static update() {
-        const bg = GET_BACKGROUND_CANVAS_CTX();
-        const fg = GET_FOREGROUND_CANVAS_CTX();
-
-        bg.canvas.width = window.innerWidth;
-        bg.canvas.height = window.innerHeight;
-
-        fg.canvas.width = window.innerWidth;
-        fg.canvas.height = window.innerHeight;
-
+    static render({ bg }: { bg: CanvasRenderingContext2D }) {
         this.wires.forEach((wire) => {
             if (wire.destroyed) {
                 if (this.wires.locked) wire.go();
@@ -153,74 +134,9 @@ export class WiringManager {
             bg.closePath();
             bg.stroke();
         }
-
-        if (
-            DraggingManager.downpos.x !== -1 &&
-            DraggingManager.downpos.y !== -1 &&
-            MouseManager.mouse.x !== -1 &&
-            MouseManager.mouse.y !== -1
-        ) {
-            fg.strokeStyle = GET_ACTIVATED_COLOR();
-
-            fg.lineWidth = 2.5;
-
-            fg.lineJoin = "miter";
-
-            fg.strokeRect(
-                DraggingManager.downpos.x,
-                DraggingManager.downpos.y,
-                MouseManager.mouse.x - DraggingManager.downpos.x,
-                MouseManager.mouse.y - DraggingManager.downpos.y,
-            );
-        }
-
-        SelectionManager.selected.forEach((component) => {
-            const rect = component.element.getBoundingClientRect();
-
-            fg.strokeStyle = GET_ACTIVATED_COLOR();
-
-            fg.lineWidth = 1;
-
-            fg.lineJoin = "miter";
-
-            fg.strokeRect(rect.left - 15, rect.top - 15, rect.width + 15 + 15, rect.height + 15 + 15);
-        });
-
-        if (QuickPickManager.line) {
-            const [from, to] = QuickPickManager.line;
-
-            fg.fillStyle = GET_GRAY_COLOR();
-            fg.strokeStyle = GET_GRAY_COLOR();
-
-            fg.lineWidth = 1;
-
-            fg.beginPath();
-            fg.arc(from.clientX, from.clientY, 2, 0, Math.PI * 2);
-            fg.closePath();
-            fg.fill();
-
-            fg.beginPath();
-            fg.moveTo(from.clientX, from.clientY);
-            fg.lineTo(to.clientX, to.clientY);
-            fg.closePath();
-            fg.stroke();
-
-            fg.beginPath();
-            fg.arc(to.clientX, to.clientY, 2, 0, Math.PI * 2);
-            fg.closePath();
-            fg.fill();
-        }
     }
 
-    static start() {
-        this.update();
-
-        const id = requestAnimationFrame(this.start.bind(this));
-
-        this.#rAF = id;
-    }
-
-    static stop() {
-        cancelAnimationFrame(this.#rAF);
+    static init() {
+        CanvasManager.addJob(this.render.bind(this));
     }
 }

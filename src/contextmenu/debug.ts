@@ -1,9 +1,9 @@
 import { ACTIVATED_CSS_COLOR, IN_DEBUG_MODE, LIGHT_GRAY_CSS_COLOR, TOAST_DURATION } from "../constants";
+import { CanvasManager } from "../managers/CanvasManager";
 import { MenuManagerActions } from "../managers/MenuManager";
 import { ModalManager } from "../managers/ModalManager";
 import { StorageManager } from "../managers/StorageManager";
 import { ToastManager } from "../managers/ToastManager";
-import { WiringManager } from "../managers/WiringManager";
 
 export const debug = (
     IN_DEBUG_MODE
@@ -69,15 +69,15 @@ export const debug = (
               },
               {
                   "stop-render": {
-                      label: "Stop rendering wires",
+                      label: "Stop rendering",
                       callback: () => {
-                          WiringManager.stop();
+                          CanvasManager.stop();
                       },
                   },
                   "start-render": {
-                      label: "Start rendering wires",
+                      label: "Start rendering",
                       callback: () => {
-                          WiringManager.start();
+                          CanvasManager.start();
                       },
                   },
               },
