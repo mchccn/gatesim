@@ -108,7 +108,7 @@ export class SandboxManager {
 
         CanvasManager.start();
 
-        DarkmodeManager.listen().onChange(() => DraggingManager.snapToGridBasedUpdate());
+        DarkmodeManager.listen().onChange(() => DraggingManager.snapToGridBasedUpdate({ onlyUpdateColor: true }));
 
         UndoRedoManager.listen();
 

@@ -13,10 +13,10 @@ export const insert = {
     "insert-component": {
         label: "Insert component",
         keybind: "A",
-        callback: async (e) => {
+        callback: async (e, n?: string) => {
             if (TestingManager.testing) return LOCKED_FOR_TESTING();
 
-            const name = await ModalManager.prompt("Enter the component's name:");
+            const name = typeof n === "string" ? n : await ModalManager.prompt("Enter the component's name:");
 
             if (typeof name !== "string") return;
 

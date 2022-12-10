@@ -1,18 +1,11 @@
-import {
-    EVEN_DARKER_GRAY_CSS_COLOR,
-    EVEN_LIGHTER_GRAY_CSS_COLOR,
-    GET_ACTIVATED_COLOR,
-    GRID_SIZE,
-    ORIGIN_POINT,
-} from "../constants";
-import { gates } from "../reified/chips";
-import { Component } from "../reified/Component";
+import { EVEN_DARKER_GRAY_CSS_COLOR, EVEN_LIGHTER_GRAY_CSS_COLOR, GET_ACTIVATED_COLOR, GRID_SIZE } from "../constants";
+import { quickpickComponents } from "../quickpicks/components";
+import { quickpickGates } from "../quickpicks/gates";
 import { Reified } from "../reified/Reified";
 import { CanvasManager } from "./CanvasManager";
 import { DarkmodeManager } from "./DarkmodeManager";
 import { KeybindsManager } from "./KeybindsManager";
 import { MouseManager } from "./MouseManager";
-import { QuickPickManager } from "./QuickPickManager";
 import { SandboxManager } from "./SandboxManager";
 import { SelectionManager } from "./SelectionManager";
 
@@ -45,23 +38,29 @@ export class DraggingManager {
         SandboxManager.forceSave();
     }
 
-    static snapToGridBasedUpdate({ forceClear = false }: { forceClear?: boolean } = { forceClear: false }) {
+    static snapToGridBasedUpdate(
+        { forceClear = false, onlyUpdateColor = false }: { forceClear?: boolean; onlyUpdateColor?: boolean } = {
+            forceClear: false,
+            onlyUpdateColor: false,
+        },
+    ) {
         if (this.snapToGrid && !forceClear) {
-            setTimeout(() => {
-                Reified.active.forEach((component) => {
-                    component.element.style.minWidth = "";
-                    component.element.style.minHeight = "";
+            if (!onlyUpdateColor)
+                setTimeout(() => {
+                    Reified.active.forEach((component) => {
+                        component.element.style.minWidth = "";
+                        component.element.style.minHeight = "";
 
-                    setTimeout(() => {
-                        const style = getComputedStyle(component.element);
-                        const width = parseFloat(style.width);
-                        const height = parseFloat(style.height);
+                        setTimeout(() => {
+                            const style = getComputedStyle(component.element);
+                            const width = parseFloat(style.width);
+                            const height = parseFloat(style.height);
 
-                        component.element.style.minWidth = Math.ceil(width / GRID_SIZE) * GRID_SIZE + "px";
-                        component.element.style.minHeight = Math.ceil(height / GRID_SIZE) * GRID_SIZE + "px";
+                            component.element.style.minWidth = Math.ceil(width / GRID_SIZE) * GRID_SIZE + "px";
+                            component.element.style.minHeight = Math.ceil(height / GRID_SIZE) * GRID_SIZE + "px";
+                        });
                     });
                 });
-            });
 
             document.body.style.backgroundSize = GRID_SIZE + "px " + GRID_SIZE + "px";
 
@@ -326,44 +325,11 @@ export class DraggingManager {
         ].find((element) => element !== null)!;
 
         if (!isOnInvalidTarget && e.button === 0) {
-            if (KeybindsManager.isKeyDown("KeyA")) {
-                QuickPickManager.activate(
-                    e,
-                    gates.map((gate) => ({
-                        label: gate.NAME,
-                        callback(e) {
-                            const component = new Component(Reflect.construct(gate, []), ORIGIN_POINT);
-
-                            const selection = SelectionManager.selected.clone(true);
-
-                            return SandboxManager.pushHistory(
-                                () => {
-                                    Reified.active.add(component);
-
-                                    if (Reified.active.has(component)) {
-                                        component.attach();
-
-                                        const { width, height } = getComputedStyle(component.element);
-
-                                        component.move({
-                                            x: e.clientX - parseFloat(width) / 2,
-                                            y: e.clientY - parseFloat(height) / 2,
-                                        });
-
-                                        SelectionManager.select(component);
-                                    }
-                                },
-                                () => {
-                                    Reified.active.delete(component);
-
-                                    component.detach();
-
-                                    SelectionManager.selected = selection;
-                                },
-                            );
-                        },
-                    })),
-                );
+            if (KeybindsManager.isKeyDown("KeyA") && KeybindsManager.isKeyDown("KeyS")) {
+            } else if (KeybindsManager.isKeyDown("KeyA")) {
+                quickpickGates(e);
+            } else if (KeybindsManager.isKeyDown("KeyS")) {
+                quickpickComponents(e);
             } else {
                 this.#downpos.x = e.clientX;
                 this.#downpos.y = e.clientY;
