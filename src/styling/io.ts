@@ -1,4 +1,4 @@
-import { ACTIVATED_CSS_COLOR } from "../constants";
+import { ACTIVATED_CSS_COLOR, EVEN_LIGHTER_GRAY_CSS_COLOR, LIGHT_GRAY_CSS_COLOR } from "../constants";
 import { css } from "../reified/Reified";
 
 export default css`
@@ -24,7 +24,7 @@ export default css`
 
         padding: 0;
 
-        border: 1px solid #dedede;
+        border: 1px solid ${LIGHT_GRAY_CSS_COLOR};
     }
 
     .board-input {
@@ -46,6 +46,6 @@ export default css`
     .activated {
         background-color: ${ACTIVATED_CSS_COLOR};
 
-        color: #eeeeee;
+        color: ${EVEN_LIGHTER_GRAY_CSS_COLOR};
     }
 `;

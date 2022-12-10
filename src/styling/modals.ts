@@ -1,3 +1,4 @@
+import { LIGHT_GRAY_CSS_COLOR } from "../constants";
 import { css } from "../reified/Reified";
 
 export default css`
@@ -32,7 +33,7 @@ export default css`
 
         background-color: #efefef;
 
-        border: 1px solid #dedede;
+        border: 1px solid ${LIGHT_GRAY_CSS_COLOR};
         border-radius: 4px;
 
         padding: 8px 10px;
@@ -110,7 +111,7 @@ export default css`
 
         background: transparent;
 
-        border: 1px solid #dedede;
+        border: 1px solid ${LIGHT_GRAY_CSS_COLOR};
         border-radius: 2px;
     }
 

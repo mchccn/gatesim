@@ -1,3 +1,4 @@
+import { LIGHT_GRAY_CSS_COLOR, SUPER_GRAY_CSS_COLOR } from "../constants";
 import { css } from "../reified/Reified";
 
 export default css`
@@ -19,7 +20,7 @@ export default css`
 
         background-color: white;
 
-        border: 1px solid #dedede;
+        border: 1px solid ${LIGHT_GRAY_CSS_COLOR};
         border-radius: 4px;
     }
 
@@ -48,7 +49,7 @@ export default css`
         font-weight: 900;
         font-size: 12px;
 
-        color: #cccccc;
+        color: ${SUPER_GRAY_CSS_COLOR};
 
         height: 16px;
         width: 16px;
@@ -57,7 +58,7 @@ export default css`
 
         user-select: none;
 
-        border: 1px solid #dedede;
+        border: 1px solid ${LIGHT_GRAY_CSS_COLOR};
     }
 
     .component-input-button {

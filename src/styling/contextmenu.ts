@@ -1,3 +1,4 @@
+import { LIGHT_GRAY_CSS_COLOR } from "../constants";
 import { css } from "../reified/Reified";
 
 export default css`
@@ -11,14 +12,14 @@ export default css`
 
         width: 200px;
 
-        border: 1px solid #dedede;
+        border: 1px solid ${LIGHT_GRAY_CSS_COLOR};
         border-radius: 4px;
 
         background-color: #fefefe;
 
         user-select: none;
 
-        box-shadow: 1px 1px 4px #dedede;
+        box-shadow: 1px 1px 4px ${LIGHT_GRAY_CSS_COLOR};
     }
 
     .contextmenu > .br {
@@ -26,7 +27,7 @@ export default css`
 
         width: 100%;
 
-        border-bottom: 1px solid #dedede;
+        border-bottom: 1px solid ${LIGHT_GRAY_CSS_COLOR};
     }
 
     .contextmenu > button {
