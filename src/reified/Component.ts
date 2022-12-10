@@ -22,6 +22,8 @@ export class Component<I extends number, O extends number> extends Reified {
 
     readonly chip: Chip<I, O>;
 
+    #angle = 0;
+
     constructor(
         chip: Chip<I, O>,
         pos:
@@ -228,6 +230,24 @@ export class Component<I extends number, O extends number> extends Reified {
                         },
                     },
                 },
+                {
+                    "rotate-component": {
+                        label: "Rotate component",
+                        keybind: "R",
+                        callback: () => {
+                            if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
+                            return SandboxManager.pushHistory(
+                                () => {
+                                    this.angle += 90;
+                                },
+                                () => {
+                                    this.angle -= 90;
+                                },
+                            );
+                        },
+                    },
+                },
             ]);
         });
 
@@ -244,6 +264,28 @@ export class Component<I extends number, O extends number> extends Reified {
         this.outputs.forEach((output, i) => {
             output.classList.toggle("activated", out[i]);
         });
+
+        return this;
+    }
+
+    get angle() {
+        return this.#angle;
+    }
+
+    set angle(v: number) {
+        this.#angle = v % 360;
+
+        this.element.style.transform = `rotateZ(${v}deg)`;
+
+        if (v === 180) {
+            this.name.style.transform = `rotateZ(${v}deg)`;
+        } else {
+            this.name.style.transform = "";
+        }
+    }
+
+    rotate(angle: number) {
+        this.angle = angle;
 
         return this;
     }

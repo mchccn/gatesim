@@ -23,6 +23,28 @@ export function css(...args: [string] | [TemplateStringsArray, ...unknown[]]) {
     return css;
 }
 
+export function computeTransformOrigin(element: HTMLElement) {
+    const { width, height, transform } = getComputedStyle(element);
+
+    if (transform && transform !== "none") {
+        const values = transform.match(/^matrix\((.+)\)$/)?.[1].split(", ");
+
+        if (values) {
+            const [a, b] = values.map(Number);
+
+            const angle = (Math.round(Math.atan2(b, a) * (180 / Math.PI)) + 360) % 360;
+
+            if (angle === 0 || angle === 90) return parseFloat(height) / 2 + "px " + parseFloat(height) / 2 + "px";
+
+            //TODO: FIX 180/270 DEGREE ROTATIONS
+
+            console.log(width, height);
+        }
+    }
+
+    return "none";
+}
+
 export function overlappedBounds(rect: DOMRect, from: { x: number; y: number }, to: { x: number; y: number }) {
     const bounds = {
         x: Math.min(from.x, to.x),
@@ -57,6 +79,8 @@ export abstract class Reified {
     abstract readonly element: HTMLElement;
 
     move({ x, y, centered }: { x: number; y: number; centered?: boolean }) {
+        this.element.style.transformOrigin = computeTransformOrigin(this.element);
+
         this.element.style.left = x + "px";
         this.element.style.top = y + "px";
 

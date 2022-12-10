@@ -41,6 +41,7 @@ export type SerializedDiagram = {
               outputs: { id: number; activated: boolean }[];
               x: number;
               y: number;
+              angle: number;
           }
         | {
               reified: number;
@@ -51,6 +52,7 @@ export type SerializedDiagram = {
               radix: number;
               x: number;
               y: number;
+              angle: number;
           }
     )[];
     wires: { from: number; to: number }[];
@@ -112,6 +114,7 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
                     }),
                     x: parseFloat(component.element.style.left),
                     y: parseFloat(component.element.style.top),
+                    angle: component.angle,
                 };
             }
 
@@ -133,6 +136,7 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
                     radix: component.radix,
                     x: parseFloat(component.element.style.left),
                     y: parseFloat(component.element.style.top),
+                    angle: component.angle,
                 };
             }
 
@@ -189,7 +193,7 @@ export function fromFile(
             }
 
             if (raw.type === "DISPLAY") {
-                const display = new Display(raw, raw.inputs.length, raw.radix);
+                const display = new Display(raw, raw.inputs.length, raw.radix).rotate(raw.angle);
 
                 display.inputs.forEach((input, index) => {
                     input.classList.toggle("activated", raw.inputs[index].activated);
@@ -206,7 +210,7 @@ export function fromFile(
                 return raw.permanent ? display.permanent() : display;
             }
 
-            const component = new Component(new (chips.get(raw.name)!)(), raw);
+            const component = new Component(new (chips.get(raw.name)!)(), raw).rotate(raw.angle);
 
             component.inputs.forEach((input, index) => {
                 input.classList.toggle("activated", raw.inputs[index].activated);
@@ -289,6 +293,10 @@ function validate(data: unknown): asserts data is SerializedDiagram {
                 break;
             }
             case "COMPONENT": {
+                if (!("angle" in component)) throw new Error("Component data is missing rotation angle.");
+
+                if (typeof component.angle !== "number") throw new Error("Rotation angle must be a number.");
+
                 if (!("inputs" in component)) throw new Error("Component data is missing inputs.");
 
                 if (!Array.isArray(component.inputs)) throw new Error("Component inputs data must be an array.");
@@ -338,6 +346,10 @@ function validate(data: unknown): asserts data is SerializedDiagram {
                 break;
             }
             case "DISPLAY": {
+                if (!("angle" in component)) throw new Error("Display data is missing rotation angle.");
+
+                if (typeof component.angle !== "number") throw new Error("Rotation angle must be a number.");
+
                 if (!("radix" in component)) throw new Error("Display data is missing display radix.");
 
                 if (typeof component.radix !== "number") throw new Error("Display radix must be a number.");

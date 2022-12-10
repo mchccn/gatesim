@@ -1,7 +1,7 @@
 import { EVEN_DARKER_GRAY_CSS_COLOR, EVEN_LIGHTER_GRAY_CSS_COLOR, GET_ACTIVATED_COLOR, GRID_SIZE } from "../constants";
 import { quickpickComponents } from "../quickpicks/components";
 import { quickpickGates } from "../quickpicks/gates";
-import { Reified } from "../reified/Reified";
+import { computeTransformOrigin, Reified } from "../reified/Reified";
 import { CanvasManager } from "./CanvasManager";
 import { DarkmodeManager } from "./DarkmodeManager";
 import { KeybindsManager } from "./KeybindsManager";
@@ -263,6 +263,8 @@ export class DraggingManager {
         this.#mouse.y = e.clientY;
 
         if (this.#dragged) {
+            this.#dragged.style.transformOrigin = computeTransformOrigin(this.#dragged);
+
             if (DraggingManager.snapToGrid) {
                 if (SelectionManager.selected.size <= 1) {
                     this.#dragged.style.left =
@@ -360,10 +362,14 @@ export class DraggingManager {
                     if (DraggingManager.snapToGrid)
                         SandboxManager.pushHistory(
                             () => {
+                                target.style.transformOrigin = computeTransformOrigin(target);
+
                                 target.style.left = Math.floor((mouse.x - mouse.ox - 1) / size) * size + "px";
                                 target.style.top = Math.floor((mouse.y - mouse.oy - 1) / size) * size + "px";
                             },
                             () => {
+                                target.style.transformOrigin = computeTransformOrigin(target);
+
                                 target.style.left = Math.floor((original.x - 1) / size) * size + "px";
                                 target.style.top = Math.floor((original.y - 1) / size) * size + "px";
                             },
@@ -371,10 +377,14 @@ export class DraggingManager {
                     else
                         SandboxManager.pushHistory(
                             () => {
+                                target.style.transformOrigin = computeTransformOrigin(target);
+
                                 target.style.left = mouse.x - mouse.ox - 1 + "px";
                                 target.style.top = mouse.y - mouse.oy - 1 + "px";
                             },
                             () => {
+                                target.style.transformOrigin = computeTransformOrigin(target);
+
                                 target.style.left = original.x - 1 + "px";
                                 target.style.top = original.y - 1 + "px";
                             },
@@ -454,6 +464,8 @@ export class DraggingManager {
         this.#mouse.y = touch.clientY;
 
         if (this.#dragged) {
+            this.#dragged.style.transformOrigin = computeTransformOrigin(this.#dragged);
+
             if (DraggingManager.snapToGrid) {
                 if (SelectionManager.selected.size <= 1) {
                     this.#dragged.style.left =
@@ -548,10 +560,14 @@ export class DraggingManager {
                     if (DraggingManager.snapToGrid)
                         SandboxManager.pushHistory(
                             () => {
+                                target.style.transformOrigin = computeTransformOrigin(target);
+
                                 target.style.left = Math.floor((mouse.x - mouse.ox - 1) / size) * size + "px";
                                 target.style.top = Math.floor((mouse.y - mouse.oy - 1) / size) * size + "px";
                             },
                             () => {
+                                target.style.transformOrigin = computeTransformOrigin(target);
+
                                 target.style.left = Math.floor((original.x - 1) / size) * size + "px";
                                 target.style.top = Math.floor((original.y - 1) / size) * size + "px";
                             },
@@ -559,10 +575,14 @@ export class DraggingManager {
                     else
                         SandboxManager.pushHistory(
                             () => {
+                                target.style.transformOrigin = computeTransformOrigin(target);
+
                                 target.style.left = mouse.x - mouse.ox - 1 + "px";
                                 target.style.top = mouse.y - mouse.oy - 1 + "px";
                             },
                             () => {
+                                target.style.transformOrigin = computeTransformOrigin(target);
+
                                 target.style.left = original.x - 1 + "px";
                                 target.style.top = original.y - 1 + "px";
                             },

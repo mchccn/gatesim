@@ -23,6 +23,8 @@ export class Display extends Reified {
     #bits;
     #radix;
 
+    #angle = 0;
+
     constructor(pos: { x: number; y: number; centered?: boolean } = { x: 0, y: 0 }, bits = 1, radix = 10) {
         super();
 
@@ -470,5 +472,21 @@ export class Display extends Reified {
 
     get radix() {
         return this.#radix;
+    }
+
+    get angle() {
+        return this.#angle;
+    }
+
+    set angle(v: number) {
+        this.#angle = v;
+
+        this.element.style.transform = `rotateZ(${v}deg)`;
+    }
+
+    rotate(angle: number) {
+        this.angle = angle;
+
+        return this;
     }
 }
