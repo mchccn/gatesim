@@ -30,19 +30,23 @@ export function computeTransformOrigin(element: HTMLElement) {
         const values = transform.match(/^matrix\((.+)\)$/)?.[1].split(", ");
 
         if (values) {
+            element.style.translate = "";
+
             const [a, b] = values.map(Number);
 
             const angle = (Math.round(Math.atan2(b, a) * (180 / Math.PI)) + 360) % 360;
 
             if (angle === 0 || angle === 90) return parseFloat(height) / 2 + "px " + parseFloat(height) / 2 + "px";
 
-            //TODO: FIX 180/270 DEGREE ROTATIONS
+            if (angle === 180) return "center";
 
-            console.log(width, height);
+            element.style.translate = "0 " + (parseFloat(width) - parseFloat(height)) + "px";
+
+            return parseFloat(height) / 2 + "px " + parseFloat(height) / 2 + "px";
         }
     }
 
-    return "none";
+    return "center";
 }
 
 export function overlappedBounds(rect: DOMRect, from: { x: number; y: number }, to: { x: number; y: number }) {
