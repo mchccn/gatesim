@@ -6,7 +6,7 @@ import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
 import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
 import { Chip } from "./chips";
-import { html, Reified } from "./Reified";
+import { computeTransformOrigin, html, Reified } from "./Reified";
 
 export class Component<I extends number, O extends number> extends Reified {
     readonly element;
@@ -282,6 +282,8 @@ export class Component<I extends number, O extends number> extends Reified {
         } else {
             this.name.style.transform = "";
         }
+
+        this.element.style.transformOrigin = computeTransformOrigin(this.element);
     }
 
     rotate(angle: number) {
