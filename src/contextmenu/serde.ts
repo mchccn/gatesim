@@ -76,7 +76,7 @@ export const serde = {
                         type: "application/json",
                     }),
                 ),
-                download: `gatesim-${Date.now()}.json`,
+                download: `${SandboxManager.savedName ?? "sandbox"}.gatesim.json`,
             }).click();
         },
     },
@@ -132,10 +132,12 @@ export const serde = {
 
             SandboxManager.reset();
 
+            const save = file.name.split(".").slice(0, -1).join(".");
+
             SandboxManager.setup({
                 keybinds,
                 menu,
-                save: "sandbox",
+                save: save.endsWith(".gatesim") ? save.slice(0, -".gatesim".length) : save,
                 initial: [components!, wires!],
                 overrideSaveIfExists: true,
                 settings: {},
@@ -143,7 +145,7 @@ export const serde = {
 
             SandboxManager.applyRawSettings(settings!);
 
-            StorageManager.set("saves:" + "sandbox", saveDiagram([...Reified.active], [...WiringManager.wires]));
+            SandboxManager.forceSave();
         },
     },
 } satisfies MenuManagerAction;

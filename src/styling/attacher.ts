@@ -1,9 +1,7 @@
-export const attachStyles = async () => {
-    const css = await Promise.all(
-        ["style", "component", "io", "contextmenu", "toast", "modals", "buttons", "darkmode", "quickpick"].map(
-            (name) => import(`./${name}.ts`),
-        ),
-    ).then((css) => css.map((_) => _.default).join(""));
+export const attachStyles = async (styles: string[]) => {
+    const css = await Promise.all(styles.map((name) => import(`./${name}.ts`))).then((css) =>
+        css.map((_) => _.default).join(""),
+    );
 
     const style = document.createElement("style");
 
@@ -11,9 +9,9 @@ export const attachStyles = async () => {
 
     document.head.appendChild(style);
 
-    return new Promise((resolve, reject) => {
-        style.addEventListener("load", resolve, { once: true });
+    return new Promise<void>((resolve, reject) => {
+        style.addEventListener("load", () => resolve(), { once: true });
 
-        style.addEventListener("error", reject, { once: true });
+        style.addEventListener("error", () => reject(), { once: true });
     });
 };

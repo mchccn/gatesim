@@ -416,6 +416,10 @@ export class SandboxManager {
         return this;
     }
 
+    static get savedName() {
+        return this.#config.save;
+    }
+
     static async saveTo(save: string) {
         this.#config.save = save;
 
