@@ -118,7 +118,7 @@ export default css`
     div.truth-table > div.buttons > button {
         flex: 1;
 
-        padding: 1rem;
+        padding: 1rem 0.5rem;
 
         user-select: none;
     }

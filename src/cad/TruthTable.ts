@@ -1,11 +1,16 @@
-import { ACTIVATED_CSS_COLOR, TOAST_DURATION } from "../constants";
 import { StorageManager } from "../managers/StorageManager";
-import { ToastManager } from "../managers/ToastManager";
 import { html } from "../reified/Reified";
+import { downloadFile, fileInput } from "./files";
+import { typeInTextarea } from "./table";
 
 export class TruthTable extends HTMLElement {
     #input;
     #highlight;
+
+    #control;
+    #import;
+    #export;
+
     #value = "";
 
     constructor() {
@@ -16,6 +21,7 @@ export class TruthTable extends HTMLElement {
                 <div class="input-highlight"></div>
                 <textarea class="table-input" spellcheck="false" autocapitalize="off"></textarea>
                 <div class="buttons">
+                    <button class="cad-control">Go</button>
                     <button class="import-table">Import table</button>
                     <button class="export-table">Export table</button>
                 </div>
@@ -25,10 +31,26 @@ export class TruthTable extends HTMLElement {
         this.#input = this.querySelector<HTMLTextAreaElement>(".table-input")!;
         this.#highlight = this.querySelector<HTMLTextAreaElement>(".input-highlight")!;
 
+        this.#control = this.querySelector<HTMLButtonElement>(".cad-control")!;
+        this.#import = this.querySelector<HTMLButtonElement>(".import-table")!;
+        this.#export = this.querySelector<HTMLButtonElement>(".export-table")!;
+
+        this.#control;
+
+        this.#import.addEventListener("click", async () => {
+            const txt = await fileInput();
+
+            if (txt) this.value = txt;
+        });
+
+        this.#export.addEventListener("click", () => {
+            downloadFile([this.value]);
+        });
+
         setTimeout(() => {
             if (!StorageManager.has("cad:input")) StorageManager.set("cad:input", "");
 
-            this.#input.value = StorageManager.get("cad:input")!;
+            this.value = StorageManager.get("cad:input")!;
 
             this.#highlightInput();
 
@@ -39,27 +61,19 @@ export class TruthTable extends HTMLElement {
             });
 
             this.#input.addEventListener("paste", async (e) => {
+                e.preventDefault();
+
                 const text = await navigator.clipboard.readText();
 
-                if (/[^01: ]/.test(text)) {
-                    e.preventDefault();
+                if (!/[^01:\s]/.test(text)) {
+                    typeInTextarea(text, this.#input);
 
-                    return ToastManager.toast({
-                        message: "Pasting text is disabled.",
-                        color: ACTIVATED_CSS_COLOR,
-                        duration: TOAST_DURATION,
-                    });
+                    this.#update();
                 }
             });
 
             this.#input.addEventListener("input", () => {
-                this.#value = this.#input.value;
-
-                StorageManager.set("cad:input", this.#value);
-
-                this.#highlightInput();
-
-                this.#syncSizes();
+                this.#update();
             });
 
             this.#input.addEventListener("scroll", () => {
@@ -73,6 +87,16 @@ export class TruthTable extends HTMLElement {
                 this.#syncSizes();
             });
         });
+    }
+
+    #update() {
+        this.value = this.#input.value;
+
+        StorageManager.set("cad:input", this.#value);
+
+        this.#highlightInput();
+
+        this.#syncSizes();
     }
 
     #syncSizes() {
@@ -94,6 +118,12 @@ export class TruthTable extends HTMLElement {
 
     get value() {
         return this.#value;
+    }
+
+    set value(v: string) {
+        this.#value = v;
+
+        this.#input.value = v;
     }
 }
 
