@@ -1,8 +1,8 @@
 //@ts-nocheck
 
-import { ACTIVATED_CSS_COLOR } from "./constants";
+import { ACTIVATED_CSS_COLOR, IS_CAD_APP } from "./constants";
 
-if (location.pathname.startsWith("/cad")) {
+if (IS_CAD_APP) {
     await import(`./cad/index.ts`);
 
     console.log("%cGATESIM CAD", `color: ${ACTIVATED_CSS_COLOR}; font-size: 2rem;`);

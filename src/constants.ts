@@ -14,8 +14,8 @@ export const CHIP_COMPONENT_CSS_HEIGHT = 40;
 export const CHIP_INPUT_CSS_SIZE = 16;
 export const CHIP_OUTPUT_CSS_SIZE = 16;
 export const ORIGIN_POINT = Object.freeze({ x: 0, y: 0 });
-export const IN_DEBUG_MODE = !!new URL(location.href).searchParams.has("debug");
-export const NO_RENDERING = !!new URL(location.href).searchParams.has("norender");
+export const IN_DEBUG_MODE = new URL(location.href).searchParams.has("debug");
+export const NO_RENDERING = new URL(location.href).searchParams.has("norender");
 export const IS_MAC_OS = [navigator.userAgentData?.platform, navigator.platform].some(
     (platform) => platform?.toLowerCase().includes("mac") ?? false,
 );
@@ -61,3 +61,5 @@ export const EVEN_LIGHTER_GRAY_CSS_COLOR = "#efefef";
 export const TOAST_DURATION = 2500;
 export const GRID_SIZE = 15;
 export const QUICKPICK_SIZE = 75;
+
+export const IS_CAD_APP = new URL(location.href).searchParams.has("cad");

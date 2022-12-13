@@ -68,6 +68,10 @@ export class TruthTable extends HTMLElement {
                 this.#highlight.scrollTop = this.#input.scrollTop;
                 this.#highlight.scrollLeft = this.#input.scrollLeft;
             });
+
+            window.addEventListener("resize", () => {
+                this.#syncSizes();
+            });
         });
     }
 
