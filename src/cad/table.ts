@@ -22,5 +22,7 @@ export function validTable(string: string) {
 
     if (parts.length > 2) heuristics.push({ row: 1, message: "more than two columns" });
 
+    heuristics;
+
     return heuristics;
 }
