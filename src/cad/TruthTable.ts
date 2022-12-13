@@ -18,7 +18,9 @@ export class TruthTable extends HTMLElement {
 
         this.appendChild(html`
             <div class="truth-table">
-                <div class="input-highlight"></div>
+                <pre>
+                    <code class="input-highlight"></code>
+                </pre>
                 <textarea class="table-input" spellcheck="false" autocapitalize="off"></textarea>
                 <div class="buttons">
                     <button class="cad-control">Go</button>
@@ -69,6 +71,9 @@ export class TruthTable extends HTMLElement {
                     typeInTextarea(text, this.#input);
 
                     this.#update();
+
+                    this.#input.blur();
+                    this.#input.focus();
                 }
             });
 

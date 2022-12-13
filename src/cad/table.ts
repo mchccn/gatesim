@@ -14,15 +14,45 @@ export function typeInTextarea(content: string, element: HTMLTextAreaElement) {
 }
 
 export function validTable(string: string) {
-    const heuristics = [];
+    const heuristics: { row?: number; message: string }[] = [];
 
-    const rows = string.split("\n");
+    const rows = string
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
 
-    const parts = rows[0].split(":");
+    const definedParts = rows[0].split(":");
 
-    if (parts.length > 2) heuristics.push({ row: 1, message: "more than two columns" });
+    const definedInputs = definedParts[0]?.length ?? 0;
+    const definedOutputs = definedParts[1]?.length ?? 0;
 
-    heuristics;
+    rows.forEach((row, i) => {
+        const rowParts = row.split(":");
+
+        if (rowParts.length !== 2) heuristics.push({ row: i + 1, message: "needs exactly 2 columns" });
+
+        const rowInputs = rowParts[0]?.length ?? 0;
+        const rowOutputs = rowParts[1]?.length ?? 0;
+
+        if (rowInputs !== definedInputs) heuristics.push({ row: i + 1, message: `must have ${definedInputs} inputs` });
+
+        if (rowOutputs !== definedOutputs)
+            heuristics.push({ row: i + 1, message: `must have ${definedOutputs} outputs` });
+    });
+
+    if (rows.length !== Math.pow(2, definedInputs))
+        heuristics.push({
+            message: `${Math.pow(2, definedInputs)} entries are needed for ${definedInputs} inputs, but ${
+                rows.length
+            } were given`,
+        });
+
+    const inputs = rows.map((row) => row.split(":")?.[0]).filter(Boolean);
+
+    if (inputs.length !== new Set(inputs).size)
+        heuristics.push({
+            message: "can't have duplicate entries",
+        });
 
     return heuristics;
 }

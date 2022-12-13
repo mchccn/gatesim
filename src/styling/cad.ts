@@ -17,6 +17,8 @@ export default css`
     }
 
     div.truth-table {
+        position: relative;
+
         height: 100%;
         width: 100%;
 
@@ -28,15 +30,18 @@ export default css`
         flex-direction: column;
     }
 
-    div.truth-table .input-highlight {
+    div.truth-table pre {
+        flex: 1;
+    }
+
+    div.truth-table .input-highlight,
+    div.truth-table .table-input {
         -ms-overflow-style: none;
         scrollbar-width: none;
 
         position: absolute;
-
-        pointer-events: none;
-
-        z-index: 100;
+        top: 0;
+        left: 0;
 
         font-size: 16px;
         font-family: Fira Code, monospace;
@@ -54,51 +59,30 @@ export default css`
 
         overflow: scroll;
         overscroll-behavior: none;
-
         white-space: pre;
-
-        padding: 0.5rem;
 
         border: none;
         outline: none;
+
+        padding: 0.5rem;
+
+        width: 100%;
+        height: 100%;
+
+        background: transparent;
+
+        max-height: calc(100% - 52px);
     }
 
-    div.truth-table .input-highlight span {
-        display: inline-block;
-
-        width: 9.85px;
+    div.truth-table .input-highlight {
+        z-index: 0;
     }
 
     div.truth-table .table-input {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+        z-index: 1;
 
-        flex: 1;
-
-        resize: none;
-
-        font-size: 16px;
-        font-family: Fira Code, monospace;
-
-        line-height: 1;
-        letter-spacing: -0.0025px;
-
-        word-spacing: 0;
-        word-break: break-all;
-        word-wrap: break-word;
-
-        overflow-wrap: break-word;
-        text-overflow: clip;
-
-        overflow: scroll;
-        overscroll-behavior: none;
-
-        white-space: pre;
-
-        padding: 0.5rem;
-
-        border: none;
-        outline: none;
+        color: transparent;
+        caret-color: black;
     }
 
     div.truth-table .input-highlight::-webkit-scrollbar,
@@ -113,12 +97,17 @@ export default css`
 
     div.truth-table > div.buttons {
         display: flex;
+
+        min-height: 52px;
     }
 
     div.truth-table > div.buttons > button {
         flex: 1;
 
         padding: 1rem 0.5rem;
+
+        display: grid;
+        place-items: center;
 
         user-select: none;
     }

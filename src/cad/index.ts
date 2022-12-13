@@ -2,7 +2,7 @@ import { html } from "../reified/Reified";
 import { attachStyles } from "../styling/attacher";
 import "./CADOutput";
 import { CADOutput } from "./CADOutput";
-import { validTable } from "./table";
+import { displayHeuristics } from "./output";
 import "./TruthTable";
 import { TruthTable } from "./TruthTable";
 
@@ -12,11 +12,13 @@ const table = html`<truth-table></truth-table>` as TruthTable;
 const output = html`<cad-output></cad-output>` as CADOutput;
 
 table.addEventListener("input", () => {
-    const heuristics = validTable(table.value);
-
-        
+    displayHeuristics(table, output);
 });
 
 document.body.appendChild(table);
 document.body.appendChild(output);
 document.body.appendChild(html`<div class="toasts-container"></div>`);
+
+setTimeout(() => {
+    displayHeuristics(table, output);
+});
