@@ -47,26 +47,6 @@ export class Boss {
                 }
             });
         });
-
-        // return new Promise<void>((resolve, reject) => {
-        //     this.#worker.addEventListener("message", (e) => {
-        //         const data = e.data;
-
-        //         if (data.code === "ERROR") {
-        //             this.#worker.terminate();
-
-        //             return reject(data.error);
-        //         }
-
-        //         if (data.code === "GENERATION") {
-        //             return this.#ongens.forEach((run) => run.call(undefined));
-        //         }
-
-        //         if (data.code === "FINISHED") {
-        //             return resolve(data.dna);
-        //         }
-        //     });
-        // });
     }
 
     async fired() {

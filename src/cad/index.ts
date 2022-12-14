@@ -54,19 +54,9 @@ control.addEventListener("click", async () => {
                 console.log(diagram);
             })
             .catch((e) => {
-                output.innerHTML = e;
+                output.element.innerHTML = e;
             })
             .finally(() => finished());
-
-        // boss.ongen(() => {})
-        //     .work()
-        //     .then((dna) => {
-        //         console.log(dna);
-        //     })
-        //     .catch((e) => {
-        //         output.innerHTML = e;
-        //     })
-        //     .finally(() => finished());
 
         control.textContent = "Stop";
     }
