@@ -6,6 +6,8 @@
 
         -   double dabble component
 
+-   ability to label inputs/outputs
+
 -   rust wasm instead of web workers
 
 -   better ui/ux
