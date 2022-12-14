@@ -16,6 +16,8 @@ export function typeInTextarea(content: string, element: HTMLTextAreaElement) {
 export function validTable(string: string) {
     const heuristics: { row?: number; message: string }[] = [];
 
+    if (!string.trim()) return heuristics;
+
     const rows = string
         .split("\n")
         .map((line) => line.trim())

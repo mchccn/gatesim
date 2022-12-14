@@ -44,17 +44,19 @@ control.addEventListener("click", async () => {
     if (control.textContent === "Stop") {
         finished();
     } else {
+        output.element.innerHTML = "";
+
         boss = new Boss(parseTable(table.value));
 
-        boss.ongen((diagram) => {
-            console.log(diagram);
+        boss.ongen((message) => {
+            output.element.textContent += (output.element.textContent ? "\n" : "") + message;
         })
             .work()
-            .then((diagram) => {
-                console.log(diagram);
+            .then((message) => {
+                console.log(message);
             })
             .catch((e) => {
-                output.element.innerHTML = e;
+                output.element.textContent = e;
             })
             .finally(() => finished());
 

@@ -1,6 +1,4 @@
-import { SerializedDiagram } from "../files";
-
-export type BossOnGen = (diagram: SerializedDiagram) => void;
+export type BossOnGen = (diagram: string) => void;
 
 export class Boss {
     #table;
@@ -28,7 +26,7 @@ export class Boss {
     async work() {
         this.#worker.postMessage(this.#table);
 
-        return new Promise<SerializedDiagram>((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             this.#worker.addEventListener("message", (e) => {
                 const data = e.data;
 
@@ -39,11 +37,11 @@ export class Boss {
                 }
 
                 if (data.code === "GENERATION") {
-                    return this.#ongens.forEach((run) => run.call(undefined, data.diagram));
+                    return this.#ongens.forEach((run) => run.call(undefined, data.message));
                 }
 
                 if (data.code === "FINISHED") {
-                    return resolve(data.diagram);
+                    return resolve(data.message);
                 }
             });
         });

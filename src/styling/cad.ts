@@ -122,6 +122,26 @@ export default css`
 
     cad-output div.cad-output {
         height: 100%;
+
+        font-size: 16px;
+        font-family: Fira Code, monospace;
+
+        line-height: 1;
+
+        letter-spacing: 0;
+
+        word-spacing: 0;
+        word-break: break-all;
+        word-wrap: break-word;
+
+        overflow-wrap: break-word;
+        text-overflow: clip;
+
+        overflow: scroll;
+        overscroll-behavior: none;
+        white-space: pre;
+
+        padding: 0.5rem;
     }
 
     @media (min-width: 984px) {
@@ -131,10 +151,18 @@ export default css`
 
         truth-table {
             max-height: unset;
+
+            max-width: 50vw;
+        }
+
+        cad-output {
+            max-width: 50vw;
         }
 
         div.cad-output {
             border-left: 1px solid black;
+
+            max-width: 50vw;
         }
     }
 `;
