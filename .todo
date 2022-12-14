@@ -1,11 +1,17 @@
 -   add more puzzles/exercises
 
+-   option to use gate icons instead of names as text
+
 -   CAD circuit developer
 
     -   naïve algorithm map outputs from inputs directly
+    
+        -   refactor code
+    
+        -   expression simplification/reduction
 
     -   genetic algorithms
 
 -   splash/landing with instructions
 
--   ability to label inputs/outputs
+    - include keybinds
