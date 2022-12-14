@@ -105,7 +105,7 @@ export class SelectionManager {
                         if (component instanceof Component || component instanceof Display) {
                             component.inputs.forEach((input) => input.classList.remove("activated"));
 
-                            setTimeout(() => component.update(), 0);
+                            setTimeout(() => component.update());
                         }
 
                         if (component instanceof Output) {

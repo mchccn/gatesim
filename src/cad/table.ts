@@ -56,3 +56,11 @@ export function validTable(string: string) {
 
     return heuristics;
 }
+
+export function parseTable(string: string) {
+    return string
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((row) => row.split(":").map((io) => io.split("").map((bit) => !!+bit)));
+}

@@ -23,7 +23,7 @@ export const IS_MAC_OS = [navigator.userAgentData?.platform, navigator.platform]
 export const LOCKED_FOR_TESTING = () =>
     ModalManager.alert("The diagram is currently locked for testing. No changes can be made.");
 
-export const DELAY = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));
+export const DELAY = (delay = 0) => new Promise((resolve) => setTimeout(resolve, delay));
 
 export const GET_BACKGROUND_CANVAS_CTX = () =>
     document.querySelector<HTMLCanvasElement>("canvas.background-canvas")!.getContext("2d")!;

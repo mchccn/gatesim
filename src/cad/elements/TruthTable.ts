@@ -1,13 +1,12 @@
-import { StorageManager } from "../managers/StorageManager";
-import { html } from "../reified/Reified";
-import { downloadFile, fileInput } from "./files";
-import { typeInTextarea } from "./table";
+import { StorageManager } from "../../managers/StorageManager";
+import { html } from "../../reified/Reified";
+import { downloadFile, fileInput } from "../files";
+import { typeInTextarea } from "../table";
 
 export class TruthTable extends HTMLElement {
     #input;
     #highlight;
 
-    #control;
     #import;
     #export;
 
@@ -33,11 +32,8 @@ export class TruthTable extends HTMLElement {
         this.#input = this.querySelector<HTMLTextAreaElement>(".table-input")!;
         this.#highlight = this.querySelector<HTMLTextAreaElement>(".input-highlight")!;
 
-        this.#control = this.querySelector<HTMLButtonElement>(".cad-control")!;
         this.#import = this.querySelector<HTMLButtonElement>(".import-table")!;
         this.#export = this.querySelector<HTMLButtonElement>(".export-table")!;
-
-        this.#control;
 
         this.#import.addEventListener("click", async () => {
             const txt = await fileInput();

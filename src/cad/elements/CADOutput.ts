@@ -1,4 +1,4 @@
-import { html } from "../reified/Reified";
+import { html } from "../../reified/Reified";
 
 export class CADOutput extends HTMLElement {
     readonly element;
