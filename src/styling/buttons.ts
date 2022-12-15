@@ -7,41 +7,12 @@ import {
 import { css } from "../reified/Reified";
 
 export default css`
-    button.settings {
-        position: absolute;
-
-        left: 16px;
-        bottom: 70px;
-
-        width: 40px;
-        height: 40px;
-
-        display: grid;
-        place-items: center;
-
-        font-size: 18px;
-
-        border: none;
-        border-radius: 50%;
-
-        cursor: pointer;
-
-        user-select: none;
-
-        background-color: ${EVEN_LIGHTER_GRAY_CSS_COLOR};
-
-        transition: 0.1s ease background-color;
-    }
-
-    button.settings:hover {
-        background-color: ${LIGHTER_GRAY_CSS_COLOR};
-    }
-
+    button.tools,
+    button.settings,
     button.darkmode {
         position: absolute;
 
         left: 16px;
-        bottom: 16px;
 
         width: 40px;
         height: 40px;
@@ -63,6 +34,20 @@ export default css`
         transition: 0.1s ease background-color;
     }
 
+    button.tools {
+        bottom: 124px;
+    }
+
+    button.settings {
+        bottom: 70px;
+    }
+
+    button.darkmode {
+        bottom: 16px;
+    }
+
+    button.tools:hover,
+    button.settings:hover,
     button.darkmode:hover {
         background-color: ${LIGHTER_GRAY_CSS_COLOR};
     }

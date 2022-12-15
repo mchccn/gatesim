@@ -18,18 +18,14 @@ export default css`
         background-color: #010102;
     }
 
-    body.darkmode button.settings {
-        background-color: ${DARKER_GRAY_CSS_COLOR};
-    }
-
-    body.darkmode button.settings:hover {
-        background-color: ${DARK_GRAY_CSS_COLOR};
-    }
-
+    body.darkmode button.tools,
+    body.darkmode button.settings,
     body.darkmode button.darkmode {
         background-color: ${DARKER_GRAY_CSS_COLOR};
     }
 
+    body.darkmode button.tools:hover,
+    body.darkmode button.settings:hover,
     body.darkmode button.darkmode:hover {
         background-color: ${DARK_GRAY_CSS_COLOR};
     }
