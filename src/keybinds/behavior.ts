@@ -1,11 +1,93 @@
-import { GRID_SIZE, LIGHT_GRAY_CSS_COLOR, TOAST_DURATION } from "../constants";
+import { GRID_SIZE, LIGHT_GRAY_CSS_COLOR, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { SandboxManager } from "../managers/SandboxManager";
+import { SelectionManager } from "../managers/SelectionManager";
+import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
 import { Reified } from "../reified/Reified";
 
 export const behavior = {
-    ["KeyG"]: async () => {
+    ["ArrowLeft"]: () => {
+        if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
+        if (!SelectionManager.selected.size) return;
+
+        const selected = SelectionManager.selected.clone(true);
+
+        return SandboxManager.pushHistory(
+            () => {
+                selected.forEach((component) => {
+                    component.move({ x: -GRID_SIZE, relative: true });
+                });
+            },
+            () => {
+                selected.forEach((component) => {
+                    component.move({ x: GRID_SIZE, relative: true });
+                });
+            },
+        );
+    },
+    ["ArrowRight"]: () => {
+        if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
+        if (!SelectionManager.selected.size) return;
+
+        const selected = SelectionManager.selected.clone(true);
+
+        return SandboxManager.pushHistory(
+            () => {
+                selected.forEach((component) => {
+                    component.move({ x: GRID_SIZE, relative: true });
+                });
+            },
+            () => {
+                selected.forEach((component) => {
+                    component.move({ x: -GRID_SIZE, relative: true });
+                });
+            },
+        );
+    },
+    ["ArrowUp"]: () => {
+        if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
+        if (!SelectionManager.selected.size) return;
+
+        const selected = SelectionManager.selected.clone(true);
+
+        return SandboxManager.pushHistory(
+            () => {
+                selected.forEach((component) => {
+                    component.move({ y: -GRID_SIZE, relative: true });
+                });
+            },
+            () => {
+                selected.forEach((component) => {
+                    component.move({ y: GRID_SIZE, relative: true });
+                });
+            },
+        );
+    },
+    ["ArrowDown"]: () => {
+        if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
+        if (!SelectionManager.selected.size) return;
+
+        const selected = SelectionManager.selected.clone(true);
+
+        return SandboxManager.pushHistory(
+            () => {
+                selected.forEach((component) => {
+                    component.move({ y: GRID_SIZE, relative: true });
+                });
+            },
+            () => {
+                selected.forEach((component) => {
+                    component.move({ y: -GRID_SIZE, relative: true });
+                });
+            },
+        );
+    },
+    ["KeyG"]: () => {
         const components = [...Reified.active];
         const positions = components.map(({ pos }) => pos);
 

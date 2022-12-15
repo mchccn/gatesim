@@ -24,6 +24,8 @@ export class Component<I extends number, O extends number> extends Reified {
 
     #angle = 0;
 
+    #complementary = false;
+
     constructor(
         chip: Chip<I, O>,
         pos:
@@ -284,6 +286,14 @@ export class Component<I extends number, O extends number> extends Reified {
         }
 
         this.element.style.transformOrigin = computeTransformOrigin(this.element);
+    }
+
+    get complementary() {
+        return this.#complementary;
+    }
+
+    set complementary(v: boolean) {
+        this.#complementary = v;
     }
 
     rotate(angle: number) {

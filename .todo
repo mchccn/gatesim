@@ -6,7 +6,7 @@
 
     -   download truth table from diagram
 
--   ability to change number of inputs to gates
+-   ability to change number of inputs for gates
 
 -   option to use gate icons instead of names as text
 
@@ -15,15 +15,9 @@
     -   editing table should stop worker
 
     -   naïve algorithm map outputs from inputs directly
-    
+
         -   refactor code
-    
+
         -   expression simplification/reduction
 
-    -   genetic algorithms
-
     -   dark mode
-
--   splash/landing with instructions
-
-    - include keybinds

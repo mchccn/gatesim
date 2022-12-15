@@ -82,11 +82,16 @@ export abstract class Reified {
 
     abstract readonly element: HTMLElement;
 
-    move({ x, y, centered }: { x: number; y: number; centered?: boolean }) {
+    move({ x, y, centered, relative }: { x?: number; y?: number; centered?: boolean; relative?: boolean }) {
         this.element.style.transformOrigin = computeTransformOrigin(this.element);
 
-        this.element.style.left = x + "px";
-        this.element.style.top = y + "px";
+        if (relative) {
+            this.element.style.left = parseFloat(this.element.style.left) + (x ?? 0) + "px";
+            this.element.style.top = parseFloat(this.element.style.top) + (y ?? 0) + "px";
+        } else {
+            if (typeof x !== "undefined") this.element.style.left = x + "px";
+            if (typeof y !== "undefined") this.element.style.top = y + "px";
+        }
 
         if (centered)
             setTimeout(() => {

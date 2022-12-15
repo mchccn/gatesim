@@ -7,6 +7,7 @@ import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
 import { overlappedBounds, Reified } from "../reified/Reified";
 import { CanvasManager } from "./CanvasManager";
+import { DraggingManager } from "./DraggingManager";
 import { KeybindsManager } from "./KeybindsManager";
 import { MouseManager } from "./MouseManager";
 import { SandboxManager } from "./SandboxManager";
@@ -141,6 +142,8 @@ export class SelectionManager {
                     this.selected.clear();
 
                     components!.forEach((component) => this.addSelection(component));
+
+                    DraggingManager.snapToGridBasedUpdate();
                 }
             },
             () => {
