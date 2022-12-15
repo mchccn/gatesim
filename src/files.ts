@@ -323,7 +323,7 @@ function validate(data: unknown): asserts data is SerializedDiagram {
                 if (component.inputs.length !== Chip.INPUTS)
                     throw new Error("Component inputs does not match chip inputs.");
 
-                if (component.outputs.length !== Chip.OUTPUTS)
+                if (component.outputs.length !== (component.complementary ? Chip.OUTPUTS + 1 : Chip.OUTPUTS))
                     throw new Error("Component outputs does not match chip outputs.");
 
                 for (const input of component.inputs as unknown[]) {

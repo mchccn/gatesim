@@ -11,8 +11,8 @@ import { computeTransformOrigin, html, Reified } from "./Reified";
 export class Component<I extends number, O extends number> extends Reified {
     readonly element;
 
-    readonly inputs;
-    readonly outputs;
+    inputs;
+    outputs;
     readonly name;
 
     readonly #observers = new Map<Element, MutationObserver>();
@@ -34,6 +34,8 @@ export class Component<I extends number, O extends number> extends Reified {
         complementary = false,
     ) {
         super();
+
+        this.#complementary = complementary;
 
         this.chip = chip;
 
@@ -68,7 +70,7 @@ export class Component<I extends number, O extends number> extends Reified {
         await DELAY(100 + Math.random() * 50 - 25);
 
         this.outputs.forEach((output, i) => {
-            output.classList.toggle("activated", out[i]);
+            output.classList.toggle("activated", this.#complementary && i === 1 ? !out[0] : out[i]);
         });
 
         return this;
@@ -94,10 +96,6 @@ export class Component<I extends number, O extends number> extends Reified {
 
     get complementary() {
         return this.#complementary;
-    }
-
-    set complementary(v: boolean) {
-        this.#complementary = v;
     }
 
     rotate(angle: number) {
@@ -229,6 +227,161 @@ export class Component<I extends number, O extends number> extends Reified {
 
         this.#contextmenus.set(this.name, () => {
             SandboxManager.queueNewContext(() => [
+                ...(this.chip.outputs === 1
+                    ? [
+                          {
+                              "toggle-complementary": {
+                                  label: "Complementary output",
+                                  callback: () => {
+                                      if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
+                                      if (this.complementary) {
+                                          const output = this.outputs[this.outputs.length - 1];
+                                          const deleted: Element[] = [];
+
+                                          return SandboxManager.pushHistory(
+                                              () => {
+                                                  this.#complementary = false;
+
+                                                  this.#destroyListeners();
+
+                                                  output.remove();
+
+                                                  this.outputs = Array.from(
+                                                      this.element.querySelectorAll<HTMLElement>(
+                                                          ".component-output-button",
+                                                      ),
+                                                  );
+
+                                                  WiringManager.wires.forEach((wire) => {
+                                                      if (wire.from === output) {
+                                                          wire.destroy();
+
+                                                          wire.to.classList.remove("activated");
+
+                                                          deleted.push(wire.to);
+                                                      }
+                                                  });
+
+                                                  this.#updateListeners();
+
+                                                  this.#attachListeners();
+
+                                                  this.update();
+
+                                                  SandboxManager.forceSave();
+
+                                                  DraggingManager.snapToGridBasedUpdate();
+                                              },
+                                              () => {
+                                                  this.#complementary = true;
+
+                                                  this.#destroyListeners();
+
+                                                  this.element
+                                                      .querySelector<HTMLElement>(".component-outputs")!
+                                                      .appendChild(output);
+
+                                                  this.outputs = Array.from(
+                                                      this.element.querySelectorAll<HTMLElement>(
+                                                          ".component-output-button",
+                                                      ),
+                                                  );
+
+                                                  WiringManager.wires.addAll(
+                                                      deleted
+                                                          .splice(0, deleted.length)
+                                                          .map((to) => new Wiring(output, to)),
+                                                  );
+
+                                                  this.#updateListeners();
+
+                                                  this.#attachListeners();
+
+                                                  this.update();
+
+                                                  SandboxManager.forceSave();
+
+                                                  DraggingManager.snapToGridBasedUpdate();
+                                              },
+                                          );
+                                      } else {
+                                          const output = html`<button class="component-output-button">O</button>`;
+
+                                          return SandboxManager.pushHistory(
+                                              () => {
+                                                  this.#complementary = true;
+
+                                                  this.#destroyListeners();
+
+                                                  this.element
+                                                      .querySelector<HTMLElement>(".component-outputs")!
+                                                      .appendChild(output);
+
+                                                  this.outputs = Array.from(
+                                                      this.element.querySelectorAll<HTMLElement>(
+                                                          ".component-output-button",
+                                                      ),
+                                                  );
+
+                                                  this.#updateListeners();
+
+                                                  this.#attachListeners();
+
+                                                  this.update();
+
+                                                  SandboxManager.forceSave();
+
+                                                  DraggingManager.snapToGridBasedUpdate();
+                                              },
+                                              () => {
+                                                  this.#complementary = false;
+
+                                                  this.#destroyListeners();
+
+                                                  output.remove();
+
+                                                  this.outputs = Array.from(
+                                                      this.element.querySelectorAll<HTMLElement>(
+                                                          ".component-output-button",
+                                                      ),
+                                                  );
+
+                                                  this.#updateListeners();
+
+                                                  this.#attachListeners();
+
+                                                  this.update();
+
+                                                  SandboxManager.forceSave();
+
+                                                  DraggingManager.snapToGridBasedUpdate();
+                                              },
+                                          );
+                                      }
+                                  },
+                              },
+                          },
+                      ]
+                    : []),
+                {
+                    "rotate-component": {
+                        label: "Rotate component",
+                        keybind: "R",
+                        callback: () => {
+                            if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
+                            return SandboxManager.pushHistory(
+                                () => {
+                                    this.angle += 90;
+                                },
+                                () => {
+                                    this.angle -= 90;
+                                },
+                            );
+                        },
+                    },
+                },
                 {
                     "delete-component": {
                         label: "Delete component",
@@ -307,30 +460,6 @@ export class Component<I extends number, O extends number> extends Reified {
                                     WiringManager.wires.addAll(
                                         deleted.splice(0, deleted.length).map(([from, to]) => new Wiring(from, to)),
                                     );
-                                },
-                            );
-                        },
-                    },
-                },
-                {
-                    "toggle-complementary": {
-                        label: "Complementary output",
-                        callback: () => {},
-                    },
-                },
-                {
-                    "rotate-component": {
-                        label: "Rotate component",
-                        keybind: "R",
-                        callback: () => {
-                            if (TestingManager.testing) return LOCKED_FOR_TESTING();
-
-                            return SandboxManager.pushHistory(
-                                () => {
-                                    this.angle += 90;
-                                },
-                                () => {
-                                    this.angle -= 90;
                                 },
                             );
                         },
