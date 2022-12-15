@@ -18,12 +18,11 @@ export function displayHeuristics(table: TruthTable, output: CADOutput) {
                 return typeof a.row === "undefined" ? -1 : 1;
             })
             .forEach((h) => {
-                output.element.appendChild(html`
-                    <div class="cad-heuristic">
-                        <p>${typeof h.row === "undefined" ? "Table" : `Row ${h.row}`}</p>
-                        ${h.message}
-                    </div>
-                `);
+                output.element.appendChild(
+                    Object.assign(html`<div class="cad-heuristic"></div>`, {
+                        textContent: `${typeof h.row === "undefined" ? "Table:" : `Row ${h.row}`} ${h.message}`,
+                    }),
+                );
             });
     }
 

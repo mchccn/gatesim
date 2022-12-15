@@ -14,15 +14,17 @@ await attachStyles(["style", "cad", "darkmode", "toast"]);
 const table = html`<truth-table></truth-table>` as TruthTable;
 const output = html`<cad-output></cad-output>` as CADOutput;
 
-table.addEventListener("input", () => {
-    displayHeuristics(table, output);
-});
-
 document.body.appendChild(table);
 document.body.appendChild(output);
 document.body.appendChild(html`<div class="toasts-container"></div>`);
 
 await DELAY();
+
+table.element.addEventListener("input", () => {
+    displayHeuristics(table, output);
+});
+
+table.asynconpaste = () => displayHeuristics(table, output);
 
 displayHeuristics(table, output);
 
@@ -42,8 +44,12 @@ function finished() {
 
 control.addEventListener("click", async () => {
     if (control.textContent === "Stop") {
+        table.element.disabled = false;
+
         finished();
     } else {
+        table.element.disabled = true;
+
         output.element.innerHTML = "";
 
         boss = new Boss(parseTable(table.value));

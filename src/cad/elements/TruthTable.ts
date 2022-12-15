@@ -4,6 +4,8 @@ import { downloadFile, fileInput } from "../files";
 import { typeInTextarea } from "../table";
 
 export class TruthTable extends HTMLElement {
+    asynconpaste?: () => void;
+
     #input;
     #highlight;
 
@@ -70,7 +72,13 @@ export class TruthTable extends HTMLElement {
 
                     this.#input.blur();
                     this.#input.focus();
+
+                    this.asynconpaste?.();
                 }
+            });
+
+            this.#input.addEventListener("change", () => {
+                this.#update();
             });
 
             this.#input.addEventListener("input", () => {
@@ -125,6 +133,10 @@ export class TruthTable extends HTMLElement {
         this.#value = v;
 
         this.#input.value = v;
+    }
+
+    get element() {
+        return this.#input;
     }
 }
 
