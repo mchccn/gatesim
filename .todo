@@ -4,6 +4,8 @@
 
 -   CAD circuit developer
 
+    -   editing table should stop worker
+
     -   naïve algorithm map outputs from inputs directly
     
         -   refactor code
