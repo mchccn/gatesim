@@ -94,14 +94,14 @@ export abstract class Reified {
         }
 
         if (centered)
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 const { top, left, width, height } = getComputedStyle(this.element);
 
                 this.move({
                     x: parseFloat(left) - parseFloat(width) / 2,
                     y: parseFloat(top) - parseFloat(height) / 2,
                 });
-            }, 0);
+            });
     }
 
     attach() {

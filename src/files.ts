@@ -42,6 +42,7 @@ export type SerializedDiagram = {
               x: number;
               y: number;
               angle: number;
+              complementary: boolean;
           }
         | {
               reified: number;
@@ -115,6 +116,7 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
                     x: parseFloat(component.element.style.left),
                     y: parseFloat(component.element.style.top),
                     angle: component.angle,
+                    complementary: component.complementary,
                 };
             }
 
@@ -210,7 +212,7 @@ export function fromFile(
                 return raw.permanent ? display.permanent() : display;
             }
 
-            const component = new Component(new (chips.get(raw.name)!)(), raw).rotate(raw.angle);
+            const component = new Component(new (chips.get(raw.name)!)(), raw, raw.complementary).rotate(raw.angle);
 
             component.inputs.forEach((input, index) => {
                 input.classList.toggle("activated", raw.inputs[index].activated);
@@ -296,6 +298,11 @@ function validate(data: unknown): asserts data is SerializedDiagram {
                 if (!("angle" in component)) throw new Error("Component data is missing rotation angle.");
 
                 if (typeof component.angle !== "number") throw new Error("Rotation angle must be a number.");
+
+                if (!("complementary" in component)) throw new Error("Component data is missing complementary output.");
+
+                if (typeof component.complementary !== "boolean")
+                    throw new Error("Complementary output must be a boolean.");
 
                 if (!("inputs" in component)) throw new Error("Component data is missing inputs.");
 

@@ -6,7 +6,7 @@ import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
 import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
-import { html, Reified } from "./Reified";
+import { computeTransformOrigin, html, Reified } from "./Reified";
 
 export class Display extends Reified {
     readonly element;
@@ -49,7 +49,7 @@ export class Display extends Reified {
 
         this.#updateListeners();
 
-        setTimeout(() => this.update(), 0);
+        requestAnimationFrame(() => this.update());
 
         this.move(pos);
     }
@@ -71,10 +71,44 @@ export class Display extends Reified {
         return this;
     }
 
+    get bits() {
+        return this.#bits;
+    }
+
+    get radix() {
+        return this.#radix;
+    }
+
+    get angle() {
+        return this.#angle;
+    }
+
+    set angle(v: number) {
+        this.#angle = v % 360;
+
+        this.element.style.transform = `rotateZ(${v}deg)`;
+
+        if (v === 180) {
+            this.display.style.transform = `rotateZ(${v}deg)`;
+        } else {
+            this.display.style.transform = "";
+        }
+
+        this.element.style.transformOrigin = computeTransformOrigin(this.element);
+
+        requestAnimationFrame(() => DraggingManager.snapToGridBasedUpdate());
+    }
+
+    rotate(angle: number): this {
+        this.angle = angle;
+
+        return this;
+    }
+
     attach() {
         super.attach();
 
-        this.#makeListeners();
+        this.#attachListeners();
 
         DraggingManager.watch(this.element, this.display);
 
@@ -95,6 +129,7 @@ export class Display extends Reified {
         this.#observers.clear();
         this.#mouseups.clear();
         this.#contextmenus.clear();
+        this.#clicks.clear();
 
         this.inputs.forEach((input) => {
             this.#observers.set(input, new MutationObserver(this.update.bind(this)));
@@ -265,7 +300,7 @@ export class Display extends Reified {
 
                                     this.#updateListeners();
 
-                                    this.#makeListeners();
+                                    this.#attachListeners();
 
                                     this.update();
 
@@ -296,7 +331,7 @@ export class Display extends Reified {
 
                                     this.#updateListeners();
 
-                                    this.#makeListeners();
+                                    this.#attachListeners();
 
                                     this.update();
 
@@ -339,6 +374,24 @@ export class Display extends Reified {
                                     this.update();
 
                                     SandboxManager.forceSave();
+                                },
+                            );
+                        },
+                    },
+                },
+                {
+                    "rotate-component": {
+                        label: "Rotate component",
+                        keybind: "R",
+                        callback: () => {
+                            if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
+                            return SandboxManager.pushHistory(
+                                () => {
+                                    this.angle += 90;
+                                },
+                                () => {
+                                    this.angle -= 90;
                                 },
                             );
                         },
@@ -431,7 +484,7 @@ export class Display extends Reified {
         });
     }
 
-    #makeListeners() {
+    #attachListeners() {
         this.inputs.forEach((input) => {
             this.#observers.get(input)!.observe(input, {
                 attributes: true,
@@ -464,29 +517,5 @@ export class Display extends Reified {
         this.#clicks.forEach((listener, element) => element.removeEventListener("click", listener));
 
         this.display.removeEventListener("contextmenu", this.#contextmenus.get(this.display)!);
-    }
-
-    get bits() {
-        return this.#bits;
-    }
-
-    get radix() {
-        return this.#radix;
-    }
-
-    get angle() {
-        return this.#angle;
-    }
-
-    set angle(v: number) {
-        this.#angle = v;
-
-        this.element.style.transform = `rotateZ(${v}deg)`;
-    }
-
-    rotate(angle: number) {
-        this.angle = angle;
-
-        return this;
     }
 }

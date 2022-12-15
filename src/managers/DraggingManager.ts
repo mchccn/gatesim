@@ -46,15 +46,22 @@ export class DraggingManager {
     ) {
         if (this.snapToGrid && !forceClear) {
             if (!onlyUpdateColor)
-                setTimeout(() => {
+                requestAnimationFrame(() => {
                     Reified.active.forEach((component) => {
                         component.element.style.minWidth = "";
                         component.element.style.minHeight = "";
 
-                        setTimeout(() => {
+                        requestAnimationFrame(() => {
                             const style = getComputedStyle(component.element);
+                            const top = parseFloat(style.top);
+                            const left = parseFloat(style.left);
                             const width = parseFloat(style.width);
                             const height = parseFloat(style.height);
+
+                            component.element.style.transformOrigin = computeTransformOrigin(component.element);
+
+                            component.element.style.top = Math.floor(top / GRID_SIZE) * GRID_SIZE + "px";
+                            component.element.style.left = Math.floor(left / GRID_SIZE) * GRID_SIZE + "px";
 
                             component.element.style.minWidth = Math.ceil(width / GRID_SIZE) * GRID_SIZE + "px";
                             component.element.style.minHeight = Math.ceil(height / GRID_SIZE) * GRID_SIZE + "px";
@@ -70,7 +77,7 @@ export class DraggingManager {
                 document.body.style.backgroundImage = `linear-gradient(to right, ${EVEN_LIGHTER_GRAY_CSS_COLOR} 1px, transparent 1px), linear-gradient(to bottom, ${EVEN_LIGHTER_GRAY_CSS_COLOR} 1px, transparent 1px)`;
             }
         } else {
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 Reified.active.forEach((component) => {
                     component.element.style.minWidth = "";
                     component.element.style.minHeight = "";

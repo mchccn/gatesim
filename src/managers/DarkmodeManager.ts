@@ -44,7 +44,7 @@ export class DarkmodeManager {
 
         this.#element.style.transition = "none";
 
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             this.#element.style.transition = "";
         });
     };

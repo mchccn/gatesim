@@ -27,7 +27,7 @@ export class QuickPickManager {
             .map(({ label }, i) => `<div class="quickpick-item index-${i}">${label}</div>`)
             .join("");
 
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             const circle = html`
                 <svg
                     class="quickpick-circle"
@@ -60,7 +60,7 @@ export class QuickPickManager {
 
             quickpick.appendChild(circle);
 
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 const { width, height } = circle.getBoundingClientRect();
 
                 circle.style.left = event.clientX - width / 2 + "px";
@@ -83,7 +83,7 @@ export class QuickPickManager {
                 item.style.left = event.clientX + (2 * x) / 3 - width / 2 + "px";
                 item.style.top = event.clientY + (2 * y) / 3 - height / 2 + "px";
 
-                setTimeout(() => {
+                requestAnimationFrame(() => {
                     item.style.left = event.clientX + x - width / 2 + "px";
                     item.style.top = event.clientY + y - height / 2 + "px";
                 });

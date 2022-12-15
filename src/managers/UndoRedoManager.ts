@@ -23,7 +23,7 @@ export class UndoRedoManager {
             this.#undoElement.style.transition = "none";
             this.#redoElement.style.transition = "none";
 
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 this.#undoElement.style.transition = "";
                 this.#redoElement.style.transition = "";
             });

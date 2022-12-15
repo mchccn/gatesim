@@ -179,7 +179,7 @@ export class SandboxManager {
                 .onAdd((component) => {
                     DraggingManager.snapToGridBasedUpdate();
 
-                    setTimeout(() => {
+                    requestAnimationFrame(() => {
                         component.move({
                             x: Math.floor(component.pos.x / GRID_SIZE) * GRID_SIZE,
                             y: Math.floor(component.pos.y / GRID_SIZE) * GRID_SIZE,
@@ -291,6 +291,8 @@ export class SandboxManager {
                 color: LIGHT_GRAY_CSS_COLOR,
                 duration: TOAST_DURATION,
             });
+
+        requestAnimationFrame(() => DraggingManager.snapToGridBasedUpdate());
 
         return this;
     }

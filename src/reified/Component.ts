@@ -31,6 +31,7 @@ export class Component<I extends number, O extends number> extends Reified {
         pos:
             | { x: number; y: number; centered?: boolean }
             | ((comp: Component<I, O>) => { x: number; y: number; centered?: boolean }),
+        complementary = false,
     ) {
         super();
 
@@ -43,7 +44,9 @@ export class Component<I extends number, O extends number> extends Reified {
                 </div>
                 <p class="component-name">${this.chip.name}</p>
                 <div class="component-outputs">
-                    ${Array(this.chip.outputs).fill('<button class="component-output-button">O</button>').join("")}
+                    ${Array(complementary && this.chip.outputs === 1 ? this.chip.outputs + 1 : this.chip.outputs)
+                        .fill('<button class="component-output-button">O</button>')
+                        .join("")}
                 </div>
             </div>
         `;
@@ -51,6 +54,85 @@ export class Component<I extends number, O extends number> extends Reified {
         this.inputs = Array.from(this.element.querySelectorAll<HTMLElement>(".component-input-button"));
         this.outputs = Array.from(this.element.querySelectorAll<HTMLElement>(".component-output-button"));
         this.name = this.element.querySelector<HTMLElement>(".component-name")!;
+
+        this.#updateListeners();
+
+        requestAnimationFrame(() => this.update());
+
+        this.move(typeof pos === "function" ? pos.call(undefined, this) : pos);
+    }
+
+    async update() {
+        const out = this.chip.evaluate(this.inputs.map((i) => i.classList.contains("activated")));
+
+        await DELAY(100 + Math.random() * 50 - 25);
+
+        this.outputs.forEach((output, i) => {
+            output.classList.toggle("activated", out[i]);
+        });
+
+        return this;
+    }
+
+    get angle() {
+        return this.#angle;
+    }
+
+    set angle(v: number) {
+        this.#angle = v % 360;
+
+        this.element.style.transform = `rotateZ(${v}deg)`;
+
+        if (v === 180) {
+            this.name.style.transform = `rotateZ(${v}deg)`;
+        } else {
+            this.name.style.transform = "";
+        }
+
+        this.element.style.transformOrigin = computeTransformOrigin(this.element);
+
+        requestAnimationFrame(() => DraggingManager.snapToGridBasedUpdate());
+    }
+
+    get complementary() {
+        return this.#complementary;
+    }
+
+    set complementary(v: boolean) {
+        this.#complementary = v;
+    }
+
+    rotate(angle: number) {
+        this.angle = angle;
+
+        return this;
+    }
+
+    attach() {
+        super.attach();
+
+        this.#attachListeners();
+
+        DraggingManager.watch(this.element, this.name);
+
+        return this;
+    }
+
+    detach() {
+        super.detach();
+
+        this.#destroyListeners();
+
+        DraggingManager.forget(this.element, true);
+
+        return this;
+    }
+
+    #updateListeners() {
+        this.#observers.clear();
+        this.#mouseups.clear();
+        this.#contextmenus.clear();
+        this.#clicks.clear();
 
         this.inputs.forEach((input) => {
             this.#observers.set(input, new MutationObserver(this.update.bind(this)));
@@ -233,6 +315,12 @@ export class Component<I extends number, O extends number> extends Reified {
                     },
                 },
                 {
+                    "toggle-complementary": {
+                        label: "Complementary output",
+                        callback: () => {},
+                    },
+                },
+                {
                     "rotate-component": {
                         label: "Rotate component",
                         keybind: "R",
@@ -252,59 +340,9 @@ export class Component<I extends number, O extends number> extends Reified {
                 },
             ]);
         });
-
-        setTimeout(() => this.update(), 0);
-
-        this.move(typeof pos === "function" ? pos.call(undefined, this) : pos);
     }
 
-    async update() {
-        const out = this.chip.evaluate(this.inputs.map((i) => i.classList.contains("activated")));
-
-        await DELAY(100 + Math.random() * 50 - 25);
-
-        this.outputs.forEach((output, i) => {
-            output.classList.toggle("activated", out[i]);
-        });
-
-        return this;
-    }
-
-    get angle() {
-        return this.#angle;
-    }
-
-    set angle(v: number) {
-        this.#angle = v % 360;
-
-        this.element.style.transform = `rotateZ(${v}deg)`;
-
-        if (v === 180) {
-            this.name.style.transform = `rotateZ(${v}deg)`;
-        } else {
-            this.name.style.transform = "";
-        }
-
-        this.element.style.transformOrigin = computeTransformOrigin(this.element);
-    }
-
-    get complementary() {
-        return this.#complementary;
-    }
-
-    set complementary(v: boolean) {
-        this.#complementary = v;
-    }
-
-    rotate(angle: number) {
-        this.angle = angle;
-
-        return this;
-    }
-
-    attach() {
-        super.attach();
-
+    #attachListeners() {
         this.inputs.forEach((input) => {
             this.#observers.get(input)!.observe(input, {
                 attributes: true,
@@ -325,15 +363,9 @@ export class Component<I extends number, O extends number> extends Reified {
         });
 
         this.name.addEventListener("contextmenu", this.#contextmenus.get(this.name)!);
-
-        DraggingManager.watch(this.element, this.name);
-
-        return this;
     }
 
-    detach() {
-        super.detach();
-
+    #destroyListeners() {
         this.#observers.forEach((o) => o.disconnect());
 
         this.#mouseups.forEach((listener, element) => element.removeEventListener("mouseup", listener));
@@ -343,9 +375,5 @@ export class Component<I extends number, O extends number> extends Reified {
         this.#clicks.forEach((listener, element) => element.removeEventListener("click", listener));
 
         this.name.removeEventListener("contextmenu", this.#contextmenus.get(this.name)!);
-
-        DraggingManager.forget(this.element, true);
-
-        return this;
     }
 }

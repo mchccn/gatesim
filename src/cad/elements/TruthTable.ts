@@ -47,7 +47,7 @@ export class TruthTable extends HTMLElement {
             downloadFile([this.value]);
         });
 
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             if (!StorageManager.has("cad:input")) StorageManager.set("cad:input", "");
 
             this.value = StorageManager.get("cad:input")!;
