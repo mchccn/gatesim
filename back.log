@@ -4,13 +4,17 @@
 
     -   replace display with 7-segment display
 
-        -   double dabble component
+        -   dabble component
+
+-   serialized diagram to circuit diagram drawing
 
 -   ability to label inputs/outputs
 
 -   rust wasm instead of web workers
 
 -   better ui/ux
+
+-   add more examples/exercises
 
 -   custom chips
 
