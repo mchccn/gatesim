@@ -5,11 +5,11 @@ export class DarkmodeManager {
 
     static readonly #key = "settings.darkmode";
 
-    static get #enabled() {
+    static get enabled() {
         return StorageManager.get(this.#key) ?? false;
     }
 
-    static set #enabled(value: boolean) {
+    static set enabled(value: boolean) {
         StorageManager.set(this.#key, value);
 
         this.#element.innerText = value ? "🌕" : "🌑";
@@ -17,10 +17,6 @@ export class DarkmodeManager {
         this.#changes.forEach((run) => run.call(undefined));
 
         document.body.classList.toggle("darkmode", value);
-    }
-
-    static get enabled() {
-        return this.#enabled;
     }
 
     static get #element() {
@@ -40,7 +36,7 @@ export class DarkmodeManager {
     }
 
     static #listener = () => {
-        this.#enabled = !this.#enabled;
+        this.enabled = !this.enabled;
 
         const buttons = document.querySelectorAll<HTMLElement>("button.tools, button.settings, button.darkmode");
 
@@ -56,9 +52,9 @@ export class DarkmodeManager {
     };
 
     static listen() {
-        this.#enabled = this.#enabled;
+        this.enabled = this.enabled;
 
-        this.#element.innerText = this.#enabled ? "🌕" : "🌑";
+        this.#element.innerText = this.enabled ? "🌕" : "🌑";
 
         this.#element.addEventListener("click", this.#listener);
 
@@ -72,6 +68,6 @@ export class DarkmodeManager {
     }
 
     static toggle(value?: boolean) {
-        this.#enabled = typeof value === "boolean" ? value : !this.#enabled;
+        this.enabled = typeof value === "boolean" ? value : !this.enabled;
     }
 }

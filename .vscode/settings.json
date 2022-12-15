@@ -9,5 +9,7 @@
     // Weeb mode
     // "typescript.locale": "ja",
     "typescript.tsdk": "node_modules/typescript/lib",
-    "typescript.disableAutomaticTypeAcquisition": true
+    "typescript.disableAutomaticTypeAcquisition": true,
+    "lit-plugin.rules.no-boolean-in-attribute-binding": "off",
+    "lit-plugin.rules.no-incompatible-type-binding": "off"
 }

@@ -2,7 +2,7 @@ import { html } from "../reified/Reified";
 import { SandboxManager } from "./SandboxManager";
 
 export class ModalManager {
-    static #abort = new AbortController();
+    static #abort?: AbortController;
 
     static get container() {
         return document.querySelector<HTMLElement>(".modal-container")!;
@@ -12,7 +12,7 @@ export class ModalManager {
         if (this.container.childElementCount <= 0) {
             this.container.classList.remove("modal-inactive");
 
-            this.#abort.abort();
+            if (this.#abort) this.#abort.abort();
 
             requestAnimationFrame(() => {
                 this.container.style.opacity = "1";
@@ -20,10 +20,12 @@ export class ModalManager {
         } else this.container.lastElementChild!.classList.add("modal-inactive");
     }
 
-    static #onModalResolved() {
+    static #onModalUnmount() {
         if (this.container.childElementCount <= 0) {
             requestAnimationFrame(() => {
                 this.container.style.opacity = "0";
+
+                this.#abort = new AbortController();
 
                 this.container.addEventListener(
                     "transitionend",
@@ -66,7 +68,7 @@ export class ModalManager {
             const done = () => {
                 alert.remove();
 
-                this.#onModalResolved();
+                this.#onModalUnmount();
 
                 SandboxManager.watchedUnresolvedPromises.delete(finish);
 
@@ -126,7 +128,7 @@ export class ModalManager {
             const handler = (value: boolean) => () => {
                 confirm.remove();
 
-                this.#onModalResolved();
+                this.#onModalUnmount();
 
                 SandboxManager.watchedUnresolvedPromises.delete(finish);
 
@@ -141,7 +143,7 @@ export class ModalManager {
 
                     confirm.remove();
 
-                    this.#onModalResolved();
+                    this.#onModalUnmount();
 
                     SandboxManager.watchedUnresolvedPromises.delete(finish);
 
@@ -160,7 +162,7 @@ export class ModalManager {
 
                 confirm.remove();
 
-                this.#onModalResolved();
+                this.#onModalUnmount();
 
                 SandboxManager.watchedUnresolvedPromises.delete(finish);
 
@@ -201,7 +203,7 @@ export class ModalManager {
             const done = () => {
                 prompt.remove();
 
-                this.#onModalResolved();
+                this.#onModalUnmount();
 
                 SandboxManager.watchedUnresolvedPromises.delete(finish);
             };
@@ -258,21 +260,29 @@ export class ModalManager {
         });
     }
 
-    static async popup(content: string | Element) {
+    static async popup(content: string | Element, onMount?: () => void, onUnmount?: () => void) {
         this.#onModalMount();
 
         const popup = html`
             <div class="modal modal-alert modal-popup">
-                <div class="modal-message">${typeof content === "string" ? content : content.outerHTML}</div>
+                <div class="modal-message"></div>
                 <div class="button-container">
                     <button class="modal-ok">Ok</button>
                 </div>
             </div>
         `;
 
+        if (typeof content === "string") {
+            popup.children[0].textContent = content;
+        } else {
+            popup.children[0].appendChild(content);
+        }
+
         this.container.appendChild(popup);
 
         popup.querySelector<HTMLElement>(".modal-ok")!.focus();
+
+        requestAnimationFrame(() => onMount?.call(undefined));
 
         return new Promise<void>((resolve) => {
             const finish = () => resolve(undefined);
@@ -282,7 +292,9 @@ export class ModalManager {
             const done = () => {
                 popup.remove();
 
-                this.#onModalResolved();
+                requestAnimationFrame(() => onUnmount?.call(undefined));
+
+                this.#onModalUnmount();
 
                 SandboxManager.watchedUnresolvedPromises.delete(finish);
 

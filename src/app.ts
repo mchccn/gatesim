@@ -10,7 +10,18 @@ import { attachStyles } from "./styling/attacher";
 
 Object.assign(globalThis, constants);
 
-await attachStyles(["style", "component", "io", "contextmenu", "toast", "modals", "buttons", "darkmode", "quickpick"]);
+await attachStyles([
+    "style",
+    "component",
+    "io",
+    "contextmenu",
+    "toast",
+    "modals",
+    "buttons",
+    "darkmode",
+    "quickpick",
+    "settings",
+]);
 
 const hrefAsUrl = new URL(location.href);
 
