@@ -1,5 +1,5 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import { ACTIVATED_CSS_COLOR, GRID_SIZE, IN_DEBUG_MODE, LIGHT_GRAY_CSS_COLOR, TOAST_DURATION } from "../constants";
+import { ACTIVATED_CSS_COLOR, IN_DEBUG_MODE, LIGHT_GRAY_CSS_COLOR, TOAST_DURATION } from "../constants";
 import { fromFile, saveDiagram, SerializedDiagram } from "../files";
 import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";
@@ -176,15 +176,8 @@ export class SandboxManager {
 
                     return true;
                 })
-                .onAdd((component) => {
+                .onAdd(() => {
                     DraggingManager.snapToGridBasedUpdate();
-
-                    requestAnimationFrame(() => {
-                        component.move({
-                            x: Math.floor(component.pos.x / GRID_SIZE) * GRID_SIZE,
-                            y: Math.floor(component.pos.y / GRID_SIZE) * GRID_SIZE,
-                        });
-                    });
 
                     return true;
                 })

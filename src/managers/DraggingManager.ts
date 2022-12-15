@@ -58,10 +58,10 @@ export class DraggingManager {
                             const width = parseFloat(style.width);
                             const height = parseFloat(style.height);
 
-                            component.element.style.transformOrigin = computeTransformOrigin(component.element);
-
-                            component.element.style.top = Math.floor(top / GRID_SIZE) * GRID_SIZE + "px";
-                            component.element.style.left = Math.floor(left / GRID_SIZE) * GRID_SIZE + "px";
+                            component.move({
+                                x: Math.floor(left / GRID_SIZE) * GRID_SIZE,
+                                y: Math.floor(top / GRID_SIZE) * GRID_SIZE,
+                            });
 
                             component.element.style.minWidth = Math.ceil(width / GRID_SIZE) * GRID_SIZE + "px";
                             component.element.style.minHeight = Math.ceil(height / GRID_SIZE) * GRID_SIZE + "px";
