@@ -2,6 +2,8 @@ import { html } from "../reified/Reified";
 import { SandboxManager } from "./SandboxManager";
 
 export class ModalManager {
+    static #abort = new AbortController();
+
     static get container() {
         return document.querySelector<HTMLElement>(".modal-container")!;
     }
@@ -9,6 +11,8 @@ export class ModalManager {
     static #onModalMount() {
         if (this.container.childElementCount <= 0) {
             this.container.classList.remove("modal-inactive");
+
+            this.#abort.abort();
 
             requestAnimationFrame(() => {
                 this.container.style.opacity = "1";
@@ -26,7 +30,7 @@ export class ModalManager {
                     () => {
                         this.container.classList.add("modal-inactive");
                     },
-                    { once: true },
+                    { once: true, signal: this.#abort.signal },
                 );
             });
         } else {
