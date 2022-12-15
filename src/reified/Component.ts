@@ -90,8 +90,6 @@ export class Component<I extends number, O extends number> extends Reified {
         }
 
         this.element.style.transformOrigin = computeTransformOrigin(this.element);
-
-        requestAnimationFrame(() => DraggingManager.snapToGridBasedUpdate());
     }
 
     get complementary() {

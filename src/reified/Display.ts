@@ -95,8 +95,6 @@ export class Display extends Reified {
         }
 
         this.element.style.transformOrigin = computeTransformOrigin(this.element);
-
-        requestAnimationFrame(() => DraggingManager.snapToGridBasedUpdate());
     }
 
     rotate(angle: number): this {
