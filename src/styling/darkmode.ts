@@ -18,6 +18,14 @@ export default css`
         background-color: #010102;
     }
 
+    body.darkmode button.settings {
+        background-color: ${DARKER_GRAY_CSS_COLOR};
+    }
+
+    body.darkmode button.settings:hover {
+        background-color: ${DARK_GRAY_CSS_COLOR};
+    }
+
     body.darkmode button.darkmode {
         background-color: ${DARKER_GRAY_CSS_COLOR};
     }
@@ -102,7 +110,7 @@ export default css`
     }
 
     body.darkmode .menu-keybind {
-        color: ${DARKER_GRAY_CSS_COLOR};
+        color: ${DARK_GRAY_CSS_COLOR};
     }
 
     body.darkmode .contextmenu > button:hover > .menu-keybind {

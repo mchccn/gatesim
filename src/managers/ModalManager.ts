@@ -7,13 +7,29 @@ export class ModalManager {
     }
 
     static #onModalMount() {
-        if (this.container.childElementCount <= 0) this.container.classList.remove("modal-inactive");
-        else this.container.lastElementChild!.classList.add("modal-inactive");
+        if (this.container.childElementCount <= 0) {
+            this.container.classList.remove("modal-inactive");
+
+            requestAnimationFrame(() => {
+                this.container.style.opacity = "1";
+            });
+        } else this.container.lastElementChild!.classList.add("modal-inactive");
     }
 
     static #onModalResolved() {
-        if (this.container.childElementCount <= 0) this.container.classList.add("modal-inactive");
-        else {
+        if (this.container.childElementCount <= 0) {
+            requestAnimationFrame(() => {
+                this.container.style.opacity = "0";
+
+                this.container.addEventListener(
+                    "transitionend",
+                    () => {
+                        this.container.classList.add("modal-inactive");
+                    },
+                    { once: true },
+                );
+            });
+        } else {
             this.container.lastElementChild!.classList.remove("modal-inactive");
 
             if (this.container.lastElementChild!.classList.contains("modal-alert")) {

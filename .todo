@@ -8,15 +8,13 @@
 
 -   ability to change number of inputs for gates
 
--   option to use gate icons instead of names as text
+-   settings icon
+
+    -   option to use gate icons instead of names as text
 
 -   CAD circuit developer
 
-    -   editing table should stop worker
-
     -   naïve algorithm map outputs from inputs directly
-
-        -   refactor code
 
         -   expression simplification/reduction
 

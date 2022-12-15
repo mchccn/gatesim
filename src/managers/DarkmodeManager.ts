@@ -42,10 +42,16 @@ export class DarkmodeManager {
     static #listener = () => {
         this.#enabled = !this.#enabled;
 
-        this.#element.style.transition = "none";
+        const buttons = document.querySelectorAll<HTMLElement>("button.tools, button.settings, button.darkmode");
+
+        buttons.forEach((b) => {
+            b.style.transition = "none";
+        });
 
         requestAnimationFrame(() => {
-            this.#element.style.transition = "";
+            buttons.forEach((b) => {
+                b.style.transition = "";
+            });
         });
     };
 

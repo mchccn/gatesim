@@ -13,6 +13,10 @@ export default css`
         z-index: 1000;
 
         background-color: #000000aa;
+
+        opacity: 0;
+
+        transition: ease-in-out 0.1s opacity;
     }
 
     .modal-container.modal-inactive,

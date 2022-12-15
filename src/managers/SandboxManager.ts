@@ -15,6 +15,7 @@ import { ModalManager } from "./ModalManager";
 import { MouseManager } from "./MouseManager";
 import { QuickPickManager } from "./QuickPickManager";
 import { SelectionManager } from "./SelectionManager";
+import { SettingsManager } from "./SettingsManager";
 import { StorageManager } from "./StorageManager";
 import { ToastManager } from "./ToastManager";
 import { UndoRedoManager } from "./UndoRedoManager";
@@ -95,6 +96,7 @@ export class SandboxManager {
         document.body.appendChild(html`<canvas class="background-canvas"></canvas>`);
         document.body.appendChild(html`<canvas class="foreground-canvas"></canvas>`);
         document.body.appendChild(html`<div class="toasts-container"></div>`);
+        document.body.appendChild(html`<button class="settings"></button>`);
         document.body.appendChild(html`<button class="darkmode"></button>`);
         document.body.appendChild(html`<button class="undo"></button>`);
         document.body.appendChild(html`<button class="redo"></button>`);
@@ -107,6 +109,8 @@ export class SandboxManager {
         QuickPickManager.init();
 
         CanvasManager.start();
+
+        SettingsManager.listen();
 
         DarkmodeManager.listen().onChange(() => DraggingManager.snapToGridBasedUpdate({ onlyUpdateColor: true }));
 
@@ -318,6 +322,7 @@ export class SandboxManager {
 
         CanvasManager.stop();
 
+        SettingsManager.stop();
         DarkmodeManager.stop();
         UndoRedoManager.stop();
 
