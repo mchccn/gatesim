@@ -17,8 +17,7 @@ export const ORIGIN_POINT = Object.freeze({ x: 0, y: 0 });
 export const IN_DEBUG_MODE = new URL(location.href).searchParams.has("debug");
 export const NO_RENDERING = new URL(location.href).searchParams.has("norender");
 
-export const LOCKED_FOR_TESTING = () =>
-    ModalManager.alert("The diagram is currently locked for testing. No changes can be made.");
+export const LOCKED_FOR_TESTING = () => ModalManager.alert("The diagram is currently locked. No changes can be made.");
 
 export const DELAY = (delay = 0) => new Promise((resolve) => setTimeout(resolve, delay));
 
@@ -41,6 +40,9 @@ export const GET_ACTIVATED_COLOR = () => (DarkmodeManager.enabled ? DARK_ACTIVAT
 export const GET_GRAY_COLOR = () =>
     DarkmodeManager.enabled ? ONLY_A_HINT_OF_DARK_GRAY_CSS_COLOR : LIGHT_GRAY_CSS_COLOR;
 
+export const GET_BIN_PERMS = (n: number) =>
+    Array.from({ length: Math.pow(2, n) }, (_, y) => Array.from({ length: n }, (_, x) => !!((y >> x) & 1)));
+
 export const ACTIVATED_CSS_COLOR = "#ff2626";
 export const DARK_ACTIVATED_CSS_COLOR = "#dd1111";
 export const EVEN_DARKER_GRAY_CSS_COLOR = "#0a0a0c";
@@ -50,6 +52,7 @@ export const DARK_GRAY_CSS_COLOR = "#1c1c24";
 export const KINDA_DARK_GRAY_CSS_COLOR = "#24242e";
 export const NOT_REALLY_DARK_GRAY_CSS_COLOR = "#2e2e3f";
 export const ONLY_A_HINT_OF_DARK_GRAY_CSS_COLOR = "#3c3c4f";
+export const MID_GRAY_CSS_COLOR = "#40404f";
 export const SUPER_GRAY_CSS_COLOR = "#bbbbbb";
 export const KINDA_LIGHT_GRAY_CSS_COLOR = "#cdcdcd";
 export const LIGHT_GRAY_CSS_COLOR = "#dedede";

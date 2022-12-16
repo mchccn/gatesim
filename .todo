@@ -1,7 +1,3 @@
--   tools
-
-    -   download truth table from diagram
-
 -   ability to change number of inputs for gates
 
 -   settings icon
@@ -17,5 +13,3 @@
         -   expression simplification/reduction
 
     -   dark mode
-
--   refactor code to use WeakMap

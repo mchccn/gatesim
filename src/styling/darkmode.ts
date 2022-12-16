@@ -7,6 +7,7 @@ import {
     KINDA_LIGHT_GRAY_CSS_COLOR,
     LIGHTER_GRAY_CSS_COLOR,
     LIGHT_GRAY_CSS_COLOR,
+    MID_GRAY_CSS_COLOR,
     NOT_REALLY_DARK_GRAY_CSS_COLOR,
     ONLY_A_HINT_OF_DARK_GRAY_CSS_COLOR,
     SLIGHTLY_DARKER_GRAY_CSS_COLOR,
@@ -83,6 +84,7 @@ export default css`
         color: ${KINDA_LIGHT_GRAY_CSS_COLOR};
     }
 
+    body.darkmode .tools-menu,
     body.darkmode .contextmenu {
         border: 1px solid ${DARKER_GRAY_CSS_COLOR};
 
@@ -91,14 +93,18 @@ export default css`
         box-shadow: 1px 1px 4px ${EVEN_DARKER_GRAY_CSS_COLOR};
     }
 
+    body.darkmode .tools-menu > .br,
     body.darkmode .contextmenu > .br {
         border-bottom: 1px solid ${DARKER_GRAY_CSS_COLOR};
     }
 
+    body.darkmode .tools-menu > button,
     body.darkmode .contextmenu > button {
-        color: ${ONLY_A_HINT_OF_DARK_GRAY_CSS_COLOR};
+        font-weight: 100;
+        color: ${MID_GRAY_CSS_COLOR};
     }
 
+    body.darkmode .tools-menu > button:hover,
     body.darkmode .contextmenu > button:hover {
         color: ${LIGHT_GRAY_CSS_COLOR};
 
@@ -106,9 +112,10 @@ export default css`
     }
 
     body.darkmode .menu-keybind {
-        color: ${DARK_GRAY_CSS_COLOR};
+        color: ${KINDA_DARK_GRAY_CSS_COLOR};
     }
 
+    body.darkmode .tools-menu > button:hover > .menu-keybind,
     body.darkmode .contextmenu > button:hover > .menu-keybind {
         color: ${ONLY_A_HINT_OF_DARK_GRAY_CSS_COLOR};
     }

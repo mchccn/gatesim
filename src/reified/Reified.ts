@@ -70,6 +70,9 @@ export function preventDefault(e: Event) {
 }
 
 export abstract class Reified {
+    static GATE_DELAY = 100;
+    static GATE_DELAY_VARIATION = 25;
+
     readonly uuid = SCUFFED_UUID();
 
     protected PERMANENT = false;

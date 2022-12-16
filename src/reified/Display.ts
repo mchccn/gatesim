@@ -58,7 +58,9 @@ export class Display extends Reified {
     async update() {
         const out = this.inputs.map((i) => i.classList.contains("activated"));
 
-        await DELAY(100 + Math.random() * 50 - 25);
+        await DELAY(
+            Reified.GATE_DELAY + Math.random() * (2 * Reified.GATE_DELAY_VARIATION) - Reified.GATE_DELAY_VARIATION,
+        );
 
         this.display.textContent = out
             .reverse()

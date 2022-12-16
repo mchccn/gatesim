@@ -44,17 +44,23 @@ export class ModalManager {
         }
     }
 
-    static async alert(message: string) {
+    static async alert(content: string | Element) {
         this.#onModalMount();
 
         const alert = html`
             <div class="modal modal-alert">
-                <p class="modal-message">${message}</p>
+                <p class="modal-message"></p>
                 <div class="button-container">
                     <button class="modal-ok">Ok</button>
                 </div>
             </div>
         `;
+
+        if (typeof content === "string") {
+            alert.children[0].textContent = content;
+        } else {
+            alert.children[0].appendChild(content);
+        }
 
         this.container.appendChild(alert);
 
@@ -103,18 +109,24 @@ export class ModalManager {
         });
     }
 
-    static async confirm(message: string) {
+    static async confirm(content: string | Element) {
         this.#onModalMount();
 
         const confirm = html`
             <div class="modal modal-confirm">
-                <p class="modal-message">${message}</p>
+                <p class="modal-message"></p>
                 <div class="button-container">
                     <button class="modal-ok">Ok</button>
                     <button class="modal-cancel">Cancel</button>
                 </div>
             </div>
         `;
+
+        if (typeof content === "string") {
+            confirm.children[0].textContent = content;
+        } else {
+            confirm.children[0].appendChild(content);
+        }
 
         this.container.appendChild(confirm);
 
@@ -177,12 +189,12 @@ export class ModalManager {
         });
     }
 
-    static async prompt(message: string) {
+    static async prompt(content: string | Element) {
         this.#onModalMount();
 
         const prompt = html`
             <div class="modal modal-confirm">
-                <p class="modal-message">${message}</p>
+                <p class="modal-message"></p>
                 <input class="modal-input" type="text" />
                 <div class="button-container">
                     <button class="modal-ok">Ok</button>
@@ -190,6 +202,12 @@ export class ModalManager {
                 </div>
             </div>
         `;
+
+        if (typeof content === "string") {
+            prompt.children[0].textContent = content;
+        } else {
+            prompt.children[0].appendChild(content);
+        }
 
         this.container.appendChild(prompt);
 

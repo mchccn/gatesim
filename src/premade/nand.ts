@@ -14,13 +14,10 @@ export const nand: Record<string, (ctx: { name: string }) => void> = {
             test: {
                 label: "Test solution",
                 async callback() {
-                    await TestingManager.test(
-                        [
-                            [[true], [false]],
-                            [[false], [true]],
-                        ],
-                        { timeout: 500 },
-                    );
+                    await TestingManager.test([
+                        [[true], [false]],
+                        [[false], [true]],
+                    ]);
                 },
             },
         });
@@ -54,15 +51,12 @@ export const nand: Record<string, (ctx: { name: string }) => void> = {
             test: {
                 label: "Test solution",
                 async callback() {
-                    await TestingManager.test(
-                        [
-                            [[false, false], [false]],
-                            [[true, false], [false]],
-                            [[false, true], [false]],
-                            [[true, true], [true]],
-                        ],
-                        { timeout: 750 },
-                    );
+                    await TestingManager.test([
+                        [[false, false], [false]],
+                        [[true, false], [false]],
+                        [[false, true], [false]],
+                        [[true, true], [true]],
+                    ]);
                 },
             },
         });
@@ -98,15 +92,12 @@ export const nand: Record<string, (ctx: { name: string }) => void> = {
             test: {
                 label: "Test solution",
                 async callback() {
-                    await TestingManager.test(
-                        [
-                            [[false, false], [false]],
-                            [[true, false], [true]],
-                            [[false, true], [true]],
-                            [[true, true], [true]],
-                        ],
-                        { timeout: 1000 },
-                    );
+                    await TestingManager.test([
+                        [[false, false], [false]],
+                        [[true, false], [true]],
+                        [[false, true], [true]],
+                        [[true, true], [true]],
+                    ]);
                 },
             },
         });
@@ -143,15 +134,12 @@ export const nand: Record<string, (ctx: { name: string }) => void> = {
             test: {
                 label: "Test solution",
                 async callback() {
-                    await TestingManager.test(
-                        [
-                            [[false, false], [false]],
-                            [[true, false], [true]],
-                            [[false, true], [true]],
-                            [[true, true], [false]],
-                        ],
-                        { timeout: 1250 },
-                    );
+                    await TestingManager.test([
+                        [[false, false], [false]],
+                        [[true, false], [true]],
+                        [[false, true], [true]],
+                        [[true, true], [false]],
+                    ]);
                 },
             },
         });

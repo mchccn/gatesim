@@ -20,8 +20,16 @@ document.body.appendChild(html`<div class="toasts-container"></div>`);
 
 await DELAY();
 
+table.element.focus();
+
 table.element.addEventListener("input", () => {
     displayHeuristics(table, output);
+});
+
+table.element.addEventListener("keypress", () => {
+    if (!table.value.trim()) {
+        output.element.innerHTML = "";
+    }
 });
 
 table.asynconpaste = () => displayHeuristics(table, output);

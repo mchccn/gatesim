@@ -68,7 +68,9 @@ export class Component<I extends number, O extends number> extends Reified {
     async update() {
         const out = this.chip.evaluate(this.inputs.map((i) => i.classList.contains("activated")));
 
-        await DELAY(100 + Math.random() * 50 - 25);
+        await DELAY(
+            Reified.GATE_DELAY + Math.random() * (2 * Reified.GATE_DELAY_VARIATION) - Reified.GATE_DELAY_VARIATION,
+        );
 
         this.outputs.forEach((output, i) => {
             output.classList.toggle("activated", this.#complementary && i === 1 ? !out[0] : out[i]);
