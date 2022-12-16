@@ -2,6 +2,7 @@ import { LIGHT_GRAY_CSS_COLOR } from "../constants";
 import { css } from "../reified/Reified";
 
 export default css`
+    .tools-menu,
     .contextmenu {
         position: absolute;
 
@@ -22,6 +23,14 @@ export default css`
         box-shadow: 1px 1px 4px ${LIGHT_GRAY_CSS_COLOR};
     }
 
+    .tools-menu {
+        left: 16px;
+        bottom: 172px;
+
+        box-shadow: none;
+    }
+
+    .tools-menu > .br,
     .contextmenu > .br {
         display: block;
 
@@ -30,6 +39,7 @@ export default css`
         border-bottom: 1px solid ${LIGHT_GRAY_CSS_COLOR};
     }
 
+    .tools-menu > button,
     .contextmenu > button {
         text-align: left;
 
@@ -46,6 +56,7 @@ export default css`
         color: #999999;
     }
 
+    .tools-menu > button:hover,
     .contextmenu > button:hover {
         cursor: pointer;
 
@@ -72,6 +83,7 @@ export default css`
         min-width: 14px;
     }
 
+    .tools-menu > button:hover > .menu-keybind,
     .contextmenu > button:hover > .menu-keybind {
         color: #bbbbbb;
     }

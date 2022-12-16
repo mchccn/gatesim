@@ -1,5 +1,6 @@
 import { WatchedSet } from "../augments/WatchedSet";
-import { ACTIVATED_CSS_COLOR, GET_ACTIVATED_COLOR, IS_MAC_OS, TOAST_DURATION } from "../constants";
+import { IS_MAC_OS } from "../circular";
+import { ACTIVATED_CSS_COLOR, GET_ACTIVATED_COLOR, TOAST_DURATION } from "../constants";
 import { fromFile, saveDiagram } from "../files";
 import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";

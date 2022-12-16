@@ -16,9 +16,6 @@ export const CHIP_OUTPUT_CSS_SIZE = 16;
 export const ORIGIN_POINT = Object.freeze({ x: 0, y: 0 });
 export const IN_DEBUG_MODE = new URL(location.href).searchParams.has("debug");
 export const NO_RENDERING = new URL(location.href).searchParams.has("norender");
-export const IS_MAC_OS = [navigator.userAgentData?.platform, navigator.platform].some(
-    (platform) => platform?.toLowerCase().includes("mac") ?? false,
-);
 
 export const LOCKED_FOR_TESTING = () =>
     ModalManager.alert("The diagram is currently locked for testing. No changes can be made.");

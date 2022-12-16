@@ -1,6 +1,7 @@
-import { IS_MAC_OS } from "../constants";
+import { IS_MAC_OS } from "../circular";
 import { serde as menu } from "../contextmenu/serde";
 import { KeybindsManager } from "../managers/KeybindsManager";
+import { ToolsManager } from "../managers/ToolsManager";
 
 export const serde = {
     ...KeybindsManager.assign("Control+K", (e) => {
@@ -8,14 +9,14 @@ export const serde = {
 
         e.preventDefault();
 
-        menu["copy-url"].callback();
+        ToolsManager.actions[0]["copy-url"].callback();
     }),
     ...KeybindsManager.assign("Meta+K", (e) => {
         if (!IS_MAC_OS) return;
 
         e.preventDefault();
 
-        menu["copy-url"].callback();
+        ToolsManager.actions[0]["copy-url"].callback();
     }),
     ...KeybindsManager.assign("Control+S", (e) => {
         if (IS_MAC_OS) return;

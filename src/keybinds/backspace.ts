@@ -1,4 +1,5 @@
-import { IS_MAC_OS, LOCKED_FOR_TESTING } from "../constants";
+import { IS_MAC_OS } from "../circular";
+import { LOCKED_FOR_TESTING } from "../constants";
 import { KeybindsManager } from "../managers/KeybindsManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { SelectionManager } from "../managers/SelectionManager";

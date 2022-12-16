@@ -1,4 +1,4 @@
-import { IS_MAC_OS } from "../constants";
+import { IS_MAC_OS } from "../circular";
 import { SandboxManager } from "./SandboxManager";
 
 export class KeybindsManager {

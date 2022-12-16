@@ -1,4 +1,5 @@
-import { ACTIVATED_CSS_COLOR, IS_MAC_OS, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
+import { IS_MAC_OS } from "../circular";
+import { ACTIVATED_CSS_COLOR, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { KeybindsManager } from "../managers/KeybindsManager";
 import { SandboxManager } from "../managers/SandboxManager";
