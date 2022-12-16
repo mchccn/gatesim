@@ -302,48 +302,58 @@ export class ModalManager {
 
         requestAnimationFrame(() => onMount?.call(undefined));
 
-        return new Promise<void>((resolve) => {
-            const finish = () => resolve(undefined);
+        let close: () => void;
 
-            SandboxManager.watchedUnresolvedPromises.add(finish);
+        const out = [
+            new Promise<void>((resolve) => {
+                const finish = () => resolve(undefined);
 
-            const done = () => {
-                popup.remove();
+                SandboxManager.watchedUnresolvedPromises.add(finish);
 
-                requestAnimationFrame(() => onUnmount?.call(undefined));
+                const done = () => {
+                    popup.remove();
 
-                this.#onModalUnmount();
+                    requestAnimationFrame(() => onUnmount?.call(undefined));
 
-                SandboxManager.watchedUnresolvedPromises.delete(finish);
+                    this.#onModalUnmount();
 
-                return finish();
-            };
+                    SandboxManager.watchedUnresolvedPromises.delete(finish);
 
-            const esc = (e: KeyboardEvent) => {
-                if (e.code === "Escape") {
-                    e.preventDefault();
+                    return finish();
+                };
 
-                    document.removeEventListener("keydown", esc);
+                close = done;
+
+                const esc = (e: KeyboardEvent) => {
+                    if (e.code === "Escape") {
+                        e.preventDefault();
+
+                        document.removeEventListener("keydown", esc);
+
+                        done();
+                    }
+                };
+
+                document.addEventListener("keydown", esc);
+
+                const clickout = (e: MouseEvent) => {
+                    const target = e.target as HTMLElement;
+
+                    if (target !== this.container || this.container.lastElementChild !== popup) return;
+
+                    this.container.removeEventListener("mousedown", clickout);
 
                     done();
-                }
-            };
+                };
 
-            document.addEventListener("keydown", esc);
+                this.container.addEventListener("mousedown", clickout);
 
-            const clickout = (e: MouseEvent) => {
-                const target = e.target as HTMLElement;
+                popup.querySelector<HTMLElement>(".modal-ok")!.addEventListener("click", done);
+            }),
+        ] as [Promise<void>, (() => void)?];
 
-                if (target !== this.container || this.container.lastElementChild !== popup) return;
+        out.push(close!);
 
-                this.container.removeEventListener("mousedown", clickout);
-
-                done();
-            };
-
-            this.container.addEventListener("mousedown", clickout);
-
-            popup.querySelector<HTMLElement>(".modal-ok")!.addEventListener("click", done);
-        });
+        return out as [Promise<void>, () => void];
     }
 }

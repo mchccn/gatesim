@@ -114,18 +114,11 @@ export class ToolsManager {
             Object.keys(record).forEach((key) => {
                 const click = record[key].callback.bind(undefined);
 
-                const listener = (e: MouseEvent) => {
-                    click(e);
-
-                    menu.style.display = "none";
-                };
-
                 const item = menu.querySelector<HTMLElement>("." + key)!;
 
-                item.addEventListener("click", listener);
-                item.addEventListener("contextmenu", listener);
+                item.addEventListener("mousedown", click);
 
-                this.#listeners.set(item, listener);
+                this.#listeners.set(item, click);
             });
         });
 
@@ -133,13 +126,20 @@ export class ToolsManager {
 
         this.#element.addEventListener("click", this.#listener);
 
+        const body = () => {
+            menu.style.display = "none";
+        };
+
+        document.body.addEventListener("mousedown", body);
+
+        this.#listeners.set(document.body, body);
+
         return this;
     }
 
     static stop() {
         this.#listeners.forEach((listener, element) => {
-            element.removeEventListener("click", listener);
-            element.removeEventListener("contextmenu", listener);
+            element.removeEventListener("mousedown", listener);
         });
 
         this.#element.removeEventListener("click", this.#listener);

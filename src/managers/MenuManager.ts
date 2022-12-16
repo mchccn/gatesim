@@ -57,8 +57,7 @@ export class MenuManager {
 
                     const listener = () => click(this.#opened);
 
-                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("click", listener);
-                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("contextmenu", listener);
+                    menu.querySelector<HTMLElement>("." + key)!.addEventListener("mousedown", listener);
 
                     clicks.set(key, listener);
                 });
@@ -149,8 +148,7 @@ export class MenuManager {
         menu.removeEventListener("contextmenu", listeners.click);
 
         Array.from(clicks).forEach(([key, listener]) => {
-            menu.querySelector("." + key)!.removeEventListener("click", listener);
-            menu.querySelector("." + key)!.removeEventListener("contextmenu", listener);
+            menu.querySelector("." + key)!.removeEventListener("mousedown", listener);
         });
 
         menu.remove();

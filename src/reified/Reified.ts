@@ -1,5 +1,6 @@
 import { WatchedSet } from "../augments/WatchedSet";
 import { SCUFFED_UUID } from "../constants";
+import { StorageManager } from "../managers/StorageManager";
 
 export function html(template: TemplateStringsArray, ...values: unknown[]): HTMLElement;
 export function html(html: string): HTMLElement;
@@ -70,9 +71,6 @@ export function preventDefault(e: Event) {
 }
 
 export abstract class Reified {
-    static GATE_DELAY = 100;
-    static GATE_DELAY_VARIATION = 25;
-
     readonly uuid = SCUFFED_UUID();
 
     protected PERMANENT = false;
@@ -134,5 +132,33 @@ export abstract class Reified {
             x: parseFloat(this.element.style.left),
             y: parseFloat(this.element.style.top),
         };
+    }
+
+    static #GATE_DELAY = 100;
+    static #GATE_DELAY_VARIATION = 25;
+
+    static get GATE_DELAY() {
+        return this.#GATE_DELAY;
+    }
+
+    static get GATE_DELAY_VARIATION() {
+        return this.#GATE_DELAY_VARIATION;
+    }
+
+    static set GATE_DELAY(v: number) {
+        this.#GATE_DELAY = v;
+
+        StorageManager.set("settings.gateDelay", this.#GATE_DELAY);
+    }
+
+    static set GATE_DELAY_VARIATION(v: number) {
+        this.#GATE_DELAY_VARIATION = v;
+
+        StorageManager.set("settings.gateDelayVariation", this.#GATE_DELAY_VARIATION);
+    }
+
+    static {
+        this.#GATE_DELAY = StorageManager.get("settings.gateDelay") ?? this.#GATE_DELAY;
+        this.#GATE_DELAY_VARIATION = StorageManager.get("settings.gateDelayVariation") ?? this.#GATE_DELAY_VARIATION;
     }
 }
