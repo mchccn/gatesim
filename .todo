@@ -17,3 +17,5 @@
         -   expression simplification/reduction
 
     -   dark mode
+
+-   refactor code to use WeakMap
