@@ -6,7 +6,7 @@ import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
-import { overlappedBounds, Reified } from "../reified/Reified";
+import { Reified, overlappedBounds } from "../reified/Reified";
 import { CanvasManager } from "./CanvasManager";
 import { DraggingManager } from "./DraggingManager";
 import { KeybindsManager } from "./KeybindsManager";

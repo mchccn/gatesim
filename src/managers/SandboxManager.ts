@@ -105,8 +105,8 @@ export class SandboxManager {
 
         MouseManager.start();
         KeybindsManager.listen();
-        DraggingManager.listen();
         SelectionManager.listen();
+        DraggingManager.listen();
         WiringManager.init();
         QuickPickManager.init();
 
@@ -320,8 +320,8 @@ export class SandboxManager {
 
         MouseManager.reset();
         KeybindsManager.reset();
-        DraggingManager.reset();
         SelectionManager.reset();
+        DraggingManager.reset();
 
         CanvasManager.stop();
 

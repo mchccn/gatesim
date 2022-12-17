@@ -1,7 +1,8 @@
+import { IS_MAC_OS } from "../circular";
 import { EVEN_DARKER_GRAY_CSS_COLOR, EVEN_LIGHTER_GRAY_CSS_COLOR, GET_ACTIVATED_COLOR, GRID_SIZE } from "../constants";
 import { quickpickComponents } from "../quickpicks/components";
 import { quickpickGates } from "../quickpicks/gates";
-import { computeTransformOrigin, Reified } from "../reified/Reified";
+import { Reified, computeTransformOrigin } from "../reified/Reified";
 import { CanvasManager } from "./CanvasManager";
 import { DarkmodeManager } from "./DarkmodeManager";
 import { KeybindsManager } from "./KeybindsManager";
@@ -107,7 +108,15 @@ export class DraggingManager {
             this.#mouse.ix = e.clientX;
             this.#mouse.iy = e.clientY;
 
-            if (!SelectionManager.isSelected(element)) SelectionManager.selected.clear();
+            if (
+                !SelectionManager.isSelected(element) &&
+                !(
+                    (IS_MAC_OS && (KeybindsManager.isKeyDown("MetaLeft") || KeybindsManager.isKeyDown("MetaRight"))) ||
+                    (!IS_MAC_OS &&
+                        (KeybindsManager.isKeyDown("ControlLeft") || KeybindsManager.isKeyDown("ControlRight")))
+                )
+            )
+                SelectionManager.selected.clear();
 
             if (SelectionManager.selected.size <= 1) {
                 this.#mouse.ox = e.clientX - rect.left;

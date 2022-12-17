@@ -28,6 +28,8 @@ export default css`
         position: absolute;
 
         transform: translate(calc(50vw - 50%), calc(50vh - 50%));
+
+        line-height: 1.5;
     }
 
     .modal-confirm,
@@ -133,5 +135,25 @@ export default css`
         display: flex;
         flex-direction: column;
         gap: 16px;
+    }
+
+    .modal .help {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .modal .help ul {
+        padding-left: 16px;
+    }
+
+    .modal .help a {
+        text-decoration: none;
+
+        color: #0077ff;
+    }
+
+    .modal .help a:visited {
+        color: #0066ee;
     }
 `;

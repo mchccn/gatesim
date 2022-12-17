@@ -1,6 +1,6 @@
 {
     "name": "@kelsny/gatesim",
-    "description": "Logical circuits playground with puzzles and exercises to solve.",
+    "description": "Logical circuits playground.",
     "version": "0.0.0",
     "private": true,
     "scripts": {
