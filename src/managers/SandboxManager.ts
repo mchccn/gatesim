@@ -1,11 +1,11 @@
 import { WatchedSet } from "../augments/WatchedSet";
 import { ACTIVATED_CSS_COLOR, IN_DEBUG_MODE, LIGHT_GRAY_CSS_COLOR, TOAST_DURATION } from "../constants";
-import { fromFile, saveDiagram, SerializedDiagram } from "../files";
+import { SerializedDiagram, fromFile, saveDiagram } from "../files";
 import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
-import { html, Reified } from "../reified/Reified";
+import { Reified, html } from "../reified/Reified";
 import { CanvasManager } from "./CanvasManager";
 import { DarkmodeManager } from "./DarkmodeManager";
 import { DraggingManager } from "./DraggingManager";

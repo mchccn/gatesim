@@ -1,15 +1,5 @@
 [in order of most interested in to god i don't want to ever do this]
 
--   https://www.youtube.com/watch?v=hEDQpqhY2MA&t=522s
-
-    -   rename Display to Debug
-
-    -   add 7-segment display component
-
-        -   dabble component
-
-        -   ripley blanking
-
 -   setting for darkmode modals
 
 -   serialized diagram to circuit diagram drawing
@@ -17,6 +7,8 @@
 -   serialized diagram patcher so old files don't become useless
 
 -   when you edit a component's inputs/outputs count, it should not delete all the wires
+
+-   fancier wires
 
 -   ability to label inputs/outputs
 

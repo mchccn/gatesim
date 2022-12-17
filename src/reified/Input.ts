@@ -6,7 +6,7 @@ import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
 import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
-import { html, Reified } from "./Reified";
+import { Reified, html } from "./Reified";
 
 export class Input extends Reified {
     readonly element;
@@ -53,8 +53,13 @@ export class Input extends Reified {
                 "create-connection": {
                     label: "Create connection",
                     keybind: "Q",
+                    stopPropagation: true,
                     callback: () => {
+                        if (TestingManager.testing) return LOCKED_FOR_TESTING();
+
                         NewWireContext.from = this.element;
+
+                        return undefined;
                     },
                 },
                 "delete-input": {

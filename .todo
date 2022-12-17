@@ -11,3 +11,13 @@
 -   splash/landing with instructions
 
     -   include keybinds
+
+-   https://www.youtube.com/watch?v=hEDQpqhY2MA&t=522s
+
+    -   rename Display to Debug
+
+    -   add 7-segment display component
+
+        -   dabble component
+
+        -   ripley blanking

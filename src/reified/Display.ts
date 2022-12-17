@@ -182,6 +182,7 @@ export class Display extends Reified {
                         "create-connection": {
                             label: "Create connection",
                             keybind: "Q",
+                            stopPropagation: true,
                             callback: () => {
                                 if (TestingManager.testing) return LOCKED_FOR_TESTING();
 

@@ -11,7 +11,7 @@ export type MenuManagerContext = {
 };
 
 export type MenuManagerActions = Array<
-    Record<string, { label: string; keybind?: string; callback: (e: MouseEvent) => void }>
+    Record<string, { label: string; keybind?: string; stopPropagation?: boolean; callback: (e: MouseEvent) => void }>
 >;
 
 export type MenuManagerAction = MenuManagerActions[number];
@@ -55,7 +55,11 @@ export class MenuManager {
                 Object.keys(record).forEach((key) => {
                     const click = record[key].callback.bind(undefined);
 
-                    const listener = () => click(this.#opened);
+                    const listener = (e: MouseEvent) => {
+                        click(this.#opened);
+
+                        if (record[key].stopPropagation) e.stopPropagation();
+                    };
 
                     menu.querySelector<HTMLElement>("." + key)!.addEventListener("mousedown", listener);
 
