@@ -98,8 +98,8 @@ export class TruthTable extends HTMLElement {
         });
     }
 
-    #update() {
-        this.value = this.#input.value;
+    #update({ value = true }: { value?: boolean } = { value: true }) {
+        if (value) this.value = this.#input.value;
 
         StorageManager.set("cad:input", this.#value);
 
@@ -133,6 +133,8 @@ export class TruthTable extends HTMLElement {
         this.#value = v;
 
         this.#input.value = v;
+
+        this.#update({ value: false });
     }
 
     get element() {

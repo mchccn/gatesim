@@ -1,4 +1,5 @@
-import { DELAY } from "../constants";
+import { ACTIVATED_CSS_COLOR, DELAY, TOAST_DURATION } from "../constants";
+import { ToastManager } from "../managers/ToastManager";
 import { html } from "../reified/Reified";
 import { attachStyles } from "../styling/attacher";
 import { Boss } from "./boss";
@@ -19,6 +20,28 @@ document.body.appendChild(output);
 document.body.appendChild(html`<div class="toasts-container"></div>`);
 
 await DELAY();
+
+const hrefAsUrl = new URL(location.href);
+
+const shouldLoadInline = hrefAsUrl.searchParams.get("inline");
+
+if (shouldLoadInline) {
+    try {
+        const inlined = atob(shouldLoadInline);
+
+        table.value = inlined;
+    } catch {
+        ToastManager.toast({
+            message: "Table is not correctly encoded.",
+            color: ACTIVATED_CSS_COLOR,
+            duration: TOAST_DURATION,
+        });
+
+        hrefAsUrl.searchParams.delete("inline");
+
+        history.pushState(undefined, "", hrefAsUrl);
+    }
+}
 
 table.element.focus();
 

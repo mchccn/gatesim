@@ -57,7 +57,7 @@ export class ToolsManager {
 
                     if (table) {
                         const pre = html`
-                            <pre><button>Download</button><hr style="margin: 4px 0; border: 1px solid ${LIGHT_GRAY_CSS_COLOR}" /><code style="font-family: Fira Code, monospace;">${table
+                            <pre><button>Copy</button> <button>Download</button> <button>Open in CAD</button><hr style="margin: 4px 0; border: 1px solid ${LIGHT_GRAY_CSS_COLOR}" /><code style="font-family: Fira Code, monospace;">${table
                                 .map((row) => row.map((io) => io.map((v) => +v).join("")).join(":"))
                                 .join("\n")
                                 .replaceAll(":", '<span style="color: gray;">:</span>')
@@ -66,9 +66,25 @@ export class ToolsManager {
                         `;
 
                         pre.children[0].addEventListener("click", async () => {
+                            await navigator.clipboard.writeText(
+                                table.map((row) => row.map((io) => io.map((v) => +v).join("")).join(":")).join("\n"),
+                            );
+                        });
+
+                        pre.children[1].addEventListener("click", async () => {
                             await downloadFile([
                                 table.map((row) => row.map((io) => io.map((v) => +v).join("")).join(":")).join("\n"),
                             ]);
+                        });
+
+                        pre.children[2].addEventListener("click", () => {
+                            const url = new URL(location.href);
+
+                            url.search = `?cad&inline=${btoa(
+                                table.map((row) => row.map((io) => io.map((v) => +v).join("")).join(":")).join("\n"),
+                            )}`;
+
+                            location.href = url.href;
                         });
 
                         await ModalManager.alert(pre);
