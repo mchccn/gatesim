@@ -3,6 +3,7 @@ import { GET_ACTIVATED_COLOR, GET_GRAY_COLOR, LOCKED_FOR_TESTING } from "../cons
 import { CanvasManager } from "./CanvasManager";
 import { MouseManager } from "./MouseManager";
 import { SandboxManager } from "./SandboxManager";
+import { StorageManager } from "./StorageManager";
 import { TestingManager } from "./TestingManager";
 
 export class NewWireContext {
@@ -110,11 +111,36 @@ export class WiringManager {
 
             bg.lineJoin = "round";
 
-            bg.beginPath();
-            bg.moveTo(from.x + from.width / 2, from.y + from.height / 2);
-            bg.lineTo(to.x + to.width / 2, to.y + to.height / 2);
-            bg.closePath();
-            bg.stroke();
+            const xaxis = from.x + from.width / 2 - (to.x + to.width / 2);
+            const yaxis = from.y + from.height / 2 - (to.y + to.width / 2);
+
+            const points: [number, number][] =
+                !this.#FANCY_WIRES || Math.abs(xaxis) < 10 || Math.abs(yaxis) < 10
+                    ? [
+                          [from.x + from.width / 2, from.y + from.height / 2],
+                          [to.x + to.width / 2, to.y + to.height / 2],
+                      ]
+                    : Math.abs(xaxis) > Math.abs(yaxis)
+                    ? [
+                          [from.x + from.width / 2, from.y + from.height / 2],
+                          [from.x + from.width / 2 - xaxis / 2, from.y + from.height / 2],
+                          [to.x + to.width / 2 + xaxis / 2, to.y + to.height / 2],
+                          [to.x + to.width / 2, to.y + to.height / 2],
+                      ]
+                    : [
+                          [from.x + from.width / 2, from.y + from.height / 2],
+                          [from.x + from.width / 2, from.y + from.height / 2 - yaxis / 2],
+                          [to.x + to.width / 2, to.y + to.height / 2 + yaxis / 2],
+                          [to.x + to.width / 2, to.y + to.height / 2],
+                      ];
+
+            points.slice(0, -1).forEach((_, i) => {
+                bg.beginPath();
+                bg.moveTo(...points[i]);
+                bg.lineTo(...points[i + 1]);
+                bg.closePath();
+                bg.stroke();
+            });
         });
 
         if (NewWireContext.from) {
@@ -128,15 +154,56 @@ export class WiringManager {
 
             bg.lineJoin = "round";
 
-            bg.beginPath();
-            bg.moveTo(from.x + from.width / 2, from.y + from.height / 2);
-            bg.lineTo(MouseManager.mouse.x, MouseManager.mouse.y);
-            bg.closePath();
-            bg.stroke();
+            const xaxis = from.x + from.width / 2 - MouseManager.mouse.x;
+            const yaxis = from.y + from.height / 2 - MouseManager.mouse.y;
+
+            const points: [number, number][] =
+                !this.#FANCY_WIRES || Math.abs(xaxis) < 10 || Math.abs(yaxis) < 10
+                    ? [
+                          [from.x + from.width / 2, from.y + from.height / 2],
+                          [MouseManager.mouse.x, MouseManager.mouse.y],
+                      ]
+                    : Math.abs(xaxis) > Math.abs(yaxis)
+                    ? [
+                          [from.x + from.width / 2, from.y + from.height / 2],
+                          [from.x + from.width / 2 - xaxis / 2, from.y + from.height / 2],
+                          [MouseManager.mouse.x + xaxis / 2, MouseManager.mouse.y],
+                          [MouseManager.mouse.x, MouseManager.mouse.y],
+                      ]
+                    : [
+                          [from.x + from.width / 2, from.y + from.height / 2],
+                          [from.x + from.width / 2, from.y + from.height / 2 - yaxis / 2],
+                          [MouseManager.mouse.x, MouseManager.mouse.y + yaxis / 2],
+                          [MouseManager.mouse.x, MouseManager.mouse.y],
+                      ];
+
+            points.slice(0, -1).forEach((_, i) => {
+                bg.beginPath();
+                bg.moveTo(...points[i]);
+                bg.lineTo(...points[i + 1]);
+                bg.closePath();
+                bg.stroke();
+            });
         }
     }
 
     static init() {
         CanvasManager.addJob(this.render.bind(this));
+    }
+
+    static #FANCY_WIRES = true;
+
+    static get FANCY_WIRES() {
+        return this.#FANCY_WIRES;
+    }
+
+    static set FANCY_WIRES(v: boolean) {
+        this.#FANCY_WIRES = v;
+
+        StorageManager.set("settings.fancyWires", this.#FANCY_WIRES);
+    }
+
+    static {
+        this.#FANCY_WIRES = StorageManager.get("settings.fancyWires") ?? this.#FANCY_WIRES;
     }
 }

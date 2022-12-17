@@ -2,6 +2,7 @@ import { html, Reified } from "../reified/Reified";
 import { DarkmodeManager } from "./DarkmodeManager";
 import { DraggingManager } from "./DraggingManager";
 import { ModalManager } from "./ModalManager";
+import { WiringManager } from "./WiringManager";
 
 export class SettingsManager {
     static readonly #changes = new Set<() => void>();
@@ -37,6 +38,11 @@ export class SettingsManager {
                 <label class="settings-control" for="snapToGrid">
                     <input name="snapToGrid" type="checkbox" ${DraggingManager.snapToGrid ? "checked" : ""} />
                     snap to grid
+                </label>
+
+                <label class="settings-control" for="fancyWires">
+                    <input name="fancyWires" type="checkbox" ${WiringManager.FANCY_WIRES ? "checked" : ""} />
+                    fancy wires
                 </label>
 
                 <label class="settings-control" for="gateDelay">
@@ -80,6 +86,7 @@ export class SettingsManager {
         if (!reset) {
             DarkmodeManager.enabled = form.querySelector<HTMLInputElement>("input[name=darkmode]")!.checked;
             DraggingManager.snapToGrid = form.querySelector<HTMLInputElement>("input[name=snapToGrid]")!.checked;
+            WiringManager.FANCY_WIRES = form.querySelector<HTMLInputElement>("input[name=fancyWires]")!.checked;
             Reified.GATE_DELAY = form.querySelector<HTMLInputElement>("input[name=gateDelay]")!.valueAsNumber;
             Reified.GATE_DELAY_VARIATION = form.querySelector<HTMLInputElement>(
                 "input[name=gateDelayVariation]",

@@ -10,13 +10,11 @@
 
         -   ripley blanking
 
--   splash/landing with instructions
-
-    - include keybinds
-
 -   setting for darkmode modals
 
 -   serialized diagram to circuit diagram drawing
+
+-   serialized diagram patcher so old files don't become useless
 
 -   when you edit a component's inputs/outputs count, it should not delete all the wires
 
