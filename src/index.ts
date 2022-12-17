@@ -15,5 +15,3 @@ if (IS_CAD_APP) {
     console.log("Right click to get started.");
     console.log("Press '?' for help.");
 }
-
-export {};

@@ -6,8 +6,8 @@ import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
 import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
+import { Reified, computeTransformOrigin, html } from "./Reified";
 import { Chip } from "./chips";
-import { computeTransformOrigin, html, Reified } from "./Reified";
 
 export class Component<I extends number, O extends number> extends Reified {
     readonly element;
@@ -21,7 +21,8 @@ export class Component<I extends number, O extends number> extends Reified {
     readonly #contextmenus = new Map<Element, () => void>();
     readonly #clicks = new Map<Element, () => void>();
 
-    readonly chip: Chip<I, O>;
+    readonly base: Chip<I, O>;
+    chip: Chip<I, O>;
 
     #angle = 0;
 
@@ -38,6 +39,7 @@ export class Component<I extends number, O extends number> extends Reified {
 
         this.#complementary = complementary;
 
+        this.base = chip;
         this.chip = chip;
 
         this.element = html`

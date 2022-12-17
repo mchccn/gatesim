@@ -2,9 +2,13 @@
 
 -   https://www.youtube.com/watch?v=hEDQpqhY2MA&t=522s
 
-    -   replace display with 7-segment display
+    -   rename Display to Debug
+
+    -   add 7-segment display component
 
         -   dabble component
+
+        -   ripley blanking
 
 -   splash/landing with instructions
 

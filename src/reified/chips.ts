@@ -25,6 +25,32 @@ export abstract class Chip<I extends number, O extends number> {
     evaluate(inputs: boolean[]) {
         return this.output(inputs as BooleanTuple<I, []>) as boolean[];
     }
+
+    static joined<I extends number, O extends number, N extends number>(
+        chip: ExtendedChip<I, O>,
+        n: N,
+    ): ExtendedChip<N, O> {
+        return class extends Chip<N, O> {
+            static readonly NAME = chip.NAME;
+            static readonly INPUTS = n;
+            static readonly OUTPUTS = chip.OUTPUTS;
+
+            #chips = Array.from({ length: n - 1 }, () => new chip());
+
+            constructor() {
+                super(chip.NAME, n, chip.OUTPUTS as O);
+            }
+
+            output(inputs: boolean[]) {
+                return this.#chips
+                    .slice(1)
+                    .reduce(
+                        (output, chip, i) => chip.output([inputs[i + chip.inputs], ...output] as BooleanTuple<I>),
+                        this.#chips[0].output(inputs.slice(0, chip.INPUTS) as BooleanTuple<I>),
+                    );
+            }
+        };
+    }
 }
 
 export class AndGate extends Chip<2, 1> {

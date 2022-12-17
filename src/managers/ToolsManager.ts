@@ -2,7 +2,7 @@ import { downloadFile } from "../cad/files";
 import { IS_MAC_OS } from "../circular";
 import { LIGHT_GRAY_CSS_COLOR, TOAST_DURATION } from "../constants";
 import { saveDiagram } from "../files";
-import { html, Reified } from "../reified/Reified";
+import { Reified, html } from "../reified/Reified";
 import { MenuManagerActions } from "./MenuManager";
 import { ModalManager } from "./ModalManager";
 import { TestingManager } from "./TestingManager";
@@ -34,6 +34,18 @@ export class ToolsManager {
                         color: LIGHT_GRAY_CSS_COLOR,
                         duration: TOAST_DURATION,
                     });
+                },
+            },
+        },
+        {
+            "open-cad": {
+                label: "Open CAD",
+                callback: () => {
+                    const url = new URL(location.href);
+
+                    url.search = "?cad";
+
+                    location.href = url.href;
                 },
             },
         },
@@ -126,7 +138,9 @@ export class ToolsManager {
 
         this.#element.addEventListener("click", this.#listener);
 
-        const body = () => {
+        const body = (e: MouseEvent) => {
+            if (e.target === this.#element || (e.target as HTMLElement).closest(".tools")) return;
+
             menu.style.display = "none";
         };
 
