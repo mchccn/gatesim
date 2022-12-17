@@ -7,13 +7,13 @@ import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
 import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
-import { computeTransformOrigin, html, Reified } from "./Reified";
+import { Reified, computeTransformOrigin, html } from "./Reified";
 
 export class Display extends Reified {
     readonly element;
 
-    readonly inputs;
-    readonly outputs;
+    inputs;
+    outputs;
     readonly display;
 
     readonly #observers = new Map<Element, MutationObserver>();
@@ -277,21 +277,13 @@ export class Display extends Reified {
                                     this.inputs.forEach((i) => i.remove());
                                     this.outputs.forEach((o) => o.remove());
 
-                                    this.inputs.splice(
-                                        0,
-                                        this.inputs.length,
-                                        ...Array(bits)
-                                            .fill(undefined)
-                                            .map(() => html`<button class="component-input-button">I</button>`),
-                                    );
+                                    this.inputs = Array(bits)
+                                        .fill(undefined)
+                                        .map(() => html`<button class="component-input-button">I</button>`);
 
-                                    this.outputs.splice(
-                                        0,
-                                        this.outputs.length,
-                                        ...Array(bits)
-                                            .fill(undefined)
-                                            .map(() => html`<button class="component-output-button">O</button>`),
-                                    );
+                                    this.outputs = Array(bits)
+                                        .fill(undefined)
+                                        .map(() => html`<button class="component-output-button">O</button>`);
 
                                     const ic = this.element.querySelector<HTMLElement>(".component-inputs")!;
                                     const oc = this.element.querySelector<HTMLElement>(".component-outputs")!;
@@ -321,8 +313,8 @@ export class Display extends Reified {
                                     this.inputs.forEach((i) => i.remove());
                                     this.outputs.forEach((o) => o.remove());
 
-                                    this.inputs.splice(0, this.inputs.length, ...inputs);
-                                    this.outputs.splice(0, this.outputs.length, ...outputs);
+                                    this.inputs = inputs;
+                                    this.outputs = outputs;
 
                                     const ic = this.element.querySelector<HTMLElement>(".component-inputs")!;
                                     const oc = this.element.querySelector<HTMLElement>(".component-outputs")!;

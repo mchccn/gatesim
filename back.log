@@ -18,6 +18,8 @@
 
 -   serialized diagram to circuit diagram drawing
 
+-   when you edit a component's inputs/outputs count, it should not delete all the wires
+
 -   ability to label inputs/outputs
 
 -   rust wasm instead of web workers

@@ -166,7 +166,8 @@ export class BufferGate extends Chip<1, 1> {
 }
 
 type StaticMembers<T> = { [K in keyof T]: T[K] };
-type ExtendedChip<I extends number = number, O extends number = number> = StaticMembers<typeof Chip<I, O>> & {
+
+export type ExtendedChip<I extends number = number, O extends number = number> = StaticMembers<typeof Chip<I, O>> & {
     new (): Chip<I, O>;
 };
 

@@ -2,12 +2,12 @@ import { ACTIVATED_CSS_COLOR, COUNTER_GENERATOR, IN_DEBUG_MODE, TOAST_DURATION }
 import { DraggingManager } from "./managers/DraggingManager";
 import { ToastManager } from "./managers/ToastManager";
 import { Wiring } from "./managers/WiringManager";
-import { chips } from "./reified/chips";
 import { Component } from "./reified/Component";
 import { Display } from "./reified/Display";
 import { Input } from "./reified/Input";
 import { Output } from "./reified/Output";
 import { Reified } from "./reified/Reified";
+import { chips } from "./reified/chips";
 
 export type SerializedDiagram = {
     settings: {
@@ -43,6 +43,7 @@ export type SerializedDiagram = {
               y: number;
               angle: number;
               complementary: boolean;
+              joins: number;
           }
         | {
               reified: number;
@@ -117,6 +118,7 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
                     y: parseFloat(component.element.style.top),
                     angle: component.angle,
                     complementary: component.complementary,
+                    joins: component.joins,
                 };
             }
 
@@ -212,7 +214,9 @@ export function fromFile(
                 return raw.permanent ? display.permanent() : display;
             }
 
-            const component = new Component(new (chips.get(raw.name)!)(), raw, raw.complementary).rotate(raw.angle);
+            const component = new Component(new (chips.get(raw.name)!)(), raw, raw.complementary, raw.joins).rotate(
+                raw.angle,
+            );
 
             component.inputs.forEach((input, index) => {
                 input.classList.toggle("activated", raw.inputs[index].activated);
@@ -304,6 +308,10 @@ function validate(data: unknown): asserts data is SerializedDiagram {
                 if (typeof component.complementary !== "boolean")
                     throw new Error("Complementary output must be a boolean.");
 
+                if (!("joins" in component)) throw new Error("Component data is missing joins.");
+
+                if (typeof component.joins !== "number") throw new Error("Joins count must be a number.");
+
                 if (!("inputs" in component)) throw new Error("Component data is missing inputs.");
 
                 if (!Array.isArray(component.inputs)) throw new Error("Component inputs data must be an array.");
@@ -320,7 +328,10 @@ function validate(data: unknown): asserts data is SerializedDiagram {
 
                 const Chip = chips.get(component.name.trim().toUpperCase())!;
 
-                if (component.inputs.length !== Chip.INPUTS)
+                if (
+                    component.inputs.length !==
+                    (component.joins !== Chip.INPUTS ? component.inputs.length : Chip.INPUTS)
+                )
                     throw new Error("Component inputs does not match chip inputs.");
 
                 if (component.outputs.length !== (component.complementary ? Chip.OUTPUTS + 1 : Chip.OUTPUTS))

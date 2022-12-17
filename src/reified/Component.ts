@@ -2,12 +2,13 @@ import { IS_MAC_OS } from "../circular";
 import { ACTIVATED_CSS_COLOR, DELAY, LOCKED_FOR_TESTING, TOAST_DURATION } from "../constants";
 import { DraggingManager } from "../managers/DraggingManager";
 import { KeybindsManager } from "../managers/KeybindsManager";
+import { ModalManager } from "../managers/ModalManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { TestingManager } from "../managers/TestingManager";
 import { ToastManager } from "../managers/ToastManager";
 import { NewWireContext, Wiring, WiringManager } from "../managers/WiringManager";
 import { Reified, computeTransformOrigin, html } from "./Reified";
-import { Chip } from "./chips";
+import { Chip, ExtendedChip } from "./chips";
 
 export class Component<I extends number, O extends number> extends Reified {
     readonly element;
@@ -28,24 +29,31 @@ export class Component<I extends number, O extends number> extends Reified {
 
     #complementary = false;
 
+    #joins = 0;
+
     constructor(
         chip: Chip<I, O>,
         pos:
             | { x: number; y: number; centered?: boolean }
             | ((comp: Component<I, O>) => { x: number; y: number; centered?: boolean }),
         complementary = false,
+        joins = chip.inputs,
     ) {
         super();
 
         this.#complementary = complementary;
+        this.#joins = joins;
 
         this.base = chip;
-        this.chip = chip;
+        this.chip =
+            this.#joins !== this.base.inputs
+                ? new (Chip.joined(this.base.constructor as ExtendedChip<I, O>, this.#joins as I))()
+                : this.base;
 
         this.element = html`
             <div class="component">
                 <div class="component-inputs">
-                    ${Array(this.chip.inputs).fill('<button class="component-input-button">I</button>').join("")}
+                    ${Array(this.joins).fill('<button class="component-input-button">I</button>').join("")}
                 </div>
                 <p class="component-name">${this.chip.name}</p>
                 <div class="component-outputs">
@@ -101,6 +109,10 @@ export class Component<I extends number, O extends number> extends Reified {
 
     get complementary() {
         return this.#complementary;
+    }
+
+    get joins() {
+        return this.#joins;
     }
 
     rotate(angle: number) {
@@ -235,6 +247,110 @@ export class Component<I extends number, O extends number> extends Reified {
                 ...(this.chip.outputs === 1
                     ? [
                           {
+                              "set-inputs": {
+                                  label: "Set inputs",
+                                  callback: async () => {
+                                      const input = await ModalManager.prompt("Enter the number of inputs:");
+
+                                      if (!input) return;
+
+                                      const joins = +input;
+
+                                      if (Number.isNaN(joins) || !Number.isInteger(joins) || joins < this.base.inputs)
+                                          return ToastManager.toast({
+                                              message: `Number of inputs must be a positive integer greater than or equal to ${this.base.inputs}.`,
+                                              color: ACTIVATED_CSS_COLOR,
+                                              duration: TOAST_DURATION,
+                                          });
+
+                                      if (this.#joins === joins) return;
+
+                                      const previous = this.#joins;
+
+                                      const deleted: [from: Element, to: Element][] = [];
+
+                                      const inputs = [...this.inputs];
+
+                                      const old = this.chip;
+
+                                      return SandboxManager.pushHistory(
+                                          () => {
+                                              this.#joins = joins;
+
+                                              WiringManager.wires.forEach((wire) => {
+                                                  if (this.inputs.some((i) => wire.to === i)) {
+                                                      wire.destroy();
+
+                                                      wire.to.classList.remove("activated");
+
+                                                      deleted.push([wire.from, wire.to]);
+                                                  }
+                                              });
+
+                                              this.#destroyListeners();
+
+                                              this.inputs.forEach((i) => i.remove());
+
+                                              this.inputs = Array(joins)
+                                                  .fill(undefined)
+                                                  .map(() => html`<button class="component-input-button">I</button>`);
+
+                                              const ic = this.element.querySelector<HTMLElement>(".component-inputs")!;
+
+                                              this.inputs.forEach((i) => ic.appendChild(i));
+
+                                              this.#updateListeners();
+
+                                              this.#attachListeners();
+
+                                              this.chip =
+                                                  this.#joins !== this.base.inputs
+                                                      ? new (Chip.joined(
+                                                            this.base.constructor as ExtendedChip<I, O>,
+                                                            this.#joins as I,
+                                                        ))()
+                                                      : this.base;
+
+                                              this.update();
+
+                                              SandboxManager.forceSave();
+
+                                              DraggingManager.snapToGridBasedUpdate();
+                                          },
+                                          () => {
+                                              this.#joins = previous;
+
+                                              WiringManager.wires.addAll(
+                                                  deleted
+                                                      .splice(0, deleted.length)
+                                                      .map(([from, to]) => new Wiring(from, to)),
+                                              );
+
+                                              this.#destroyListeners();
+
+                                              this.inputs.forEach((i) => i.remove());
+
+                                              this.inputs = inputs;
+
+                                              const ic = this.element.querySelector<HTMLElement>(".component-inputs")!;
+
+                                              this.inputs.forEach((i) => ic.appendChild(i));
+
+                                              this.#updateListeners();
+
+                                              this.#attachListeners();
+
+                                              this.chip = old;
+
+                                              this.update();
+
+                                              SandboxManager.forceSave();
+
+                                              DraggingManager.snapToGridBasedUpdate();
+                                          },
+                                      );
+                                  },
+                              },
                               "toggle-complementary": {
                                   label: "Complementary output",
                                   callback: () => {
