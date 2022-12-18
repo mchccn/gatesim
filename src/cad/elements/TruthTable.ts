@@ -4,6 +4,7 @@ import { downloadFile, fileInput } from "../files";
 import { typeInTextarea } from "../table";
 
 export class TruthTable extends HTMLElement {
+    /** small hack to do things after successful pastes */
     asynconpaste?: () => void;
 
     #input;
@@ -98,6 +99,7 @@ export class TruthTable extends HTMLElement {
         });
     }
 
+    // added a flag so we avoid having to update the value
     #update({ value = true }: { value?: boolean } = { value: true }) {
         if (value) this.value = this.#input.value;
 
@@ -121,6 +123,7 @@ export class TruthTable extends HTMLElement {
             .replaceAll("0", '<span style="color: red;">0</span>')
             .replaceAll("1", '<span style="color: blue;">1</span>');
 
+        // new lines at the end of the textarea don't actually show up so we need to manually add in the new line
         if (this.#input.value.endsWith("\n"))
             this.#highlight.innerHTML += `<span style="display: block; height: 16px;"></span>`;
     }

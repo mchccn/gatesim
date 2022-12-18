@@ -2,6 +2,7 @@
 
 import { ACTIVATED_CSS_COLOR, IS_CAD_APP } from "./constants";
 
+// using ts extension because of webpack things
 if (IS_CAD_APP) {
     await import(`./cad/index.ts`);
 

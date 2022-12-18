@@ -8,6 +8,7 @@ export class Boss {
     constructor(table: readonly boolean[][][]) {
         this.#table = table;
 
+        // using ts extension because of webpack things
         this.#worker = new Worker(new URL("./employee.ts", import.meta.url));
     }
 
@@ -24,6 +25,7 @@ export class Boss {
     }
 
     async work() {
+        // send table to worker
         this.#worker.postMessage(this.#table);
 
         return new Promise<string>((resolve, reject) => {
@@ -40,7 +42,10 @@ export class Boss {
                     return this.#ongens.forEach((run) => run.call(undefined, data.message));
                 }
 
+                // promise is resolved when the worker is done
                 if (data.code === "FINISHED") {
+                    this.fired();
+
                     return resolve(data.message);
                 }
             });

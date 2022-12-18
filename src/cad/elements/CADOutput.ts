@@ -1,5 +1,7 @@
 import { html } from "../../reified/Reified";
 
+// nothing special just a custom element that wraps a div
+// in case there is any special behavior to add
 export class CADOutput extends HTMLElement {
     readonly element;
 

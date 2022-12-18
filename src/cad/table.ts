@@ -1,3 +1,4 @@
+/** utility to insert text where the caret is in a textarea */
 export function typeInTextarea(content: string, element: HTMLTextAreaElement) {
     const start = element.selectionStart;
     const end = element.selectionEnd;
@@ -13,6 +14,7 @@ export function typeInTextarea(content: string, element: HTMLTextAreaElement) {
     return element.focus();
 }
 
+// checks if the given input is a valid truth table
 export function validTable(string: string) {
     const heuristics: { row?: number; message: string }[] = [];
 
@@ -23,6 +25,7 @@ export function validTable(string: string) {
         .map((line) => line.trim())
         .filter(Boolean);
 
+    // first row defines how many inputs and outputs the following rows should have
     const definedParts = rows[0].split(":");
 
     const definedInputs = definedParts[0]?.length ?? 0;
@@ -59,6 +62,7 @@ export function validTable(string: string) {
     return heuristics;
 }
 
+/** converts a (hopefully valid) input into a truth table */
 export function parseTable(string: string) {
     return string
         .split("\n")

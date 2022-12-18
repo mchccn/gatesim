@@ -1,4 +1,5 @@
 export const attachStyles = async (styles: string[]) => {
+    // using ts extension because of webpack things
     const css = await Promise.all(styles.map((name) => import(`./${name}.ts`))).then((css) =>
         css.map((_) => _.default).join(""),
     );

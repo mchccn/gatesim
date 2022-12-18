@@ -1,6 +1,7 @@
 import { ACTIVATED_CSS_COLOR, TOAST_DURATION } from "../constants";
 import { ToastManager } from "../managers/ToastManager";
 
+/** asks user to input a file */
 export async function fileInput() {
     const input = Object.assign(document.createElement("input"), { type: "file" });
 
@@ -39,6 +40,7 @@ export async function fileInput() {
     return raw;
 }
 
+/** downloads the contents as a file */
 export async function downloadFile(contents: BlobPart[]) {
     Object.assign(document.createElement("a"), {
         href: URL.createObjectURL(

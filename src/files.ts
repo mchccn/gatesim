@@ -9,6 +9,20 @@ import { Output } from "./reified/Output";
 import type { Reified } from "./reified/Reified";
 import { chips } from "./reified/chips";
 
+export type SerializedComponents = SerializedDiagram["components"][number];
+
+export type SerializedInput = Extract<SerializedComponents, { type: "INPUT" }>;
+
+export type SerializedOutput = Extract<SerializedComponents, { type: "OUTPUT" }>;
+
+export type SerializedComponent = Extract<SerializedComponents, { type: "COMPONENT" }>;
+
+export type SerializedDisplay = Extract<SerializedComponents, { type: "DISPLAY" }>;
+
+export type SerializedWires = SerializedDiagram["wires"];
+
+export type SerializedWire = SerializedWires[number];
+
 export type SerializedDiagram = {
     settings: {
         ["DraggingManager.snapToGrid"]: boolean;

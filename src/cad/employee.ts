@@ -1,9 +1,9 @@
-import { saveDiagram } from "../files";
 import { reify } from "./algebra/reify";
 import { stringify } from "./algebra/stringify";
 import { substitute } from "./algebra/substitute";
 
 try {
+    // wait for boss to give us the table
     const table = await new Promise<boolean[][][]>((resolve, reject) => {
         self.onmessage = (e) => resolve(e.data);
 
@@ -37,11 +37,9 @@ try {
                 .join("\n"),
     });
 
-    const [components, wirings] = reify(stringify(table));
-
     self.postMessage({
         code: "FINISHED",
-        message: saveDiagram(components, wirings),
+        message: JSON.stringify(reify(table[0][0].length, stringify(table))),
     });
 } catch (e) {
     self.postMessage({ code: "ERROR", error: e });

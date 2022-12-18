@@ -90,6 +90,12 @@ control.addEventListener("click", async () => {
         })
             .work()
             .then((message) => {
+                const link = new URL(location.href);
+
+                link.search = "?inline=" + btoa(message);
+
+                console.log(link.href);
+
                 console.log(message);
             })
             .catch((e) => {
