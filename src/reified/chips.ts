@@ -30,6 +30,10 @@ export abstract class Chip<I extends number, O extends number> {
         chip: ExtendedChip<I, O>,
         n: N,
     ): ExtendedChip<N, O> {
+        if (chip.INPUTS < 1 || chip.OUTPUTS < 1) throw new TypeError("Invalid chip");
+
+        if (n === 1) return (chip instanceof NotGate ? NotGate : BufferGate) as ExtendedChip<N, O>;
+
         return class extends Chip<N, O> {
             static readonly NAME = chip.NAME;
             static readonly INPUTS = n;

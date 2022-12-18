@@ -38,7 +38,7 @@ export class Boss {
                     return reject(data.error);
                 }
 
-                if (data.code === "GENERATION") {
+                if (data.code === "MESSAGE") {
                     return this.#ongens.forEach((run) => run.call(undefined, data.message));
                 }
 

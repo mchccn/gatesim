@@ -11,12 +11,12 @@ try {
     });
 
     self.postMessage({
-        code: "GENERATION",
+        code: "MESSAGE",
         message: "Received:\n" + table.map((row) => row.map((col) => col.map(Number).join(" ")).join(" | ")).join("\n"),
     });
 
     self.postMessage({
-        code: "GENERATION",
+        code: "MESSAGE",
         message:
             "Expressions:\n" +
             stringify(table)
@@ -25,7 +25,7 @@ try {
     });
 
     self.postMessage({
-        code: "GENERATION",
+        code: "MESSAGE",
         message:
             "Tests:\n" +
             table
@@ -37,11 +37,26 @@ try {
                 .join("\n"),
     });
 
+    const generated = reify(table[0][0].length, table[0][1].length, stringify(table));
+
+    const link = new URL(location.href);
+
+    link.pathname = "";
+
+    link.search = "?inline=" + btoa(JSON.stringify(generated));
+
+    self.postMessage({
+        code: "MESSAGE",
+        message: "Link:\n" + link.href,
+    });
+
     self.postMessage({
         code: "FINISHED",
-        message: JSON.stringify(reify(table[0][0].length, stringify(table))),
+        message: "Generated:\n" + JSON.stringify(generated, undefined, 4),
     });
 } catch (e) {
+    console.log(e);
+
     self.postMessage({ code: "ERROR", error: e });
 }
 

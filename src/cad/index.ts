@@ -45,10 +45,14 @@ if (shouldLoadInline) {
 
 table.element.focus();
 
+// can't move this into keypress event
+// since we only want to display heuristics when the input has changed meaningfully
 table.element.addEventListener("input", () => {
     displayHeuristics(table, output);
 });
 
+// emptying the input doesn't trigger an input event
+// have to manually clear output here
 table.element.addEventListener("keypress", () => {
     if (!table.value.trim()) {
         output.element.innerHTML = "";
@@ -64,6 +68,8 @@ const control = table.querySelector<HTMLButtonElement>(".cad-control")!;
 let boss: Boss | undefined;
 
 function finished() {
+    table.element.disabled = false;
+
     if (boss) {
         boss.fired();
 
@@ -75,8 +81,6 @@ function finished() {
 
 control.addEventListener("click", async () => {
     if (control.textContent === "Stop") {
-        table.element.disabled = false;
-
         finished();
     } else {
         table.element.disabled = true;
@@ -85,23 +89,11 @@ control.addEventListener("click", async () => {
 
         boss = new Boss(parseTable(table.value));
 
-        boss.ongen((message) => {
+        const update = (message: unknown) => {
             output.element.textContent += (output.element.textContent ? "\n" : "") + message;
-        })
-            .work()
-            .then((message) => {
-                const link = new URL(location.href);
+        };
 
-                link.search = "?inline=" + btoa(message);
-
-                console.log(link.href);
-
-                console.log(message);
-            })
-            .catch((e) => {
-                output.element.textContent = e;
-            })
-            .finally(() => finished());
+        boss.ongen(update).work().then(update).catch(update).finally(finished);
 
         control.textContent = "Stop";
     }
