@@ -1,3 +1,5 @@
+import { saveDiagram } from "../files";
+import { reify } from "./algebra/reify";
 import { stringify } from "./algebra/stringify";
 import { substitute } from "./algebra/substitute";
 
@@ -33,6 +35,13 @@ try {
                         substitute(stringify(table), input).map(Number).join(" "),
                 )
                 .join("\n"),
+    });
+
+    const [components, wirings] = reify(stringify(table));
+
+    self.postMessage({
+        code: "FINISHED",
+        message: saveDiagram(components, wirings),
     });
 } catch (e) {
     self.postMessage({ code: "ERROR", error: e });

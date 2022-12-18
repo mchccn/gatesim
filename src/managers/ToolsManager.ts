@@ -3,7 +3,7 @@ import { IS_MAC_OS } from "../circular";
 import { LIGHT_GRAY_CSS_COLOR, TOAST_DURATION } from "../constants";
 import { saveDiagram } from "../files";
 import { Reified, html } from "../reified/Reified";
-import { MenuManagerActions } from "./MenuManager";
+import type { MenuManagerActions } from "./MenuManager";
 import { ModalManager } from "./ModalManager";
 import { TestingManager } from "./TestingManager";
 import { ToastManager } from "./ToastManager";

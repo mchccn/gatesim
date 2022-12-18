@@ -1,13 +1,13 @@
 import { LOCKED_FOR_TESTING, ORIGIN_POINT } from "../constants";
-import { MenuManagerAction } from "../managers/MenuManager";
+import type { MenuManagerAction } from "../managers/MenuManager";
 import { ModalManager } from "../managers/ModalManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { SelectionManager } from "../managers/SelectionManager";
 import { TestingManager } from "../managers/TestingManager";
-import { chips } from "../reified/chips";
 import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";
 import { Reified } from "../reified/Reified";
+import { chips } from "../reified/chips";
 
 export const insert = {
     "insert-component": {

@@ -1,4 +1,4 @@
-import { MenuManagerActions } from "../managers/MenuManager";
+import type { MenuManagerActions } from "../managers/MenuManager";
 import { debug } from "./debug";
 import { insert } from "./insert";
 import { io } from "./io";

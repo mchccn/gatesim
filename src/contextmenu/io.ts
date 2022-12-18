@@ -1,5 +1,5 @@
 import { INPUT_COMPONENT_CSS_SIZE, LOCKED_FOR_TESTING, OUTPUT_COMPONENT_CSS_SIZE } from "../constants";
-import { MenuManagerAction } from "../managers/MenuManager";
+import type { MenuManagerAction } from "../managers/MenuManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { SelectionManager } from "../managers/SelectionManager";
 import { TestingManager } from "../managers/TestingManager";

@@ -1,6 +1,6 @@
 import { ACTIVATED_CSS_COLOR, IN_DEBUG_MODE, LIGHT_GRAY_CSS_COLOR, TOAST_DURATION } from "../constants";
 import { CanvasManager } from "../managers/CanvasManager";
-import { MenuManagerActions } from "../managers/MenuManager";
+import type { MenuManagerActions } from "../managers/MenuManager";
 import { ModalManager } from "../managers/ModalManager";
 import { StorageManager } from "../managers/StorageManager";
 import { ToastManager } from "../managers/ToastManager";

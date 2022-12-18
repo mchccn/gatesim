@@ -1,6 +1,6 @@
 import { html } from "../reified/Reified";
-import { CADOutput } from "./elements/CADOutput";
-import { TruthTable } from "./elements/TruthTable";
+import type { CADOutput } from "./elements/CADOutput";
+import type { TruthTable } from "./elements/TruthTable";
 import { validTable } from "./table";
 
 export function displayHeuristics(table: TruthTable, output: CADOutput) {

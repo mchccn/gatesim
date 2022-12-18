@@ -6,7 +6,7 @@ import { Component } from "./reified/Component";
 import { Display } from "./reified/Display";
 import { Input } from "./reified/Input";
 import { Output } from "./reified/Output";
-import { Reified } from "./reified/Reified";
+import type { Reified } from "./reified/Reified";
 import { chips } from "./reified/chips";
 
 export type SerializedDiagram = {

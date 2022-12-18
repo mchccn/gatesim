@@ -4,9 +4,9 @@ import { html } from "../reified/Reified";
 import { attachStyles } from "../styling/attacher";
 import { Boss } from "./boss";
 import "./elements/CADOutput";
-import { CADOutput } from "./elements/CADOutput";
+import type { CADOutput } from "./elements/CADOutput";
 import "./elements/TruthTable";
-import { TruthTable } from "./elements/TruthTable";
+import type { TruthTable } from "./elements/TruthTable";
 import { displayHeuristics } from "./output";
 import { parseTable } from "./table";
 
