@@ -33,7 +33,8 @@ export default css`
     }
 
     .modal-confirm,
-    .modal-alert {
+    .modal-alert,
+    .modal-prompt {
         min-width: 400px;
         min-height: 80px;
 
@@ -51,7 +52,8 @@ export default css`
     }
 
     .modal-confirm > .button-container,
-    .modal-alert > .button-container {
+    .modal-alert > .button-container,
+    .modal-prompt > .button-container {
         display: flex;
         flex-direction: row-reverse;
         justify-content: flex-start;

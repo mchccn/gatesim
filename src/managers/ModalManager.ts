@@ -9,6 +9,8 @@ export class ModalManager {
     }
 
     static #onModalMount() {
+        SandboxManager.killMenu();
+
         if (this.container.childElementCount <= 0) {
             this.container.classList.remove("modal-inactive");
 
@@ -193,7 +195,7 @@ export class ModalManager {
         this.#onModalMount();
 
         const prompt = html`
-            <div class="modal modal-confirm">
+            <div class="modal modal-prompt">
                 <p class="modal-message"></p>
                 <input class="modal-input" type="text" />
                 <div class="button-container">

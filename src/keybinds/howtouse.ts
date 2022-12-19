@@ -18,6 +18,11 @@ export const howtouse = {
 
                 <p>Right click on the blank screen to get started. Press '/' to bring up a cheatsheet for keybinds.</p>
 
+                <p>
+                    If there are performance problems, you may want to increase gate delay, or disable fancy wires in
+                    the settings.
+                </p>
+
                 <details>
                     <summary>Examples</summary>
                     <ul>

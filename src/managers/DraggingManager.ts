@@ -72,7 +72,7 @@ export class DraggingManager {
 
             document.body.style.backgroundSize = GRID_SIZE + "px " + GRID_SIZE + "px";
 
-            if (DarkmodeManager.enabled) {
+            if (DarkmodeManager.darkmodeEnabled) {
                 document.body.style.backgroundImage = `linear-gradient(to right, ${EVEN_DARKER_GRAY_CSS_COLOR} 1px, transparent 1px), linear-gradient(to bottom, ${EVEN_DARKER_GRAY_CSS_COLOR} 1px, transparent 1px)`;
             } else {
                 document.body.style.backgroundImage = `linear-gradient(to right, ${EVEN_LIGHTER_GRAY_CSS_COLOR} 1px, transparent 1px), linear-gradient(to bottom, ${EVEN_LIGHTER_GRAY_CSS_COLOR} 1px, transparent 1px)`;

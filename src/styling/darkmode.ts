@@ -137,4 +137,44 @@ export default css`
     body.darkmode .quickpick-item {
         color: ${KINDA_LIGHT_GRAY_CSS_COLOR};
     }
+
+    body.darkmode.darkmode-modals .modal {
+        color: ${LIGHT_GRAY_CSS_COLOR};
+
+        background-color: ${EVEN_DARKER_GRAY_CSS_COLOR};
+
+        border: 1px solid ${DARKER_GRAY_CSS_COLOR};
+
+        box-shadow: 1px 1px 4px ${EVEN_DARKER_GRAY_CSS_COLOR};
+    }
+
+    body.darkmode.darkmode-modals .modal-cancel {
+        background: transparent;
+
+        color: ${LIGHT_GRAY_CSS_COLOR};
+
+        border: 1px solid ${DARK_GRAY_CSS_COLOR};
+    }
+
+    body.darkmode.darkmode-modals .modal-cancel:hover {
+        color: ${LIGHTER_GRAY_CSS_COLOR};
+
+        border: 1px solid ${ONLY_A_HINT_OF_DARK_GRAY_CSS_COLOR};
+    }
+
+    body.darkmode.darkmode-modals .modal-ok {
+        background-color: #0066ee;
+
+        outline: 1px solid #0066ee;
+    }
+
+    body.darkmode.darkmode-modals .modal-ok:hover {
+        background-color: #0077ff;
+
+        outline: 1px solid #0077ff;
+    }
+
+    .modal-input {
+        border: 1px solid ${DARK_GRAY_CSS_COLOR};
+    }
 `;

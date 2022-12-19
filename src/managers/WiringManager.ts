@@ -192,9 +192,14 @@ export class WiringManager {
     }
 
     static #FANCY_WIRES = true;
+    static #FANCIER_WIRES = true;
 
     static get FANCY_WIRES() {
         return this.#FANCY_WIRES;
+    }
+
+    static get FANCIER_WIRES() {
+        return this.#FANCIER_WIRES;
     }
 
     static set FANCY_WIRES(v: boolean) {
@@ -203,7 +208,14 @@ export class WiringManager {
         StorageManager.set("settings.fancyWires", this.#FANCY_WIRES);
     }
 
+    static set FANCIER_WIRES(v: boolean) {
+        this.#FANCIER_WIRES = v;
+
+        StorageManager.set("settings.fancierWires", this.#FANCIER_WIRES);
+    }
+
     static {
         this.#FANCY_WIRES = StorageManager.get("settings.fancyWires") ?? this.#FANCY_WIRES;
+        this.#FANCIER_WIRES = StorageManager.get("settings.fancierWires") ?? this.#FANCIER_WIRES;
     }
 }

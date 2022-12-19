@@ -1,23 +1,17 @@
-[in order of most interested in to god i don't want to ever do this]
-
--   setting for darkmode modals
-
 -   serialized diagram to circuit diagram drawing
-
--   serialized diagram patcher so old files don't become useless
 
 -   when you edit a component's inputs/outputs count, it should not delete all the wires
 
--   fancier wires
-
--   ability to label inputs/outputs
+-   serialized diagram patcher so old files don't become useless
 
 -   rust wasm instead of web workers
 
--   better ui/ux
-
 -   add more examples/exercises
 
+-   fancier wires
+
 -   custom chips
+
+    -   ability to label inputs/outputs
 
 -   panning/zooming

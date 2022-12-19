@@ -18,7 +18,7 @@ export const insert = {
 
             const name = typeof n === "string" ? n : await ModalManager.prompt("Enter the component's name:");
 
-            if (typeof name !== "string") return;
+            if (typeof name !== "string" || !name.trim()) return;
 
             const chip = chips.get(name.toUpperCase());
 

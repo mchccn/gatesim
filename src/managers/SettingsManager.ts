@@ -30,37 +30,64 @@ export class SettingsManager {
 
                 <p>Settings are saved automatically.</p>
 
-                <label class="settings-control" for="darkmode">
-                    <input name="darkmode" type="checkbox" ${DarkmodeManager.enabled ? "checked" : ""} />
-                    dark mode
-                </label>
+                <div>
+                    <label class="settings-control" for="darkmode">
+                        <input name="darkmode" type="checkbox" ${DarkmodeManager.darkmodeEnabled ? "checked" : ""} />
+                        dark mode
+                    </label>
+
+                    <label class="settings-control" for="darkmodeModals">
+                        <input
+                            name="darkmodeModals"
+                            type="checkbox"
+                            ${DarkmodeManager.darkmodeModalsEnabled ? "checked" : ""}
+                        />
+                        dark mode modals
+                    </label>
+                </div>
 
                 <label class="settings-control" for="snapToGrid">
                     <input name="snapToGrid" type="checkbox" ${DraggingManager.snapToGrid ? "checked" : ""} />
                     snap to grid
                 </label>
 
-                <label class="settings-control" for="fancyWires">
-                    <input name="fancyWires" type="checkbox" ${WiringManager.FANCY_WIRES ? "checked" : ""} />
-                    fancy wires
-                </label>
+                <div>
+                    <label class="settings-control" for="fancyWires">
+                        <input name="fancyWires" type="checkbox" ${WiringManager.FANCY_WIRES ? "checked" : ""} />
+                        fancy wires
+                    </label>
 
-                <label class="settings-control" for="gateDelay">
-                    <input name="gateDelay" type="range" min="0" max="250" step="25" value="${Reified.GATE_DELAY}" />
-                    gate delay (0-250/25)
-                </label>
+                    <label class="settings-control" for="fancierWires">
+                        <input name="fancierWires" type="checkbox" ${WiringManager.FANCIER_WIRES ? "checked" : ""} />
+                        fancier wires
+                    </label>
+                </div>
 
-                <label class="settings-control" for="gateDelayVariation">
-                    <input
-                        name="gateDelayVariation"
-                        type="range"
-                        min="0"
-                        max="100"
-                        step="5"
-                        value="${Reified.GATE_DELAY_VARIATION}"
-                    />
-                    gate delay variation (0-100/5)
-                </label>
+                <div>
+                    <label class="settings-control" for="gateDelay">
+                        <input
+                            name="gateDelay"
+                            type="range"
+                            min="0"
+                            max="250"
+                            step="25"
+                            value="${Reified.GATE_DELAY}"
+                        />
+                        gate delay (0-250/25)
+                    </label>
+
+                    <label class="settings-control" for="gateDelayVariation">
+                        <input
+                            name="gateDelayVariation"
+                            type="range"
+                            min="0"
+                            max="100"
+                            step="5"
+                            value="${Reified.GATE_DELAY_VARIATION}"
+                        />
+                        gate delay variation (0-100/5)
+                    </label>
+                </div>
 
                 <button style="width: 60px;">reset</button>
             </div>
@@ -69,7 +96,8 @@ export class SettingsManager {
         let reset = false;
 
         form.querySelector("button")!.addEventListener("click", () => {
-            DarkmodeManager.enabled = false;
+            DarkmodeManager.darkmodeEnabled = false;
+            DarkmodeManager.darkmodeModalsEnabled = false;
             DraggingManager.snapToGrid = false;
             Reified.GATE_DELAY = 100;
             Reified.GATE_DELAY_VARIATION = 25;
@@ -84,7 +112,9 @@ export class SettingsManager {
         await closed;
 
         if (!reset) {
-            DarkmodeManager.enabled = form.querySelector<HTMLInputElement>("input[name=darkmode]")!.checked;
+            DarkmodeManager.darkmodeEnabled = form.querySelector<HTMLInputElement>("input[name=darkmode]")!.checked;
+            DarkmodeManager.darkmodeModalsEnabled =
+                form.querySelector<HTMLInputElement>("input[name=darkmodeModals]")!.checked;
             DraggingManager.snapToGrid = form.querySelector<HTMLInputElement>("input[name=snapToGrid]")!.checked;
             WiringManager.FANCY_WIRES = form.querySelector<HTMLInputElement>("input[name=fancyWires]")!.checked;
             Reified.GATE_DELAY = form.querySelector<HTMLInputElement>("input[name=gateDelay]")!.valueAsNumber;

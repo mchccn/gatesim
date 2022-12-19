@@ -36,9 +36,10 @@ export const SCUFFED_UUID = () =>
 
 export const ROUND_TO_NEAREST = (x: number, n: number) => Math.round(x / n) * n;
 
-export const GET_ACTIVATED_COLOR = () => (DarkmodeManager.enabled ? DARK_ACTIVATED_CSS_COLOR : ACTIVATED_CSS_COLOR);
+export const GET_ACTIVATED_COLOR = () =>
+    DarkmodeManager.darkmodeEnabled ? DARK_ACTIVATED_CSS_COLOR : ACTIVATED_CSS_COLOR;
 export const GET_GRAY_COLOR = () =>
-    DarkmodeManager.enabled ? ONLY_A_HINT_OF_DARK_GRAY_CSS_COLOR : LIGHT_GRAY_CSS_COLOR;
+    DarkmodeManager.darkmodeEnabled ? ONLY_A_HINT_OF_DARK_GRAY_CSS_COLOR : LIGHT_GRAY_CSS_COLOR;
 
 export const GET_BIN_PERMS = (n: number) =>
     Array.from({ length: Math.pow(2, n) }, (_, y) => Array.from({ length: n }, (_, x) => !!((y >> x) & 1)));
