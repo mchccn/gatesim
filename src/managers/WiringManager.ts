@@ -54,6 +54,7 @@ export class Wiring {
 
     constructor(readonly from: Element, readonly to: Element) {
         this.#observer = new MutationObserver(() => {
+            // make sure this wire is being tracked still before updating the elements
             if (!WiringManager.wires.has(this)) {
                 if (![...WiringManager.wires].some((wire) => wire.to === this.to)) to.classList.remove("activated");
 

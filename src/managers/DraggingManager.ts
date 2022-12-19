@@ -93,7 +93,7 @@ export class DraggingManager {
     static watch(element: HTMLElement, target = element) {
         element.dataset.watched = "true";
 
-        const mousedown = (e: MouseEvent) => {
+        const mousedown = (e: { clientX: number; clientY: number }) => {
             this.#dragged = element;
 
             this.#dragged.dataset.dragged = "true";
@@ -124,6 +124,7 @@ export class DraggingManager {
             } else {
                 this.#positions = [...SelectionManager.selected].map((target) => target.pos);
 
+                // store most top left element as an anchor for the others
                 const topleft = [...SelectionManager.selected].sort((a, b) => {
                     const ax = parseFloat(a.element.style.left);
                     const ay = parseFloat(a.element.style.top);
@@ -145,49 +146,7 @@ export class DraggingManager {
             this.#original = { x: rect.left, y: rect.top };
         };
 
-        const touchstart = (e: TouchEvent) => {
-            const [touch] = e.touches;
-
-            this.#dragged = element;
-
-            this.#dragged.dataset.dragged = "true";
-
-            this.#dragged.style.cursor = "grabbing";
-
-            const rect = this.#dragged.getBoundingClientRect();
-
-            this.#mouse.x = touch.clientX;
-            this.#mouse.y = touch.clientY;
-
-            this.#mouse.ix = touch.clientX;
-            this.#mouse.iy = touch.clientY;
-
-            if (SelectionManager.selected.size <= 1) {
-                this.#mouse.ox = touch.clientX - rect.left;
-                this.#mouse.oy = touch.clientY - rect.top;
-            } else {
-                this.#positions = [...SelectionManager.selected].map((target) => target.pos);
-
-                const topleft = [...SelectionManager.selected].sort((a, b) => {
-                    const ax = parseFloat(a.element.style.left);
-                    const ay = parseFloat(a.element.style.top);
-                    const bx = parseFloat(b.element.style.left);
-                    const by = parseFloat(b.element.style.top);
-                    const ad = Math.sqrt(ax * ax + ay * ay);
-                    const bd = Math.sqrt(bx * bx + by * by);
-                    return ad - bd;
-                })[0].element;
-
-                const bounds = topleft.getBoundingClientRect();
-
-                this.#mouse.ox = touch.clientX - bounds.x;
-                this.#mouse.oy = touch.clientY - bounds.y;
-
-                this.#topleft = topleft;
-            }
-
-            this.#original = { x: rect.left, y: rect.top };
-        };
+        const touchstart = (e: TouchEvent) => mousedown(e.touches[0]);
 
         target.addEventListener("mousedown", mousedown, { capture: true });
         target.addEventListener("touchstart", touchstart, { capture: true });
@@ -274,7 +233,7 @@ export class DraggingManager {
         document.body.removeEventListener("touchend", this.#touchend);
     }
 
-    static readonly #mousemove = (e: MouseEvent) => {
+    static readonly #mousemove = (e: { clientX: number; clientY: number }) => {
         this.#mouse.x = e.clientX;
         this.#mouse.y = e.clientY;
 
@@ -325,12 +284,14 @@ export class DraggingManager {
         }
     };
 
-    static readonly #mousedown = (e: MouseEvent) => {
-        this.#mouse.x = e.clientX;
-        this.#mouse.y = e.clientY;
+    static readonly #mousedown = (e: MouseEvent | TouchEvent) => {
+        const m = e instanceof MouseEvent ? e : e.touches[0];
 
-        this.#mouse.ix = e.clientX;
-        this.#mouse.iy = e.clientY;
+        this.#mouse.x = m.clientX;
+        this.#mouse.y = m.clientY;
+
+        this.#mouse.ix = m.clientX;
+        this.#mouse.iy = m.clientY;
 
         const target = e.target as Element;
 
@@ -342,22 +303,29 @@ export class DraggingManager {
             target.closest("div.contextmenu"),
         ].find((element) => element !== null)!;
 
-        if (!isOnInvalidTarget && e.button === 0) {
-            if (KeybindsManager.isKeyDown("KeyA") && KeybindsManager.isKeyDown("KeyS")) {
-            } else if (KeybindsManager.isKeyDown("KeyA")) {
-                quickpickGates(e);
-            } else if (KeybindsManager.isKeyDown("KeyS")) {
-                quickpickComponents(e);
-            } else {
-                this.#downpos.x = e.clientX;
-                this.#downpos.y = e.clientY;
+        if (e instanceof MouseEvent) {
+            if (!isOnInvalidTarget && e.button === 0) {
+                if (KeybindsManager.isKeyDown("KeyA") && KeybindsManager.isKeyDown("KeyS")) {
+                } else if (KeybindsManager.isKeyDown("KeyA")) {
+                    quickpickGates(e);
+                } else if (KeybindsManager.isKeyDown("KeyS")) {
+                    quickpickComponents(e);
+                } else {
+                    this.#downpos.x = m.clientX;
+                    this.#downpos.y = m.clientY;
+                }
+            }
+        } else {
+            if (!isOnInvalidTarget) {
+                this.#downpos.x = m.clientX;
+                this.#downpos.y = m.clientY;
             }
         }
 
         this.#mouse.down = true;
     };
 
-    static readonly #mouseup = (e: MouseEvent) => {
+    static readonly #mouseup = (e: { clientX: number; clientY: number }) => {
         this.#mouse.x = e.clientX;
         this.#mouse.y = e.clientY;
 
@@ -473,203 +441,11 @@ export class DraggingManager {
         this.#positions = undefined;
     };
 
-    static readonly #touchmove = (e: TouchEvent) => {
-        const [touch] = e.touches;
+    static readonly #touchmove = (e: TouchEvent) => this.#mousemove(e.touches[0]);
 
-        this.#mouse.x = touch.clientX;
-        this.#mouse.y = touch.clientY;
+    static readonly #touchstart = (e: TouchEvent) => this.#mousedown(e);
 
-        if (this.#dragged) {
-            this.#dragged.style.transformOrigin = computeTransformOrigin(this.#dragged);
-
-            if (DraggingManager.snapToGrid) {
-                if (SelectionManager.selected.size <= 1) {
-                    this.#dragged.style.left =
-                        Math.floor((this.#mouse.x - this.#mouse.ox) / GRID_SIZE) * GRID_SIZE + "px";
-                    this.#dragged.style.top =
-                        Math.floor((this.#mouse.y - this.#mouse.oy) / GRID_SIZE) * GRID_SIZE + "px";
-                } else if (this.#topleft) {
-                    const topleft = this.#topleft.getBoundingClientRect();
-
-                    SelectionManager.selected.forEach((component) => {
-                        const offset = component.element.getBoundingClientRect();
-
-                        component.move({
-                            x:
-                                Math.floor((this.#mouse.x - this.#mouse.ox) / GRID_SIZE) * GRID_SIZE +
-                                offset.left -
-                                topleft.left,
-                            y:
-                                Math.floor((this.#mouse.y - this.#mouse.oy) / GRID_SIZE) * GRID_SIZE +
-                                offset.top -
-                                topleft.top,
-                        });
-                    });
-                }
-            } else {
-                if (SelectionManager.selected.size <= 1) {
-                    this.#dragged.style.left = this.#mouse.x - this.#mouse.ox + "px";
-                    this.#dragged.style.top = this.#mouse.y - this.#mouse.oy + "px";
-                } else if (this.#topleft) {
-                    const topleft = this.#topleft.getBoundingClientRect();
-
-                    SelectionManager.selected.forEach((component) => {
-                        const offset = component.element.getBoundingClientRect();
-
-                        component.move({
-                            x: this.#mouse.x - this.#mouse.ox + offset.left - topleft.left,
-                            y: this.#mouse.y - this.#mouse.oy + offset.top - topleft.top,
-                        });
-                    });
-                }
-            }
-        }
-    };
-
-    static readonly #touchstart = (e: TouchEvent) => {
-        const [touch] = e.touches;
-
-        this.#mouse.x = touch.clientX;
-        this.#mouse.y = touch.clientY;
-
-        this.#mouse.ix = touch.clientX;
-        this.#mouse.iy = touch.clientY;
-
-        const target = e.target as Element;
-
-        const isOnInvalidTarget = [
-            target.closest("button.board-input"),
-            target.closest("button.board-output"),
-            target.closest("div.component"),
-            target.closest("div.display"),
-            target.closest("div.contextmenu"),
-        ].find((element) => element !== null)!;
-
-        if (!isOnInvalidTarget) {
-            this.#downpos.x = touch.clientX;
-            this.#downpos.y = touch.clientY;
-        }
-
-        this.#mouse.down = true;
-    };
-
-    static readonly #touchend = (e: TouchEvent) => {
-        const [touch] = e.changedTouches;
-
-        this.#mouse.x = touch.clientX;
-        this.#mouse.y = touch.clientY;
-
-        if (this.#dragged) {
-            document.querySelectorAll<HTMLElement>('[data-dragged="true"]').forEach((e) => {
-                delete e.dataset.dragged;
-
-                e.style.cursor = "";
-            });
-
-            if (SelectionManager.selected.size <= 1) {
-                const target = this.#dragged;
-                const mouse = this.#mouse;
-                const original = this.#original!;
-                const size = GRID_SIZE;
-
-                if (mouse.x !== mouse.ix || mouse.y !== mouse.iy)
-                    if (DraggingManager.snapToGrid)
-                        SandboxManager.pushHistory(
-                            () => {
-                                target.style.transformOrigin = computeTransformOrigin(target);
-
-                                target.style.left = Math.floor((mouse.x - mouse.ox - 1) / size) * size + "px";
-                                target.style.top = Math.floor((mouse.y - mouse.oy - 1) / size) * size + "px";
-                            },
-                            () => {
-                                target.style.transformOrigin = computeTransformOrigin(target);
-
-                                target.style.left = Math.floor((original.x - 1) / size) * size + "px";
-                                target.style.top = Math.floor((original.y - 1) / size) * size + "px";
-                            },
-                        );
-                    else
-                        SandboxManager.pushHistory(
-                            () => {
-                                target.style.transformOrigin = computeTransformOrigin(target);
-
-                                target.style.left = mouse.x - mouse.ox - 1 + "px";
-                                target.style.top = mouse.y - mouse.oy - 1 + "px";
-                            },
-                            () => {
-                                target.style.transformOrigin = computeTransformOrigin(target);
-
-                                target.style.left = original.x - 1 + "px";
-                                target.style.top = original.y - 1 + "px";
-                            },
-                        );
-            } else if (this.#topleft) {
-                const mouse = this.#mouse;
-                const targets = [...SelectionManager.selected];
-                const positions = this.#positions!;
-                const topleft = this.#topleft.getBoundingClientRect();
-                const size = GRID_SIZE;
-
-                if (mouse.x !== mouse.ix || mouse.y !== mouse.iy)
-                    if (DraggingManager.snapToGrid)
-                        SandboxManager.pushHistory(
-                            () => {
-                                targets.forEach((component) => {
-                                    const offset = component.element.getBoundingClientRect();
-
-                                    component.move({
-                                        x: Math.floor((mouse.x - mouse.ox) / size) * size + offset.left - topleft.left,
-                                        y: Math.floor((mouse.y - mouse.oy) / size) * size + offset.top - topleft.top,
-                                    });
-                                });
-                            },
-                            () => {
-                                targets.forEach((component, i) => {
-                                    component.move(positions[i]);
-                                });
-                            },
-                        );
-                    else
-                        SandboxManager.pushHistory(
-                            () => {
-                                targets.forEach((component) => {
-                                    const offset = component.element.getBoundingClientRect();
-
-                                    component.move({
-                                        x: mouse.x - mouse.ox + offset.left - topleft.left,
-                                        y: mouse.y - mouse.oy + offset.top - topleft.top,
-                                    });
-                                });
-                            },
-                            () => {
-                                targets.forEach((component, i) => {
-                                    component.move(positions[i]);
-                                });
-                            },
-                        );
-            }
-        }
-
-        if (
-            this.#downpos.x !== -1 &&
-            this.#downpos.y !== -1 &&
-            MouseManager.mouse.x !== -1 &&
-            MouseManager.mouse.y !== -1
-        )
-            SelectionManager.selectAllIn(DraggingManager.#downpos, MouseManager.mouse);
-
-        this.#mouse = { x: -1, y: -1, ox: -1, oy: -1, ix: -1, iy: -1, down: false };
-
-        this.#downpos = { x: -1, y: -1 };
-
-        this.#topleft = undefined;
-
-        this.#dragged = undefined;
-
-        this.#original = undefined;
-
-        this.#positions = undefined;
-    };
+    static readonly #touchend = (e: TouchEvent) => this.#mouseup(e.touches[0]);
 
     static get downpos() {
         return { ...this.#downpos };

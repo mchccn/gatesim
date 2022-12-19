@@ -257,6 +257,7 @@ export function fromFile(
     }
 }
 
+// giant mess to make sure the provided data matches the expected type
 function validate(data: unknown): asserts data is SerializedDiagram {
     if (!data || typeof data !== "object") throw new Error("Data is not an object.");
 

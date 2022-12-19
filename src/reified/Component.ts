@@ -98,6 +98,7 @@ export class Component<I extends number, O extends number> extends Reified {
 
         this.element.style.transform = `rotateZ(${v}deg)`;
 
+        // rotate name rightside up if it's upside down
         if (v === 180) {
             this.name.style.transform = `rotateZ(${v}deg)`;
         } else {

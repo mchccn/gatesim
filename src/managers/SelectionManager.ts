@@ -26,7 +26,7 @@ export class SelectionManager {
             target.closest("button.board-output"),
             target.closest("div.component"),
             target.closest("div.display"),
-        ].find((element) => element !== null)!;
+        ].find((element) => element !== null);
 
         const reified = [...Reified.active].find((component) => component.element === element);
 

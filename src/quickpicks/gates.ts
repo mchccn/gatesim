@@ -2,9 +2,9 @@ import { ORIGIN_POINT } from "../constants";
 import { QuickPickManager } from "../managers/QuickPickManager";
 import { SandboxManager } from "../managers/SandboxManager";
 import { SelectionManager } from "../managers/SelectionManager";
-import { gates } from "../reified/chips";
 import { Component } from "../reified/Component";
 import { Reified } from "../reified/Reified";
+import { gates } from "../reified/chips";
 
 export const quickpickGates = (e: MouseEvent) =>
     QuickPickManager.activate(

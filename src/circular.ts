@@ -1,3 +1,5 @@
+// this file only exists to break circular dependencies
+
 export const IS_MAC_OS = [navigator.userAgentData?.platform, navigator.platform].some(
     (platform) => platform?.toLowerCase().includes("mac") ?? false,
 );

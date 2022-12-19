@@ -10,6 +10,7 @@ export const attachStyles = async (styles: string[]) => {
 
     document.head.appendChild(style);
 
+    // return a promise that resolves when the styles have been loaded
     return new Promise<void>((resolve, reject) => {
         style.addEventListener("load", () => resolve(), { once: true });
 

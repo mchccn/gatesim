@@ -63,4 +63,4 @@ export const TOAST_DURATION = 2500;
 export const GRID_SIZE = 15;
 export const QUICKPICK_SIZE = 75;
 
-export const IS_CAD_APP = new URL(location.href).searchParams.has("cad");
+export const APP_NAME = (new URL(location.href).searchParams.get("app") ?? "sim").toLowerCase();

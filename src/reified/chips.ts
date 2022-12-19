@@ -30,8 +30,11 @@ export abstract class Chip<I extends number, O extends number> {
         chip: ExtendedChip<I, O>,
         n: N,
     ): ExtendedChip<N, O> {
+        // gates should have at least one input and one output
         if (chip.INPUTS < 1 || chip.OUTPUTS < 1) throw new TypeError("Invalid chip");
 
+        // if there is only one input then it's just a buffer gate
+        // special case if chip is a not gate, then it's just a not gate
         if (n === 1) return (chip instanceof NotGate ? NotGate : BufferGate) as ExtendedChip<N, O>;
 
         return class extends Chip<N, O> {
@@ -209,6 +212,8 @@ export class FullAdderGate extends Chip<3, 2> {
     }
 
     output([a, b, c]: [boolean, boolean, boolean]): [boolean, boolean] {
+        // (a xor b) xor c
+        // ((a xor b) and c) or (a and b)
         return [!!(+!!(+a ^ +b) ^ +c), (!!(+a ^ +b) && c) || (a && b)];
     }
 }

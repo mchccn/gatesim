@@ -43,7 +43,7 @@ export class ToolsManager {
                 callback: () => {
                     const url = new URL(location.href);
 
-                    url.search = "?cad";
+                    url.search = "?app=cad";
 
                     location.href = url.href;
                 },
@@ -80,7 +80,7 @@ export class ToolsManager {
                         pre.children[2].addEventListener("click", () => {
                             const url = new URL(location.href);
 
-                            url.search = `?cad&inline=${btoa(
+                            url.search = `?app=cad&inline=${btoa(
                                 table.map((row) => row.map((io) => io.map((v) => +v).join("")).join(":")).join("\n"),
                             )}`;
 
