@@ -2,7 +2,7 @@ import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, ParserPass, UnaryExpr, Var
 import { Token, TokenType } from "../token";
 
 // sole goal is to identify constant expressions and evaluate them beforehand
-export class ConstantsReducerPass implements ParserPass {
+export class ConstantExpressionEvaluationPass implements ParserPass {
     pass(expr: Expr) {
         return expr.accept(this);
     }
@@ -92,6 +92,8 @@ export class ConstantsReducerPass implements ParserPass {
     }
 
     visitUnaryExpr(expr: UnaryExpr): Expr {
+        expr.right = expr.right.accept(this);
+
         if (expr.operator.type === TokenType.Not && expr.right instanceof LiteralExpr)
             return new LiteralExpr(!expr.right.value);
 

@@ -1,3 +1,4 @@
+import * as circular from "./circular";
 import * as constants from "./constants";
 import { ACTIVATED_CSS_COLOR, TOAST_DURATION } from "./constants";
 import { menu } from "./contextmenu/menu";
@@ -8,7 +9,7 @@ import { ToastManager } from "./managers/ToastManager";
 import { premade } from "./premade";
 import { attachStyles } from "./styling/attacher";
 
-Object.assign(globalThis, constants);
+Object.assign(globalThis, constants, circular);
 
 await attachStyles([
     "style",

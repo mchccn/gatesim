@@ -4,6 +4,7 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
+        "node:watch": "tsc -w -p tsconfig.node.json",
         "watch": "tsc -w",
         "build": "webpack",
         "dev": "webpack --watch",

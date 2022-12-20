@@ -14,7 +14,7 @@ export class Parser {
         return this.#or();
     }
 
-    #or() {
+    #or(): Expr {
         let expr = this.#and();
 
         while (this.#match(TokenType.Or, TokenType.Nor)) {
@@ -28,7 +28,7 @@ export class Parser {
         return expr;
     }
 
-    #and() {
+    #and(): Expr {
         let expr = this.#xor();
 
         while (this.#match(TokenType.And, TokenType.Nand)) {
@@ -42,12 +42,14 @@ export class Parser {
         return expr;
     }
 
-    #xor() {
+    #xor(): Expr {
         let expr = this.#not();
 
         while (this.#match(TokenType.Xor, TokenType.Xnor)) {
             const operator = this.#previous();
+
             const right = this.#not();
+
             expr = new BinaryExpr(expr, operator, right);
         }
 
@@ -66,7 +68,7 @@ export class Parser {
         return this.#primary();
     }
 
-    #primary() {
+    #primary(): Expr {
         if (this.#match(TokenType.False)) return new LiteralExpr(false);
         if (this.#match(TokenType.True)) return new LiteralExpr(true);
 
@@ -118,11 +120,13 @@ export class Parser {
 
     #check(type: TokenType) {
         if (this.#isAtEnd()) return false;
-        return this.#peek().type == type;
+
+        return this.#peek().type === type;
     }
 
     #advance() {
         if (!this.#isAtEnd()) this.#current++;
+
         return this.#previous();
     }
 

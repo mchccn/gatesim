@@ -78,21 +78,21 @@ export class Scanner {
             ["\v", () => this.#col++],
             ["\f", () => this.#col++],
             ["\n", () => (this.#line++, (this.#col = 1))],
-            ["¬", () => this.#addToken(TokenType.Not)],
-            ["+", () => this.#addToken(TokenType.Or)],
-            ["|", () => this.#addToken(TokenType.Or)],
-            ["∨", () => this.#addToken(TokenType.Or)],
-            ["∥", () => this.#addToken(TokenType.Or)],
-            ["⊽", () => this.#addToken(TokenType.Nor)],
-            ["*", () => this.#addToken(TokenType.And)],
-            ["&", () => this.#addToken(TokenType.And)],
-            ["∧", () => this.#addToken(TokenType.And)],
-            ["⊕", () => this.#addToken(TokenType.Xor)],
-            ["⊻", () => this.#addToken(TokenType.Xor)],
-            ["⊙", () => this.#addToken(TokenType.Xnor)],
-            ["⊼", () => this.#addToken(TokenType.Nand)],
-            ["1", () => this.#implicitMultiply(TokenType.True)],
-            ["0", () => this.#implicitMultiply(TokenType.False)],
+            ["¬", () => this.#addToken(TokenType.Not, "not", true)],
+            ["+", () => this.#addToken(TokenType.Or, "or", true)],
+            ["|", () => this.#addToken(TokenType.Or, "or", true)],
+            ["∨", () => this.#addToken(TokenType.Or, "or", true)],
+            ["∥", () => this.#addToken(TokenType.Or, "or", true)],
+            ["⊽", () => this.#addToken(TokenType.Nor, "nor", true)],
+            ["*", () => this.#addToken(TokenType.And, "and", true)],
+            ["&", () => this.#addToken(TokenType.And, "and", true)],
+            ["∧", () => this.#addToken(TokenType.And, "and", true)],
+            ["⊕", () => this.#addToken(TokenType.Xor, "xor", true)],
+            ["⊻", () => this.#addToken(TokenType.Xor, "xor", true)],
+            ["⊙", () => this.#addToken(TokenType.Xnor, "xnor", true)],
+            ["⊼", () => this.#addToken(TokenType.Nand, "nand", true)],
+            ["1", () => this.#implicitMultiply(TokenType.True, "true", true)],
+            ["0", () => this.#implicitMultiply(TokenType.False, "false", true)],
             ["\\", () => this.#processEscapeSequence()],
         ]);
 
@@ -118,7 +118,7 @@ export class Scanner {
             const parts = text.split(/(?=[a-zA-Z])/);
 
             return parts.forEach((lexeme, i) => {
-                if (i) this.#addToken(TokenType.And, "*", true);
+                if (i) this.#addToken(TokenType.And, "and", true);
 
                 this.#implicitMultiply(TokenType.Variable, lexeme);
             });
@@ -127,7 +127,7 @@ export class Scanner {
         // unary operators should have implicit multiplication
         if (type === TokenType.Not) return this.#implicitMultiply(type);
 
-        this.#addToken(type);
+        return this.#addToken(type);
     }
 
     #processEscapeSequence() {
@@ -166,7 +166,7 @@ export class Scanner {
                 TokenType.Xnor,
             ].includes(this.#tokens.at(-1)?.type ?? TokenType.Eof)
         )
-            this.#addToken(TokenType.And, "*", true);
+            this.#addToken(TokenType.And, "and", true);
 
         return this.#addToken(type, lexeme, artificiallyInserted);
     }

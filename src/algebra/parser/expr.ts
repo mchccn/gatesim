@@ -1,4 +1,6 @@
-import type { Token } from "./token";
+import { ConstructorClone, ConstructorCloneSymbol } from "./derive/clone";
+import { derive } from "./derive/decorator";
+import { Token } from "./token";
 
 export interface ParserPass extends ExprVisitor<Expr> {
     pass(expr: Expr): Expr;
@@ -12,10 +14,20 @@ export interface ExprVisitor<R> {
     visitVariableExpr(expr: VariableExpr): R;
 }
 
-export abstract class Expr {
+export abstract class Expr implements ConstructorClone {
     abstract accept<R>(visitor: ExprVisitor<R>): R;
+
+    clone(): this {
+        return Reflect.construct(
+            this.constructor,
+            (Reflect.get(this, ConstructorCloneSymbol) as any[]).map((v) =>
+                v instanceof Expr || v instanceof Token ? v.clone() : v,
+            ),
+        );
+    }
 }
 
+@derive(ConstructorClone)
 export class BinaryExpr extends Expr {
     left;
     operator;
@@ -34,6 +46,7 @@ export class BinaryExpr extends Expr {
     }
 }
 
+@derive(ConstructorClone)
 export class GroupingExpr extends Expr {
     expression;
 
@@ -48,6 +61,7 @@ export class GroupingExpr extends Expr {
     }
 }
 
+@derive(ConstructorClone)
 export class LiteralExpr extends Expr {
     value;
 
@@ -62,6 +76,7 @@ export class LiteralExpr extends Expr {
     }
 }
 
+@derive(ConstructorClone)
 export class UnaryExpr extends Expr {
     operator;
     right;
@@ -78,6 +93,7 @@ export class UnaryExpr extends Expr {
     }
 }
 
+@derive(ConstructorClone)
 export class VariableExpr extends Expr {
     name;
 
