@@ -1,6 +1,3 @@
-import { ConstructorClone } from "./derive/clone";
-import { derive } from "./derive/decorator";
-
 export enum TokenType {
     LeftParen = "LeftParen",
     RightParen = "RightParen",
@@ -27,11 +24,10 @@ export enum TokenType {
     Eof = "Eof",
 }
 
-@derive(ConstructorClone)
-export class Token implements ConstructorClone {
+export class Token {
     constructor(readonly type: TokenType, readonly lexeme: string, readonly line: number, readonly col: number) {}
 
-    clone(): this {
-        return new Token(this.type, this.lexeme, this.line, this.col) as this;
+    clone() {
+        return new Token(this.type, this.lexeme, this.line, this.col);
     }
 }

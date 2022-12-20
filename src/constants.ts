@@ -1,12 +1,6 @@
 import { DarkmodeManager } from "./managers/DarkmodeManager";
 import { ModalManager } from "./managers/ModalManager";
 
-declare global {
-    interface Navigator {
-        userAgentData?: { platform: string };
-    }
-}
-
 export const INPUT_COMPONENT_CSS_SIZE = 24;
 export const OUTPUT_COMPONENT_CSS_SIZE = 24;
 export const CHIP_COMPONENT_CSS_WIDTH = 120;

@@ -1,8 +1,10 @@
+import type { Expr } from "./parser/expr";
 import { Parser } from "./parser/parser";
 import { ConstantExpressionEvaluationPass as ConstExprEvalPass } from "./parser/passes/constants";
 import { ExpressionSimplificationPass as ExprSimpPass } from "./parser/passes/expressions";
 import { ExpressionPrinter } from "./parser/printer";
 import { Scanner } from "./parser/scanner";
+import { areTreesExactlyEqual } from "./parser/trees/equal";
 
 const lines = String.raw`
 a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
@@ -33,9 +35,14 @@ function show(source: string) {
     let expr = new Parser(tokens).parse();
 
     // simplify until the passes do not change anything
-    expr = new ExprSimpPass().pass(new ConstExprEvalPass().pass(expr));
-    expr = new ExprSimpPass().pass(new ConstExprEvalPass().pass(expr));
-    expr = new ExprSimpPass().pass(new ConstExprEvalPass().pass(expr));
+
+    // ugly code
+    const pass = (expr: Expr) => new ExprSimpPass().pass(new ConstExprEvalPass().pass(expr.clone()));
+
+    let passed;
+    while (((passed = pass(expr)), !areTreesExactlyEqual(expr, passed))) {
+        expr = passed;
+    }
 
     console.log(new ExpressionPrinter().print(expr));
 

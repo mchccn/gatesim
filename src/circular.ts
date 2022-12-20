@@ -1,5 +1,11 @@
 // this file only exists to break circular dependencies
 
+declare global {
+    interface Navigator {
+        userAgentData?: { platform: string };
+    }
+}
+
 export const IS_MAC_OS =
     typeof navigator !== "undefined"
         ? [navigator.userAgentData?.platform, navigator.platform].some(
