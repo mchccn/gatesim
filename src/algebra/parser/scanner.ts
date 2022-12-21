@@ -13,7 +13,7 @@ export class Scanner {
         ["xnor", TokenType.Xnor],
     ]);
 
-    static #invertedKeywords: ReadonlyMap<TokenType, string> = new Map([...this.#keywords].map(([k, v]) => [v, k]));
+    static lexemeForKeyword: ReadonlyMap<TokenType, string> = new Map([...this.#keywords].map(([k, v]) => [v, k]));
 
     static #escapes: ReadonlyMap<string, TokenType> = new Map([
         ["true", TokenType.True],
@@ -94,6 +94,7 @@ export class Scanner {
             ["1", () => this.#implicitMultiply(TokenType.True, "true", true)],
             ["0", () => this.#implicitMultiply(TokenType.False, "false", true)],
             ["\\", () => this.#processEscapeSequence()],
+            ["%", () => this.#skipComment()],
         ]);
 
         (
@@ -142,11 +143,18 @@ export class Scanner {
         if (!type) throw new SyntaxError();
 
         // lookup text by token type
-        const lexeme = Scanner.#invertedKeywords.get(type)!;
+        const lexeme = Scanner.lexemeForKeyword.get(type)!;
 
         if (type === TokenType.Not) return this.#implicitMultiply(type, lexeme, true);
 
         return this.#addToken(type, lexeme, true);
+    }
+
+    #skipComment() {
+        // comments start with '%' and end with '%'
+        while (this.#peek() !== "%" && !this.#isAtEnd()) this.#advance();
+
+        this.#advance();
     }
 
     // insert a multiplication before opening groups

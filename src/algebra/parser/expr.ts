@@ -1,6 +1,6 @@
 import type { Token } from "./token";
 
-export interface ParserPass extends ExprVisitor<Expr> {
+export interface TreePass extends ExprVisitor<Expr> {
     pass(expr: Expr): Expr;
 }
 

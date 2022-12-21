@@ -1,8 +1,8 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, ParserPass, UnaryExpr, VariableExpr } from "../expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, TreePass, UnaryExpr, VariableExpr } from "../expr";
 import { Token, TokenType } from "../token";
 
 // sole goal is to identify constant expressions and evaluate them beforehand
-export class ConstantExpressionEvaluationPass implements ParserPass {
+export class ConstantExpressionEvaluationPass implements TreePass {
     pass(expr: Expr) {
         return expr.accept(this);
     }

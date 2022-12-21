@@ -1,7 +1,8 @@
-import type { Expr } from "./parser/expr";
 import { Parser } from "./parser/parser";
 import { ConstantExpressionEvaluationPass as ConstExprEvalPass } from "./parser/passes/constants";
 import { ExpressionSimplificationPass as ExprSimpPass } from "./parser/passes/expressions";
+import { ExpressionNormalizingPass as ExprNormPass } from "./parser/passes/normalizer";
+import { pipeline } from "./parser/passes/pipeline";
 import { ExpressionPrinter } from "./parser/printer";
 import { Scanner } from "./parser/scanner";
 import { areTreesExactlyEqual } from "./parser/trees/equal";
@@ -23,6 +24,10 @@ not not not not not a
 (a)
 ((a))
 ((a) or ((b and c)) xor (0))(11)
+(not (a nand b))
+(((not (a nand b)) xor 1) and (a or not a))
+% comment % 1
+(((    (a nand b)) xor 1) and (a or not a))
 `
     .split("\n")
     .filter(Boolean);
@@ -35,21 +40,20 @@ function show(source: string) {
     let expr = new Parser(tokens).parse();
 
     // simplify until the passes do not change anything
+    const pass = pipeline(ExprNormPass, ConstExprEvalPass, ExprSimpPass);
 
     // ugly code
-    const pass = (expr: Expr) => new ExprSimpPass().pass(new ConstExprEvalPass().pass(expr.clone()));
+    let passed = pass(expr);
 
-    let passed;
-    while (((passed = pass(expr)), !areTreesExactlyEqual(expr, passed))) {
+    do {
         expr = passed;
-    }
+    } while (((passed = pass(expr)), !areTreesExactlyEqual(expr, passed)));
 
     console.log(new ExpressionPrinter().print(expr));
 
     console.log("-".repeat(16));
 }
 
-lines.forEach(show);
+console.clear();
 
-//@ts-ignore
-globalThis.show = show;
+lines.forEach(show);
