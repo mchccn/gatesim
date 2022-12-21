@@ -15,6 +15,8 @@ export class ExpressionNormalizingPass implements ExprPass {
         expr.left = expr.left.accept(this);
         expr.right = expr.right.accept(this);
 
+        //TODO: replace with better way
+
         // if the left is lexographically larger than the right
         // then switch the sides so that the larger term is on the right
         if (print(expr.left) > print(expr.right)) [expr.left, expr.right] = [expr.right, expr.left];

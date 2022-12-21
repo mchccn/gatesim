@@ -165,6 +165,8 @@ export class ExpressionSimplificationPass implements ExprPass {
                 }
             }
 
+            //TODO: IMPLEMENT DE MORGAN'S LAWS CORRECTLY
+
             // not a or not b -> a nand b
             if (
                 expr.left instanceof UnaryExpr &&
@@ -231,6 +233,8 @@ export class ExpressionSimplificationPass implements ExprPass {
                     return new LiteralExpr(false);
                 }
             }
+
+            //TODO: IMPLEMENT DE MORGAN'S LAWS CORRECTLY
 
             // not a and not b -> a nor b
             if (

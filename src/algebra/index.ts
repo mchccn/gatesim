@@ -1,4 +1,3 @@
-import { TotalOperationsHeuristic } from "./parser/heuristics/operations";
 import { Parser } from "./parser/parser";
 import { ConstantExpressionEvaluationPass as ConstExprEvalPass } from "./parser/passes/constants";
 import { ExpressionSimplificationPass as ExprSimpPass } from "./parser/passes/expressions";
@@ -92,8 +91,6 @@ function show(source: string) {
     const pass = pipeline(ExprNormPass, ConstExprEvalPass, ExprSimpPass);
 
     let expr = new Parser(tokens).parse();
-
-    console.log(new TotalOperationsHeuristic().score(expr));
 
     let passed = pass(expr);
 
