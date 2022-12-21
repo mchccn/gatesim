@@ -1,3 +1,5 @@
+import { Scanner } from "./scanner";
+
 export enum TokenType {
     LeftParen = "LeftParen",
     RightParen = "RightParen",
@@ -29,5 +31,9 @@ export class Token {
 
     clone() {
         return new Token(this.type, this.lexeme, this.line, this.col);
+    }
+
+    static spoofed(type: TokenType) {
+        return new Token(type, Scanner.lexemeForKeyword.get(type) ?? "\0", 0, 0);
     }
 }

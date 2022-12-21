@@ -1,17 +1,15 @@
 -   boolean algebra
 
-    -   meta transpiler that turns rules into code
-
 -   settings icon
 
     -   option to use gate icons instead of names as text
 
 -   https://www.youtube.com/watch?v=hEDQpqhY2MA&t=522s
 
-    -   rename Display to Debug
+    -   change name of Display component
 
     -   add 7-segment display component
 
         -   dabble component
 
-        -   ripley blanking
+        -   ripple blanking

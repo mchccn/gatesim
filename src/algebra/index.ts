@@ -1,11 +1,13 @@
+import type { Expr } from "./parser/expr";
 import { Parser } from "./parser/parser";
 import { ConstantExpressionEvaluationPass as ConstExprEvalPass } from "./parser/passes/constants";
 import { ExpressionSimplificationPass as ExprSimpPass } from "./parser/passes/expressions";
 import { ExpressionNormalizingPass as ExprNormPass } from "./parser/passes/normalizer";
 import { pipeline } from "./parser/passes/pipeline";
-import { ExpressionPrinter } from "./parser/printer";
+import { ExpressionPrinter, printExpr } from "./parser/printer";
 import { Scanner } from "./parser/scanner";
 import { areTreesExactlyEqual } from "./parser/trees/equal";
+import { factoringSteps } from "./solver/factoring";
 
 // const lines = String.raw`
 // a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
@@ -48,8 +50,6 @@ import { areTreesExactlyEqual } from "./parser/trees/equal";
 // not (a xnor not b) % a xor not b %
 // ((a and not b) or (not a and b)) % a xor b %
 // ((a and b) or (not a and not b)) % a xnor b %
-// (not a and not b and not c and not d) % a nor b nor c nor d %
-// (not a or not b or not c or not d) % a nand b nand c nand d %
 // `
 //     .split("\n")
 //     .filter(Boolean);
@@ -88,18 +88,40 @@ function show(source: string) {
 
     const tokens = new Scanner(source).scanTokens();
 
-    const pass = pipeline(ExprNormPass, ConstExprEvalPass, ExprSimpPass);
+    const singlePass = pipeline(ExprNormPass, ConstExprEvalPass, ExprSimpPass);
+
+    const maxPass = (expr: Expr) => {
+        let passed = singlePass(expr);
+
+        // simplify until the passes do not change anything
+        while (!areTreesExactlyEqual(expr, passed)) [expr, passed] = [passed, singlePass(expr)];
+
+        return expr;
+    };
 
     let expr = new Parser(tokens).parse();
 
-    let passed = pass(expr);
-
-    // simplify until the passes do not change anything
-    while (!areTreesExactlyEqual(expr, passed)) [expr, passed] = [passed, pass(expr)];
+    expr = maxPass(expr);
 
     console.log(new ExpressionPrinter().print(expr));
 
-    console.log("-".repeat(16));
+    const factoringStepsToTry = factoringSteps({ description: "initial", expr });
+
+    factoringStepsToTry.forEach(({ description, expr }) => {
+        console.log(description);
+        console.log(printExpr(maxPass(expr)));
+
+        const factoringStepsToTry = factoringSteps({ description: "initial", expr });
+
+        console.log();
+
+        factoringStepsToTry.forEach(({ description, expr }) => {
+            console.log(description);
+            console.log(printExpr(maxPass(expr)));
+        });
+
+        console.log("+".repeat(16));
+    });
 }
 
 console.clear();

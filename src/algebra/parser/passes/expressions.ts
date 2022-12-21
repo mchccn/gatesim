@@ -83,30 +83,28 @@ export class ExpressionSimplificationPass implements ExprPass {
                 }
             }
 
-            // ((a and not b) or (b and not a)) -> a xor b
+            // a and not b or b and not a -> a xor b
             if (
-                expr.left instanceof GroupingExpr &&
-                expr.left.expression instanceof BinaryExpr &&
-                expr.left.expression.operator.type === TokenType.And &&
-                expr.left.expression.right instanceof UnaryExpr &&
-                expr.left.expression.right.operator.type === TokenType.Not &&
-                expr.right instanceof GroupingExpr &&
-                expr.right.expression instanceof BinaryExpr &&
-                expr.right.expression.operator.type === TokenType.And &&
-                expr.right.expression.right instanceof UnaryExpr &&
-                expr.right.expression.right.operator.type === TokenType.Not
+                expr.left instanceof BinaryExpr &&
+                expr.left.operator.type === TokenType.And &&
+                expr.left.right instanceof UnaryExpr &&
+                expr.left.right.operator.type === TokenType.Not &&
+                expr.right instanceof BinaryExpr &&
+                expr.right.operator.type === TokenType.And &&
+                expr.right.right instanceof UnaryExpr &&
+                expr.right.right.operator.type === TokenType.Not
             ) {
-                const a = expr.left.expression.left;
-                const b = expr.right.expression.left;
+                const a = expr.left.left;
+                const b = expr.right.left;
 
                 if (
                     areTreesExactlyEqual(
                         new ExpressionNormalizingPass().pass(a),
-                        new ExpressionNormalizingPass().pass(expr.right.expression.right.right),
+                        new ExpressionNormalizingPass().pass(expr.right.right.right),
                     ) &&
                     areTreesExactlyEqual(
                         new ExpressionNormalizingPass().pass(b),
-                        new ExpressionNormalizingPass().pass(expr.left.expression.right.right),
+                        new ExpressionNormalizingPass().pass(expr.left.right.right),
                     )
                 ) {
                     return new GroupingExpr(
@@ -124,30 +122,28 @@ export class ExpressionSimplificationPass implements ExprPass {
                 }
             }
 
-            // ((a and b) or (not a and not b)) -> a xnor b
+            // a and b or not a and not b -> a xnor b
             if (
-                expr.left instanceof GroupingExpr &&
-                expr.left.expression instanceof BinaryExpr &&
-                expr.left.expression.operator.type === TokenType.And &&
-                expr.right instanceof GroupingExpr &&
-                expr.right.expression instanceof BinaryExpr &&
-                expr.right.expression.operator.type === TokenType.And &&
-                expr.right.expression.left instanceof UnaryExpr &&
-                expr.right.expression.left.operator.type === TokenType.Not &&
-                expr.right.expression.right instanceof UnaryExpr &&
-                expr.right.expression.right.operator.type === TokenType.Not
+                expr.left instanceof BinaryExpr &&
+                expr.left.operator.type === TokenType.And &&
+                expr.right instanceof BinaryExpr &&
+                expr.right.operator.type === TokenType.And &&
+                expr.right.left instanceof UnaryExpr &&
+                expr.right.left.operator.type === TokenType.Not &&
+                expr.right.right instanceof UnaryExpr &&
+                expr.right.right.operator.type === TokenType.Not
             ) {
-                const a = expr.left.expression.left;
-                const b = expr.left.expression.right;
+                const a = expr.left.left;
+                const b = expr.left.right;
 
                 if (
                     areTreesExactlyEqual(
                         new ExpressionNormalizingPass().pass(a),
-                        new ExpressionNormalizingPass().pass(expr.right.expression.left.right),
+                        new ExpressionNormalizingPass().pass(expr.right.left.right),
                     ) &&
                     areTreesExactlyEqual(
                         new ExpressionNormalizingPass().pass(b),
-                        new ExpressionNormalizingPass().pass(expr.right.expression.right.right),
+                        new ExpressionNormalizingPass().pass(expr.right.right.right),
                     )
                 ) {
                     return new GroupingExpr(
@@ -163,51 +159,6 @@ export class ExpressionSimplificationPass implements ExprPass {
                         ),
                     );
                 }
-            }
-
-            //TODO: IMPLEMENT DE MORGAN'S LAWS CORRECTLY
-
-            // not a or not b -> a nand b
-            if (
-                expr.left instanceof UnaryExpr &&
-                expr.left.operator.type === TokenType.Not &&
-                expr.right instanceof UnaryExpr &&
-                expr.right.operator.type === TokenType.Not
-            ) {
-                return new GroupingExpr(
-                    new BinaryExpr(
-                        expr.left.right,
-                        new Token(
-                            TokenType.Nand,
-                            Scanner.lexemeForKeyword.get(TokenType.Nand)!,
-                            expr.operator.line,
-                            expr.operator.col,
-                        ),
-                        expr.right.right,
-                    ),
-                );
-            }
-
-            // (a nand b) or not c -> a nand b nand c
-            if (
-                expr.left instanceof GroupingExpr &&
-                expr.left.expression instanceof BinaryExpr &&
-                expr.left.expression.operator.type === TokenType.Nand &&
-                expr.right instanceof UnaryExpr &&
-                expr.right.operator.type === TokenType.Not
-            ) {
-                return new GroupingExpr(
-                    new BinaryExpr(
-                        expr.left,
-                        new Token(
-                            TokenType.Nand,
-                            Scanner.lexemeForKeyword.get(TokenType.Nand)!,
-                            expr.operator.line,
-                            expr.operator.col,
-                        ),
-                        expr.right.right,
-                    ),
-                );
             }
         }
 
@@ -232,51 +183,6 @@ export class ExpressionSimplificationPass implements ExprPass {
                 ) {
                     return new LiteralExpr(false);
                 }
-            }
-
-            //TODO: IMPLEMENT DE MORGAN'S LAWS CORRECTLY
-
-            // not a and not b -> a nor b
-            if (
-                expr.left instanceof UnaryExpr &&
-                expr.left.operator.type === TokenType.Not &&
-                expr.right instanceof UnaryExpr &&
-                expr.right.operator.type === TokenType.Not
-            ) {
-                return new GroupingExpr(
-                    new BinaryExpr(
-                        expr.left.right,
-                        new Token(
-                            TokenType.Nor,
-                            Scanner.lexemeForKeyword.get(TokenType.Nor)!,
-                            expr.operator.line,
-                            expr.operator.col,
-                        ),
-                        expr.right.right,
-                    ),
-                );
-            }
-
-            // (a nor b) and not c -> a nor b nor c
-            if (
-                expr.left instanceof GroupingExpr &&
-                expr.left.expression instanceof BinaryExpr &&
-                expr.left.expression.operator.type === TokenType.Nor &&
-                expr.right instanceof UnaryExpr &&
-                expr.right.operator.type === TokenType.Not
-            ) {
-                return new GroupingExpr(
-                    new BinaryExpr(
-                        expr.left,
-                        new Token(
-                            TokenType.Nor,
-                            Scanner.lexemeForKeyword.get(TokenType.Nor)!,
-                            expr.operator.line,
-                            expr.operator.col,
-                        ),
-                        expr.right.right,
-                    ),
-                );
             }
         }
 
