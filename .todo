@@ -1,12 +1,10 @@
--   boolean algebra to circuit
+-   boolean algebra
+
+    -   meta transpiler that turns rules into code
 
 -   settings icon
 
     -   option to use gate icons instead of names as text
-
--   CAD circuit developer
-
-    -   expression simplification/reduction
 
 -   https://www.youtube.com/watch?v=hEDQpqhY2MA&t=522s
 

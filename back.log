@@ -1,3 +1,7 @@
+-   CAD circuit developer
+
+    -   expression simplification/reduction
+
 -   serialized diagram to circuit diagram drawing
 
 -   when you edit a component's inputs/outputs count, it should not delete all the wires
