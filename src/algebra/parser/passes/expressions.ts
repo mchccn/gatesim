@@ -5,10 +5,10 @@ import { areTreesExactlyEqual } from "../trees/equal";
 import { ExpressionNormalizingPass } from "./normalizer";
 
 enum Precedence {
-    Not,
-    XorXnor,
-    AndNand,
     OrNor,
+    AndNand,
+    XorXnor,
+    Not,
 }
 
 const precedence: ReadonlyMap<TokenType, Precedence> = new Map([
@@ -136,6 +136,49 @@ export class ExpressionSimplificationPass implements TreePass {
                     );
                 }
             }
+
+            // not a or not b -> a nand b
+            if (
+                expr.left instanceof UnaryExpr &&
+                expr.left.operator.type === TokenType.Not &&
+                expr.right instanceof UnaryExpr &&
+                expr.right.operator.type === TokenType.Not
+            ) {
+                return new GroupingExpr(
+                    new BinaryExpr(
+                        expr.left.right,
+                        new Token(
+                            TokenType.Nand,
+                            Scanner.lexemeForKeyword.get(TokenType.Nand)!,
+                            expr.operator.line,
+                            expr.operator.col,
+                        ),
+                        expr.right.right,
+                    ),
+                );
+            }
+
+            // (a nand b) or not c -> a nand b nand c
+            if (
+                expr.left instanceof GroupingExpr &&
+                expr.left.expression instanceof BinaryExpr &&
+                expr.left.expression.operator.type === TokenType.Nand &&
+                expr.right instanceof UnaryExpr &&
+                expr.right.operator.type === TokenType.Not
+            ) {
+                return new GroupingExpr(
+                    new BinaryExpr(
+                        expr.left,
+                        new Token(
+                            TokenType.Nand,
+                            Scanner.lexemeForKeyword.get(TokenType.Nand)!,
+                            expr.operator.line,
+                            expr.operator.col,
+                        ),
+                        expr.right.right,
+                    ),
+                );
+            }
         }
 
         if (expr.operator.type === TokenType.And) {
@@ -150,12 +193,68 @@ export class ExpressionSimplificationPass implements TreePass {
                     return new LiteralExpr(false);
                 }
             }
+
+            // not a and not b -> a nor b
+            if (
+                expr.left instanceof UnaryExpr &&
+                expr.left.operator.type === TokenType.Not &&
+                expr.right instanceof UnaryExpr &&
+                expr.right.operator.type === TokenType.Not
+            ) {
+                return new GroupingExpr(
+                    new BinaryExpr(
+                        expr.left.right,
+                        new Token(
+                            TokenType.Nor,
+                            Scanner.lexemeForKeyword.get(TokenType.Nor)!,
+                            expr.operator.line,
+                            expr.operator.col,
+                        ),
+                        expr.right.right,
+                    ),
+                );
+            }
+
+            // (a nor b) and not c -> a nor b nor c
+            if (
+                expr.left instanceof GroupingExpr &&
+                expr.left.expression instanceof BinaryExpr &&
+                expr.left.expression.operator.type === TokenType.Nor &&
+                expr.right instanceof UnaryExpr &&
+                expr.right.operator.type === TokenType.Not
+            ) {
+                return new GroupingExpr(
+                    new BinaryExpr(
+                        expr.left,
+                        new Token(
+                            TokenType.Nor,
+                            Scanner.lexemeForKeyword.get(TokenType.Nor)!,
+                            expr.operator.line,
+                            expr.operator.col,
+                        ),
+                        expr.right.right,
+                    ),
+                );
+            }
         }
 
-        //TODO: stuff
+        // checking if left side has unnecessary nesting
+        if (
+            expr.left instanceof GroupingExpr &&
+            expr.left.expression instanceof BinaryExpr &&
+            precedence.get(expr.left.expression.operator.type)! >= precedence.get(expr.operator.type)!
+        ) {
+            expr.left = expr.left.expression;
+        }
 
-        //TODO: determine if a grouping expr is unnecessary
-        precedence;
+        // checking if right side has unnecessary nesting
+        if (
+            expr.right instanceof GroupingExpr &&
+            expr.right.expression instanceof BinaryExpr &&
+            precedence.get(expr.right.expression.operator.type)! >= precedence.get(expr.operator.type)!
+        ) {
+            expr.right = expr.right.expression;
+        }
 
         return expr;
     }

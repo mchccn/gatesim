@@ -41,39 +41,50 @@ import { areTreesExactlyEqual } from "./parser/trees/equal";
 //     .split("\n")
 //     .filter(Boolean);
 
-const lines = String.raw`
-(b or not b) % 1 %
-(not c and c) % 0 %
-not (not b xor a) % a xor b %
-not (a xnor not b) % a xor not b %
-((a and not b) or (not a and b)) % a xor b %
-((a and b) or (not a and not b)) % a xnor b %
-`
-    .split("\n")
-    .filter(Boolean);
-
 // const lines = String.raw`
-// a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
+// (b or not b) % 1 %
+// (not c and c) % 0 %
+// not (not b xor a) % a xor b %
+// not (a xnor not b) % a xor not b %
+// ((a and not b) or (not a and b)) % a xor b %
+// ((a and b) or (not a and not b)) % a xnor b %
+// (not a and not b and not c and not d) % a nor b nor c nor d %
+// (not a or not b or not c or not d) % a nand b nand c nand d %
 // `
 //     .split("\n")
 //     .filter(Boolean);
+
+// const lines = String.raw`
+// (a or b) and c % lower precedence %
+// (a and b) and c % same precedence %
+// (a xor b) and c % higher precedence %
+// a and (b or c) % lower precedence %
+// a and (b and c) % same precedence %
+// a and (b xor c) % higher precedence %
+// (a and b) and (c and d)
+// `
+//     .split("\n")
+//     .filter(Boolean);
+
+const lines = String.raw`
+a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
+`
+    .split("\n")
+    .filter(Boolean);
 
 function show(source: string) {
     console.log(source);
 
     const tokens = new Scanner(source).scanTokens();
 
-    let expr = new Parser(tokens).parse();
-
-    // simplify until the passes do not change anything
     const pass = pipeline(ExprNormPass, ConstExprEvalPass, ExprSimpPass);
+
+    let expr = new Parser(tokens).parse();
 
     let passed = pass(expr);
 
-    while (!areTreesExactlyEqual(expr, passed)) {
-        expr = passed;
-        passed = pass(expr);
-    }
+    // simplify until the passes do not change anything
+    while (!areTreesExactlyEqual(expr, passed)) [expr, passed] = [passed, pass(expr)];
 
     console.log(new ExpressionPrinter().print(expr));
 
