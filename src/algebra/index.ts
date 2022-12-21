@@ -66,6 +66,17 @@ import { areTreesExactlyEqual } from "./parser/trees/equal";
 //     .split("\n")
 //     .filter(Boolean);
 
+// const lines = String.raw`
+// a and a
+// a or a
+// a nand a
+// a nor a
+// a xor a
+// a xnor a
+// `
+//     .split("\n")
+//     .filter(Boolean);
+
 const lines = String.raw`
 a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
 `

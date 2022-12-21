@@ -42,7 +42,35 @@ export class ExpressionSimplificationPass implements TreePass {
         expr.left = expr.left.accept(this);
         expr.right = expr.right.accept(this);
 
+        // checking if left side has unnecessary nesting
+        if (
+            expr.left instanceof GroupingExpr &&
+            expr.left.expression instanceof BinaryExpr &&
+            precedence.get(expr.left.expression.operator.type)! >= precedence.get(expr.operator.type)!
+        ) {
+            expr.left = expr.left.expression;
+        }
+
+        // checking if right side has unnecessary nesting
+        if (
+            expr.right instanceof GroupingExpr &&
+            expr.right.expression instanceof BinaryExpr &&
+            precedence.get(expr.right.expression.operator.type)! >= precedence.get(expr.operator.type)!
+        ) {
+            expr.right = expr.right.expression;
+        }
+
         if (expr.operator.type === TokenType.Or) {
+            // a or a -> a
+            if (
+                areTreesExactlyEqual(
+                    new ExpressionNormalizingPass().pass(expr.left),
+                    new ExpressionNormalizingPass().pass(expr.right),
+                )
+            ) {
+                return expr.left;
+            }
+
             // a or not a -> 1
             if (expr.right instanceof UnaryExpr && expr.right.operator.type === TokenType.Not) {
                 if (
@@ -182,6 +210,16 @@ export class ExpressionSimplificationPass implements TreePass {
         }
 
         if (expr.operator.type === TokenType.And) {
+            // a and a -> a
+            if (
+                areTreesExactlyEqual(
+                    new ExpressionNormalizingPass().pass(expr.left),
+                    new ExpressionNormalizingPass().pass(expr.right),
+                )
+            ) {
+                return expr.left;
+            }
+
             // a and not a -> 0
             if (expr.right instanceof UnaryExpr && expr.right.operator.type === TokenType.Not) {
                 if (
@@ -238,22 +276,68 @@ export class ExpressionSimplificationPass implements TreePass {
             }
         }
 
-        // checking if left side has unnecessary nesting
-        if (
-            expr.left instanceof GroupingExpr &&
-            expr.left.expression instanceof BinaryExpr &&
-            precedence.get(expr.left.expression.operator.type)! >= precedence.get(expr.operator.type)!
-        ) {
-            expr.left = expr.left.expression;
+        if (expr.operator.type === TokenType.Nand) {
+            // a nand a -> not a
+            if (
+                areTreesExactlyEqual(
+                    new ExpressionNormalizingPass().pass(expr.left),
+                    new ExpressionNormalizingPass().pass(expr.right),
+                )
+            ) {
+                return new UnaryExpr(
+                    new Token(
+                        TokenType.Not,
+                        Scanner.lexemeForKeyword.get(TokenType.Not)!,
+                        expr.operator.line,
+                        expr.operator.col,
+                    ),
+                    expr.left,
+                );
+            }
         }
 
-        // checking if right side has unnecessary nesting
-        if (
-            expr.right instanceof GroupingExpr &&
-            expr.right.expression instanceof BinaryExpr &&
-            precedence.get(expr.right.expression.operator.type)! >= precedence.get(expr.operator.type)!
-        ) {
-            expr.right = expr.right.expression;
+        if (expr.operator.type === TokenType.Nor) {
+            // a nor a -> not a
+            if (
+                areTreesExactlyEqual(
+                    new ExpressionNormalizingPass().pass(expr.left),
+                    new ExpressionNormalizingPass().pass(expr.right),
+                )
+            ) {
+                return new UnaryExpr(
+                    new Token(
+                        TokenType.Not,
+                        Scanner.lexemeForKeyword.get(TokenType.Not)!,
+                        expr.operator.line,
+                        expr.operator.col,
+                    ),
+                    expr.left,
+                );
+            }
+        }
+
+        if (expr.operator.type === TokenType.Xor) {
+            // a xor a -> 0
+            if (
+                areTreesExactlyEqual(
+                    new ExpressionNormalizingPass().pass(expr.left),
+                    new ExpressionNormalizingPass().pass(expr.right),
+                )
+            ) {
+                return new LiteralExpr(false);
+            }
+        }
+
+        if (expr.operator.type === TokenType.Xnor) {
+            // a xnor a -> 1
+            if (
+                areTreesExactlyEqual(
+                    new ExpressionNormalizingPass().pass(expr.left),
+                    new ExpressionNormalizingPass().pass(expr.right),
+                )
+            ) {
+                return new LiteralExpr(true);
+            }
         }
 
         return expr;
