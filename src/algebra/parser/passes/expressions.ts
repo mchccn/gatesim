@@ -1,6 +1,8 @@
 import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, TreePass, UnaryExpr, VariableExpr } from "../expr";
 import { Scanner } from "../scanner";
 import { Token, TokenType } from "../token";
+import { areTreesExactlyEqual } from "../trees/equal";
+import { ExpressionNormalizingPass } from "./normalizer";
 
 enum Precedence {
     Not,
@@ -40,8 +42,119 @@ export class ExpressionSimplificationPass implements TreePass {
         expr.left = expr.left.accept(this);
         expr.right = expr.right.accept(this);
 
-        //TODO: determine if a grouping expr is unnecessary
+        if (expr.operator.type === TokenType.Or) {
+            // a or not a -> 1
+            if (expr.right instanceof UnaryExpr && expr.right.operator.type === TokenType.Not) {
+                if (
+                    areTreesExactlyEqual(
+                        new ExpressionNormalizingPass().pass(expr.left),
+                        new ExpressionNormalizingPass().pass(expr.right.right),
+                    )
+                ) {
+                    return new LiteralExpr(true);
+                }
+            }
+
+            // ((a and not b) or (b and not a)) -> a xor b
+            if (
+                expr.left instanceof GroupingExpr &&
+                expr.left.expression instanceof BinaryExpr &&
+                expr.left.expression.operator.type === TokenType.And &&
+                expr.left.expression.right instanceof UnaryExpr &&
+                expr.left.expression.right.operator.type === TokenType.Not &&
+                expr.right instanceof GroupingExpr &&
+                expr.right.expression instanceof BinaryExpr &&
+                expr.right.expression.operator.type === TokenType.And &&
+                expr.right.expression.right instanceof UnaryExpr &&
+                expr.right.expression.right.operator.type === TokenType.Not
+            ) {
+                const a = expr.left.expression.left;
+                const b = expr.right.expression.left;
+
+                if (
+                    areTreesExactlyEqual(
+                        new ExpressionNormalizingPass().pass(a),
+                        new ExpressionNormalizingPass().pass(expr.right.expression.right.right),
+                    ) &&
+                    areTreesExactlyEqual(
+                        new ExpressionNormalizingPass().pass(b),
+                        new ExpressionNormalizingPass().pass(expr.left.expression.right.right),
+                    )
+                ) {
+                    return new GroupingExpr(
+                        new BinaryExpr(
+                            a,
+                            new Token(
+                                TokenType.Xor,
+                                Scanner.lexemeForKeyword.get(TokenType.Xor)!,
+                                expr.operator.line,
+                                expr.operator.col,
+                            ),
+                            b,
+                        ),
+                    );
+                }
+            }
+
+            // ((a and b) or (not a and not b)) -> a xnor b
+            if (
+                expr.left instanceof GroupingExpr &&
+                expr.left.expression instanceof BinaryExpr &&
+                expr.left.expression.operator.type === TokenType.And &&
+                expr.right instanceof GroupingExpr &&
+                expr.right.expression instanceof BinaryExpr &&
+                expr.right.expression.operator.type === TokenType.And &&
+                expr.right.expression.left instanceof UnaryExpr &&
+                expr.right.expression.left.operator.type === TokenType.Not &&
+                expr.right.expression.right instanceof UnaryExpr &&
+                expr.right.expression.right.operator.type === TokenType.Not
+            ) {
+                const a = expr.left.expression.left;
+                const b = expr.left.expression.right;
+
+                if (
+                    areTreesExactlyEqual(
+                        new ExpressionNormalizingPass().pass(a),
+                        new ExpressionNormalizingPass().pass(expr.right.expression.left.right),
+                    ) &&
+                    areTreesExactlyEqual(
+                        new ExpressionNormalizingPass().pass(b),
+                        new ExpressionNormalizingPass().pass(expr.right.expression.right.right),
+                    )
+                ) {
+                    return new GroupingExpr(
+                        new BinaryExpr(
+                            a,
+                            new Token(
+                                TokenType.Xnor,
+                                Scanner.lexemeForKeyword.get(TokenType.Xnor)!,
+                                expr.operator.line,
+                                expr.operator.col,
+                            ),
+                            b,
+                        ),
+                    );
+                }
+            }
+        }
+
+        if (expr.operator.type === TokenType.And) {
+            // a and not a -> 0
+            if (expr.right instanceof UnaryExpr && expr.right.operator.type === TokenType.Not) {
+                if (
+                    areTreesExactlyEqual(
+                        new ExpressionNormalizingPass().pass(expr.left),
+                        new ExpressionNormalizingPass().pass(expr.right.right),
+                    )
+                ) {
+                    return new LiteralExpr(false);
+                }
+            }
+        }
+
         //TODO: stuff
+
+        //TODO: determine if a grouping expr is unnecessary
         precedence;
 
         return expr;
@@ -66,9 +179,9 @@ export class ExpressionSimplificationPass implements TreePass {
                 return expr.right.right;
             }
 
-            // converting negation of negated gates into normal gates
             if (expr.right instanceof GroupingExpr) {
                 if (expr.right.expression instanceof BinaryExpr) {
+                    // converting negation of negated gates into normal gates
                     if ([TokenType.Xnor, TokenType.Nand, TokenType.Nor].includes(expr.right.expression.operator.type)) {
                         const normalGate = inverseGateLookup.get(expr.right.expression.operator.type)!;
 
@@ -84,6 +197,22 @@ export class ExpressionSimplificationPass implements TreePass {
                                 expr.right.expression.right,
                             ),
                         );
+                    }
+
+                    if (expr.right.expression.operator.type === TokenType.Xor) {
+                        // not (a xor not b) -> a xor b
+                        if (
+                            expr.right.expression.right instanceof UnaryExpr &&
+                            expr.right.expression.right.operator.type === TokenType.Not
+                        ) {
+                            return new GroupingExpr(
+                                new BinaryExpr(
+                                    expr.right.expression.left,
+                                    expr.right.expression.operator,
+                                    expr.right.expression.right.right,
+                                ),
+                            );
+                        }
                     }
                 }
             }

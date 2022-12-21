@@ -15,6 +15,29 @@ export class Scanner {
 
     static lexemeForKeyword: ReadonlyMap<TokenType, string> = new Map([...this.#keywords].map(([k, v]) => [v, k]));
 
+    static symbolForKeyword: ReadonlyMap<TokenType, string> = new Map([
+        [TokenType.True, "1"],
+        [TokenType.False, "0"],
+        [TokenType.Not, "¬"],
+        [TokenType.Or, "∨"],
+        [TokenType.Nor, "⊽"],
+        [TokenType.And, "∧"],
+        [TokenType.Nand, "⊼"],
+        [TokenType.Xor, "⊕"],
+        [TokenType.Xnor, "⊙"],
+    ]);
+
+    static nestingPairs: ReadonlyMap<TokenType, TokenType> = new Map(
+        [
+            [TokenType.RightParen, TokenType.LeftParen],
+            [TokenType.RightBrack, TokenType.LeftBrack],
+            [TokenType.RightBrace, TokenType.LeftBrace],
+        ].flatMap(([k, v]) => [
+            [k, v],
+            [v, k],
+        ]),
+    );
+
     static #escapes: ReadonlyMap<string, TokenType> = new Map([
         ["true", TokenType.True],
         ["t", TokenType.True],
@@ -121,7 +144,11 @@ export class Scanner {
             return parts.forEach((lexeme, i) => {
                 if (i) this.#addToken(TokenType.And, "and", true);
 
-                this.#implicitMultiply(TokenType.Variable, lexeme);
+                if (lexeme === "0") return this.#implicitMultiply(TokenType.False, lexeme);
+
+                if (lexeme === "1") return this.#implicitMultiply(TokenType.True, lexeme);
+
+                return this.#implicitMultiply(TokenType.Variable, lexeme);
             });
         }
 

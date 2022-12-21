@@ -32,11 +32,31 @@ import { areTreesExactlyEqual } from "./parser/trees/equal";
 //     .split("\n")
 //     .filter(Boolean);
 
+// const lines = String.raw`
+// c0b1a % multiplication should be sorted alphabetically and prioritize constants to back with 1 before 0 %
+// c+0+b+1+a % same rules as above %
+// c0b+ba+a1c % ab + 1ac + 0bc %
+// (cd+ba1)(ca+db1) % (1ab + cd)(ac + 1db) %
+// `
+//     .split("\n")
+//     .filter(Boolean);
+
 const lines = String.raw`
-c0b1a % multiplication should be sorted alphabetically and move constants to back with 1 before 0 %
+(b or not b) % 1 %
+(not c and c) % 0 %
+not (not b xor a) % a xor b %
+not (a xnor not b) % a xor not b %
+((a and not b) or (not a and b)) % a xor b %
+((a and b) or (not a and not b)) % a xnor b %
 `
     .split("\n")
     .filter(Boolean);
+
+// const lines = String.raw`
+// a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
+// `
+//     .split("\n")
+//     .filter(Boolean);
 
 function show(source: string) {
     console.log(source);
@@ -48,12 +68,12 @@ function show(source: string) {
     // simplify until the passes do not change anything
     const pass = pipeline(ExprNormPass, ConstExprEvalPass, ExprSimpPass);
 
-    // ugly code
     let passed = pass(expr);
 
-    do {
+    while (!areTreesExactlyEqual(expr, passed)) {
         expr = passed;
-    } while (((passed = pass(expr)), !areTreesExactlyEqual(expr, passed)));
+        passed = pass(expr);
+    }
 
     console.log(new ExpressionPrinter().print(expr));
 

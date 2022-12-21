@@ -1,4 +1,5 @@
 import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
+import { Scanner } from "./scanner";
 import { Token, TokenType } from "./token";
 
 export class Parser {
@@ -7,6 +8,8 @@ export class Parser {
     constructor(readonly tokens: Token[]) {}
 
     parse() {
+        this.#validateNestings();
+
         return this.#expression();
     }
 
@@ -140,5 +143,30 @@ export class Parser {
 
     #previous() {
         return this.tokens[this.#current - 1];
+    }
+
+    #validateNestings() {
+        const stack = new Array<TokenType>();
+
+        for (const token of this.tokens) {
+            if (
+                token.type === TokenType.LeftParen ||
+                token.type === TokenType.LeftBrack ||
+                token.type === TokenType.LeftBrace
+            )
+                stack.push(token.type);
+
+            if (
+                token.type === TokenType.RightParen ||
+                token.type === TokenType.RightBrack ||
+                token.type === TokenType.RightBrace
+            ) {
+                const pair = stack.pop();
+
+                if (!pair || token.type !== Scanner.nestingPairs.get(pair)) throw new SyntaxError();
+            }
+        }
+
+        if (stack.length) throw new SyntaxError();
     }
 }
