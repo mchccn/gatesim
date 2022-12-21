@@ -1,7 +1,11 @@
 import type { Token } from "./token";
 
-export interface TreePass extends ExprVisitor<Expr> {
+export interface ExprPass extends ExprVisitor<Expr> {
     pass(expr: Expr): Expr;
+}
+
+export interface ExprHeuristic<T> extends ExprVisitor<T> {
+    score(expr: Expr): T;
 }
 
 export interface ExprVisitor<R> {

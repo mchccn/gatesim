@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, TreePass, UnaryExpr, VariableExpr } from "../expr";
+import { BinaryExpr, Expr, ExprPass, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "../expr";
 import { Scanner } from "../scanner";
 import { Token, TokenType } from "../token";
 import { areTreesExactlyEqual } from "../trees/equal";
@@ -33,7 +33,7 @@ const inverseGateLookup: ReadonlyMap<TokenType, TokenType> = new Map(
 );
 
 // only recognizes direct representations of some gates and simplifies them
-export class ExpressionSimplificationPass implements TreePass {
+export class ExpressionSimplificationPass implements ExprPass {
     pass(expr: Expr): Expr {
         return expr.accept(this);
     }

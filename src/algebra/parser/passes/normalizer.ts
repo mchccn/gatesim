@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, TreePass, UnaryExpr, VariableExpr } from "../expr";
+import { BinaryExpr, Expr, ExprPass, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "../expr";
 import { ExpressionPrinter } from "../printer";
 import { TokenType } from "../token";
 
@@ -6,7 +6,7 @@ const print = ExpressionPrinter.prototype.print.bind(new ExpressionPrinter({ min
 
 // sort and re-order nodes to a standard so that later passes
 // will have an easier time working with nested structures
-export class ExpressionNormalizingPass implements TreePass {
+export class ExpressionNormalizingPass implements ExprPass {
     pass(expr: Expr): Expr {
         return expr.accept(this);
     }
