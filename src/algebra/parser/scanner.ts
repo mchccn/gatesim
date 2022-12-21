@@ -116,7 +116,7 @@ export class Scanner {
 
         if (!type) {
             // transform into products
-            const parts = text.split(/(?=[a-zA-Z])/);
+            const parts = text.split(/(?=[01a-zA-Z])/);
 
             return parts.forEach((lexeme, i) => {
                 if (i) this.#addToken(TokenType.And, "and", true);

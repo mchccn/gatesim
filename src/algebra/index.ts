@@ -7,27 +7,33 @@ import { ExpressionPrinter } from "./parser/printer";
 import { Scanner } from "./parser/scanner";
 import { areTreesExactlyEqual } from "./parser/trees/equal";
 
+// const lines = String.raw`
+// a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
+// (a+b+c)
+// 1 + 0
+// (a + not a)
+// not a
+// not not a
+// not not not a
+// not not not not a
+// not not not not not a
+// 1 + 0
+// 10
+// (1 + 0)
+// (10)
+// (a)
+// ((a))
+// ((a) or ((b and c)) xor (0))(11)
+// (not (a nand b))
+// (((not (a nand b)) xor 1) and (a or not a))
+// % comment % 1
+// (((    (a nand b)) xor 1) and (a or not a))
+// `
+//     .split("\n")
+//     .filter(Boolean);
+
 const lines = String.raw`
-a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
-(a+b+c)
-1 + 0
-(a + not a)
-not a
-not not a
-not not not a
-not not not not a
-not not not not not a
-1 + 0
-10
-(1 + 0)
-(10)
-(a)
-((a))
-((a) or ((b and c)) xor (0))(11)
-(not (a nand b))
-(((not (a nand b)) xor 1) and (a or not a))
-% comment % 1
-(((    (a nand b)) xor 1) and (a or not a))
+c0b1a % multiplication should be sorted alphabetically and move constants to back with 1 before 0 %
 `
     .split("\n")
     .filter(Boolean);
