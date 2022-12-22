@@ -4,7 +4,7 @@ import { ConstantExpressionEvaluationPass as ConstExprEvalPass } from "./parser/
 import { ExpressionSimplificationPass as ExprSimpPass } from "./parser/passes/expressions";
 import { ExpressionNormalizingPass as ExprNormPass } from "./parser/passes/normalizer";
 import { pipeline } from "./parser/passes/pipeline";
-import { ExpressionPrinter, printExpr } from "./parser/printer";
+import { printExpr } from "./parser/printer";
 import { Scanner } from "./parser/scanner";
 import { areTreesExactlyEqual } from "./parser/trees/equal";
 import { factoringSteps } from "./solver/factoring";
@@ -83,9 +83,13 @@ a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
     .split("\n")
     .filter(Boolean);
 
-function show(source: string) {
-    console.log(source);
+// const lines = String.raw`
+// x(ab + ac + d)
+// `
+//     .split("\n")
+//     .filter(Boolean);
 
+function show(source: string) {
     const tokens = new Scanner(source).scanTokens();
 
     const singlePass = pipeline(ExprNormPass, ConstExprEvalPass, ExprSimpPass);
@@ -96,6 +100,9 @@ function show(source: string) {
         // simplify until the passes do not change anything
         while (!areTreesExactlyEqual(expr, passed)) [expr, passed] = [passed, singlePass(expr)];
 
+        // at least one pass should be done
+        expr = singlePass(expr);
+
         return expr;
     };
 
@@ -103,13 +110,15 @@ function show(source: string) {
 
     expr = maxPass(expr);
 
-    console.log(new ExpressionPrinter().print(expr));
+    console.log(printExpr(expr, { explicitGrouping: true }));
 
     const factoringStepsToTry = factoringSteps({ description: "initial", expr });
 
     factoringStepsToTry.forEach(({ description, expr }) => {
+        console.log("+".repeat(16));
+
         console.log(description);
-        console.log(printExpr(maxPass(expr)));
+        console.log(printExpr(maxPass(expr), { explicitGrouping: true }));
 
         const factoringStepsToTry = factoringSteps({ description: "initial", expr });
 
@@ -117,7 +126,7 @@ function show(source: string) {
 
         factoringStepsToTry.forEach(({ description, expr }) => {
             console.log(description);
-            console.log(printExpr(maxPass(expr)));
+            console.log(printExpr(maxPass(expr), { explicitGrouping: true }));
         });
 
         console.log("+".repeat(16));

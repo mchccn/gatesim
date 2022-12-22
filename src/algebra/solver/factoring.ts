@@ -1,9 +1,11 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "../parser/expr";
+import { BinaryExpr, Expr, ExprWalker, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "../parser/expr";
 import { printExpr } from "../parser/printer";
 import { Token, TokenType } from "../parser/token";
 import { areTreesExactlyEqual } from "../parser/trees/equal";
 import type { Step } from "./steps";
 
+// picks out adjacent expressions of the same type
+// a and b and c -> [a, b, c]
 export function getAdjacentBinaryExprs(expr: BinaryExpr) {
     const adjacent: Expr[] = [];
     const queue = [expr.left, expr.right];
@@ -14,13 +16,15 @@ export function getAdjacentBinaryExprs(expr: BinaryExpr) {
         if (o instanceof BinaryExpr && o.operator.type === expr.operator.type) {
             queue.push(o.left, o.right);
         } else {
-            adjacent.push(o);
+            adjacent.unshift(o);
         }
     }
 
     return adjacent;
 }
 
+// joins expressions with a specific operator
+// [a, b, c], and -> a and b and c
 export function joinAdjacentExprs(exprs: Expr[], type: TokenType) {
     if (exprs.length < 2) return exprs[0];
 
@@ -35,92 +39,139 @@ export function joinAdjacentExprs(exprs: Expr[], type: TokenType) {
 
 // tries to create factoring steps
 // ab + ac -> a(b + c)
-export function factoringSteps(step: Step, steps: Step[] = []): Step[] {
-    const { expr } = step;
+export function factoringSteps(step: Step): Step[] {
+    return new (class FactoringStepsWalker implements ExprWalker<Step[]> {
+        #steps: Step[] = [];
+        #stack: Expr[] = [];
 
-    if (expr instanceof BinaryExpr) {
-        if (expr.operator.type === TokenType.Or) {
-            const terms = getAdjacentBinaryExprs(expr);
+        walk(expr: Expr): Step[] {
+            this.#stack.push(expr);
 
-            const productTerms: Expr[][] = [];
+            expr.accept(this);
 
-            terms.forEach((term) => {
-                if (term instanceof BinaryExpr && term.operator.type === TokenType.And) {
-                    const factors = getAdjacentBinaryExprs(term);
+            this.#stack.pop();
 
-                    productTerms.push(factors);
-                }
-            });
-
-            const allCommonFactors = productTerms.flatMap((a, i) => {
-                return productTerms.flatMap((b, j) => {
-                    if (i === j) return [];
-
-                    return [
-                        ...a.filter((x) => b.some((y) => areTreesExactlyEqual(x, y))),
-                        ...b.filter((x) => a.some((y) => areTreesExactlyEqual(x, y))),
-                    ];
-                });
-            });
-
-            // filter out duplicate common factors
-            const commonFactors = allCommonFactors.filter(
-                (x, i) => allCommonFactors.findIndex((y) => areTreesExactlyEqual(x, y)) === i,
-            );
-
-            commonFactors.forEach((factor) => {
-                const affected = productTerms.filter((term) => term.some((x) => areTreesExactlyEqual(x, factor)));
-                const unaffected = productTerms.filter((term) => term.every((x) => !areTreesExactlyEqual(x, factor)));
-
-                // join the affected terms into a product, leaving out the factored part
-                const factored = affected.map((term) =>
-                    joinAdjacentExprs(
-                        term.filter((x) => !areTreesExactlyEqual(x, factor)),
-                        TokenType.And,
-                    ),
-                );
-
-                // join back unaffected terms into a product
-                const unfactored = unaffected.map((term) => joinAdjacentExprs(term, TokenType.And));
-
-                const builtFactoredExpr = joinAdjacentExprs(
-                    [
-                        new BinaryExpr(factor, Token.spoofed(TokenType.And), joinAdjacentExprs(factored, TokenType.Or)),
-                        ...unfactored,
-                    ],
-                    TokenType.Or,
-                );
-
-                // add to possible steps
-                steps.push({
-                    description: "factor out " + printExpr(factor),
-                    expr: builtFactoredExpr,
-                    from: step,
-                });
-            });
-
-            steps.push(...terms.flatMap((term) => factoringSteps({ ...step, expr: term })));
-        } else {
-            steps.push(
-                ...factoringSteps({ ...step, expr: expr.left }),
-                ...factoringSteps({ ...step, expr: expr.right }),
-            );
+            return this.#steps;
         }
-    }
 
-    if (expr instanceof GroupingExpr) {
-        steps.push(...factoringSteps({ ...step, expr: expr.expression }));
-    }
+        visitBinaryExpr(expr: BinaryExpr): void {
+            this.#stack.push(expr);
 
-    if (expr instanceof LiteralExpr) {
-    }
+            expr.left.accept(this);
+            expr.right.accept(this);
 
-    if (expr instanceof UnaryExpr) {
-        steps.push(...factoringSteps({ ...step, expr: expr.right }));
-    }
+            if (expr.operator.type === TokenType.Or) {
+                const terms = getAdjacentBinaryExprs(expr);
 
-    if (expr instanceof VariableExpr) {
-    }
+                if (terms.length > 2) {
+                    const productTerms: Expr[][] = [];
 
-    return steps;
+                    terms.forEach((term) => {
+                        if (term instanceof BinaryExpr && term.operator.type === TokenType.And) {
+                            const factors = getAdjacentBinaryExprs(term);
+
+                            productTerms.push(factors);
+                        }
+
+                        if (term instanceof VariableExpr) {
+                            productTerms.push([term]);
+                        }
+                    });
+
+                    // get all factors that are shared between the terms
+                    const allCommonFactors = productTerms.flatMap((a, i) => {
+                        return productTerms.flatMap((b, j) => {
+                            if (i === j) return [];
+
+                            return [
+                                ...a.filter((x) => b.some((y) => areTreesExactlyEqual(x, y))),
+                                ...b.filter((x) => a.some((y) => areTreesExactlyEqual(x, y))),
+                            ];
+                        });
+                    });
+
+                    // filter out duplicate common factors
+                    const commonFactors = allCommonFactors.filter(
+                        (x, i) => allCommonFactors.findIndex((y) => areTreesExactlyEqual(x, y)) === i,
+                    );
+
+                    commonFactors.forEach((factor) => {
+                        const affected = productTerms.filter((term) =>
+                            term.some((x) => areTreesExactlyEqual(x, factor)),
+                        );
+                        const unaffected = productTerms.filter((term) =>
+                            term.every((x) => !areTreesExactlyEqual(x, factor)),
+                        );
+
+                        // join the affected terms into a product, leaving out the factored part
+                        // if the result is undefined then that means the whole term is the factor and we replace it with true
+                        const factored = affected.map(
+                            (term) =>
+                                joinAdjacentExprs(
+                                    term.filter((x) => !areTreesExactlyEqual(x, factor)),
+                                    TokenType.And,
+                                ) ?? new LiteralExpr(true),
+                        );
+
+                        // join back unaffected terms into a product
+                        const unfactored = unaffected.map((term) => joinAdjacentExprs(term, TokenType.And));
+
+                        const builtFactoredExpr = joinAdjacentExprs(
+                            [
+                                new BinaryExpr(
+                                    factor,
+                                    Token.spoofed(TokenType.And),
+                                    joinAdjacentExprs(factored, TokenType.Or),
+                                ),
+                                ...unfactored,
+                            ],
+                            TokenType.Or,
+                        ) as BinaryExpr;
+
+                        // keep track of original expression
+                        const original = expr.clone();
+
+                        // mutate this one into the factored version
+                        expr.left = builtFactoredExpr.left;
+                        expr.operator = builtFactoredExpr.operator;
+                        expr.right = builtFactoredExpr.right;
+
+                        // add to possible steps
+                        this.#steps.push({
+                            description: "factor out " + printExpr(factor),
+                            expr: this.#stack[0].clone(),
+                            from: step,
+                        });
+
+                        // reset to original
+                        expr.left = original.left;
+                        expr.operator = original.operator;
+                        expr.right = original.right;
+                    });
+                }
+            }
+
+            this.#stack.pop();
+        }
+
+        visitGroupingExpr(expr: GroupingExpr): void {
+            this.#stack.push(expr);
+
+            expr.expression.accept(this);
+
+            this.#stack.pop();
+        }
+
+        visitLiteralExpr(): void {}
+
+        visitUnaryExpr(expr: UnaryExpr): void {
+            this.#stack.push(expr);
+
+            expr.right.accept(this);
+
+            this.#stack.pop();
+        }
+
+        visitVariableExpr(): void {}
+    })().walk(step.expr);
 }

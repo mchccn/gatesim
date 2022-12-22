@@ -8,6 +8,10 @@ export interface ExprHeuristic<T> extends ExprVisitor<T> {
     score(expr: Expr): T;
 }
 
+export interface ExprWalker<T> extends ExprVisitor<void> {
+    walk(expr: Expr): T;
+}
+
 export interface ExprVisitor<R> {
     visitBinaryExpr(expr: BinaryExpr): R;
     visitGroupingExpr(expr: GroupingExpr): R;

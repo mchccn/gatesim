@@ -55,8 +55,6 @@ try {
         message: "Generated:\n" + JSON.stringify(generated, undefined, 4),
     });
 } catch (e) {
-    console.log(e);
-
     self.postMessage({ code: "ERROR", error: e });
 }
 
