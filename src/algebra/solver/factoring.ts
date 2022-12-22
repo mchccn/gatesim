@@ -45,11 +45,7 @@ export function factoringSteps(step: Step): Step[] {
         #stack: Expr[] = [];
 
         walk(expr: Expr): Step[] {
-            this.#stack.push(expr);
-
             expr.accept(this);
-
-            this.#stack.pop();
 
             return this.#steps;
         }

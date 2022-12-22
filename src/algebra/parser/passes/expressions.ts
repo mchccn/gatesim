@@ -11,7 +11,7 @@ enum Precedence {
     Not,
 }
 
-const precedence: ReadonlyMap<TokenType, Precedence> = new Map([
+export const precedence: ReadonlyMap<TokenType, Precedence> = new Map([
     [TokenType.Not, Precedence.Not],
     [TokenType.Xor, Precedence.XorXnor],
     [TokenType.Xnor, Precedence.XorXnor],
@@ -21,7 +21,7 @@ const precedence: ReadonlyMap<TokenType, Precedence> = new Map([
     [TokenType.Nor, Precedence.OrNor],
 ]);
 
-const inverseGateLookup: ReadonlyMap<TokenType, TokenType> = new Map(
+export const inverseGateLookup: ReadonlyMap<TokenType, TokenType> = new Map(
     [
         [TokenType.Xor, TokenType.Xnor],
         [TokenType.And, TokenType.Nand],

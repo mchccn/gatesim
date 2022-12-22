@@ -8,6 +8,7 @@ import { printExpr } from "./parser/printer";
 import { Scanner } from "./parser/scanner";
 import { areTreesExactlyEqual } from "./parser/trees/equal";
 import { factoringSteps } from "./solver/factoring";
+import { negationExtractionSteps } from "./solver/negations";
 
 // const lines = String.raw`
 // a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
@@ -122,11 +123,16 @@ function show(source: string) {
 
         const factoringStepsToTry = factoringSteps({ description: "initial", expr });
 
-        console.log();
-
         factoringStepsToTry.forEach(({ description, expr }) => {
             console.log(description);
             console.log(printExpr(maxPass(expr), { explicitGrouping: true }));
+
+            const extractedNegationStepsToTry = negationExtractionSteps({ description: "initial", expr });
+
+            extractedNegationStepsToTry.forEach(({ description, expr }) => {
+                console.log(description);
+                console.log(printExpr(maxPass(expr), { explicitGrouping: true }));
+            });
         });
 
         console.log("+".repeat(16));

@@ -1,3 +1,4 @@
+import { getAdjacentBinaryExprs, joinAdjacentExprs } from "../../solver/factoring";
 import { BinaryExpr, Expr, ExprPass, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "../expr";
 import { ExpressionPrinter } from "../printer";
 import { TokenType } from "../token";
@@ -15,9 +16,19 @@ export class ExpressionNormalizingPass implements ExprPass {
         expr.left = expr.left.accept(this);
         expr.right = expr.right.accept(this);
 
-        // if the left is lexographically larger than the right
-        // then switch the sides so that the larger term is on the right
-        if (print(expr.left) > print(expr.right)) [expr.left, expr.right] = [expr.right, expr.left];
+        const level = getAdjacentBinaryExprs(expr);
+
+        // sorting the expressions and assigning the re-ordered nodes back to the original
+        if (level.length > 2) {
+            level.sort((a, b) => (print(a) > print(b) ? -1 : 1));
+
+            const sorted = joinAdjacentExprs(level, expr.operator.type) as BinaryExpr;
+
+            expr.left = sorted.left;
+            expr.right = sorted.right;
+        } else {
+            if (print(expr.left) > print(expr.right)) [expr.left, expr.right] = [expr.right, expr.left];
+        }
 
         return expr;
     }
