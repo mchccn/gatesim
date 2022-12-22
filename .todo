@@ -10,6 +10,12 @@
 
     -   not good enough yet to simplify "abc̄+ab̄c+ābc+abc"
 
+        -   greedy factoring
+
+            -   should generate all possible factorings with a certain factor
+
+            -   look at paper notes
+
 -   tool that turns algebraic expressions into circuits
 
 -   option to draw gates on the component instead of using names as text
@@ -18,8 +24,8 @@
 
     -   change name of Display component
 
-    -   add 7-segment display component
+    -   dabble component
 
-        -   dabble component
+    -   ripple blanking
 
-        -   ripple blanking
+    -   ripple negative
