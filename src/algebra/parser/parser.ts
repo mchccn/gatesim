@@ -1,5 +1,8 @@
 import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
+import { Scanner } from "./scanner";
 import { Token, TokenType, tokenNestingPairs } from "./token";
+
+export const parse = (source: string) => new Parser(new Scanner(source).scanTokens()).parse();
 
 export class Parser {
     #current = 0;

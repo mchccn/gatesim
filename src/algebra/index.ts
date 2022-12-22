@@ -1,5 +1,6 @@
+import { evaluate } from "./evaluate/evaluate";
 import { TotalOperationsHeuristic } from "./parser/heuristics/operations";
-import { Parser } from "./parser/parser";
+import { Parser, parse } from "./parser/parser";
 import { printExpr } from "./parser/printer";
 import { Scanner } from "./parser/scanner";
 import { simplifyExpr } from "./solver/solver";
@@ -109,3 +110,10 @@ function show(source: string) {
 console.clear();
 
 lines.forEach(show);
+
+//@ts-ignore
+globalThis.show = show;
+//@ts-ignore
+globalThis.parse = parse;
+//@ts-ignore
+globalThis.evaluate = evaluate;
