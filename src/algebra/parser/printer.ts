@@ -1,5 +1,5 @@
 import type { BinaryExpr, Expr, ExprVisitor, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
-import { Scanner } from "./scanner";
+import { symbolForTokenType } from "./token";
 
 export interface ExpressionPrinterOptions {
     minimal?: boolean;
@@ -30,7 +30,7 @@ export class ExpressionPrinter implements ExprVisitor<string> {
 
     visitBinaryExpr(expr: BinaryExpr): string {
         if (this.#options.minimal)
-            return `${this.#options.explicitGrouping ? "<" : ""}${expr.left.accept(this)}${Scanner.symbolForKeyword.get(
+            return `${this.#options.explicitGrouping ? "<" : ""}${expr.left.accept(this)}${symbolForTokenType.get(
                 expr.operator.type,
             )!}${expr.right.accept(this)}${this.#options.explicitGrouping ? ">" : ""}`;
 
@@ -50,8 +50,7 @@ export class ExpressionPrinter implements ExprVisitor<string> {
     }
 
     visitUnaryExpr(expr: UnaryExpr): string {
-        if (this.#options.minimal)
-            return `${Scanner.symbolForKeyword.get(expr.operator.type)!}${expr.right.accept(this)}`;
+        if (this.#options.minimal) return `${symbolForTokenType.get(expr.operator.type)!}${expr.right.accept(this)}`;
 
         return `${expr.operator.lexeme}${this.#options.explicitGrouping ? "<" : " "}${expr.right.accept(this)}${
             this.#options.explicitGrouping ? ">" : ""

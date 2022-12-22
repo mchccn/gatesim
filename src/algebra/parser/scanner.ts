@@ -1,43 +1,6 @@
-import { Token, TokenType } from "./token";
+import { Token, TokenType, lexemeForTokenType, tokenTypeForKeyword } from "./token";
 
 export class Scanner {
-    static #keywords: ReadonlyMap<string, TokenType> = new Map([
-        ["true", TokenType.True],
-        ["false", TokenType.False],
-        ["not", TokenType.Not],
-        ["or", TokenType.Or],
-        ["nor", TokenType.Nor],
-        ["and", TokenType.And],
-        ["nand", TokenType.Nand],
-        ["xor", TokenType.Xor],
-        ["xnor", TokenType.Xnor],
-    ]);
-
-    static lexemeForKeyword: ReadonlyMap<TokenType, string> = new Map([...this.#keywords].map(([k, v]) => [v, k]));
-
-    static symbolForKeyword: ReadonlyMap<TokenType, string> = new Map([
-        [TokenType.True, "1"],
-        [TokenType.False, "0"],
-        [TokenType.Not, "¬"],
-        [TokenType.Or, "∨"],
-        [TokenType.Nor, "⊽"],
-        [TokenType.And, "∧"],
-        [TokenType.Nand, "⊼"],
-        [TokenType.Xor, "⊕"],
-        [TokenType.Xnor, "⊙"],
-    ]);
-
-    static nestingPairs: ReadonlyMap<TokenType, TokenType> = new Map(
-        [
-            [TokenType.RightParen, TokenType.LeftParen],
-            [TokenType.RightBrack, TokenType.LeftBrack],
-            [TokenType.RightBrace, TokenType.LeftBrace],
-        ].flatMap(([k, v]) => [
-            [k, v],
-            [v, k],
-        ]),
-    );
-
     static #escapes: ReadonlyMap<string, TokenType> = new Map([
         ["true", TokenType.True],
         ["t", TokenType.True],
@@ -135,7 +98,7 @@ export class Scanner {
 
         const text = this.source.substring(this.#start, this.#current);
 
-        const type = Scanner.#keywords.get(text);
+        const type = tokenTypeForKeyword.get(text);
 
         if (!type) {
             // transform into products
@@ -170,7 +133,7 @@ export class Scanner {
         if (!type) throw new SyntaxError();
 
         // lookup text by token type
-        const lexeme = Scanner.lexemeForKeyword.get(type)!;
+        const lexeme = lexemeForTokenType.get(type)!;
 
         if (type === TokenType.Not) return this.#implicitMultiply(type, lexeme, true);
 

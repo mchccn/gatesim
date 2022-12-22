@@ -1,14 +1,7 @@
-import type { Expr } from "./parser/expr";
+import { TotalOperationsHeuristic } from "./parser/heuristics/operations";
 import { Parser } from "./parser/parser";
-import { ConstantExpressionEvaluationPass as ConstExprEvalPass } from "./parser/passes/constants";
-import { ExpressionSimplificationPass as ExprSimpPass } from "./parser/passes/expressions";
-import { ExpressionNormalizingPass as ExprNormPass } from "./parser/passes/normalizer";
-import { pipeline } from "./parser/passes/pipeline";
-import { printExpr } from "./parser/printer";
 import { Scanner } from "./parser/scanner";
-import { areTreesExactlyEqual } from "./parser/trees/equal";
-import { factoringSteps } from "./solver/factoring";
-import { negationExtractionSteps } from "./solver/negations";
+import { simplifyExpr } from "./solver/solver";
 
 // const lines = String.raw`
 // a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
@@ -93,50 +86,11 @@ a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
 function show(source: string) {
     const tokens = new Scanner(source).scanTokens();
 
-    const singlePass = pipeline(ExprNormPass, ConstExprEvalPass, ExprSimpPass);
-
-    const maxPass = (expr: Expr) => {
-        let passed = singlePass(expr);
-
-        // simplify until the passes do not change anything
-        while (!areTreesExactlyEqual(expr, passed)) [expr, passed] = [passed, singlePass(expr)];
-
-        // at least one pass should be done
-        expr = singlePass(expr);
-
-        return expr;
-    };
-
     let expr = new Parser(tokens).parse();
 
-    expr = maxPass(expr);
+    const steps = simplifyExpr(expr, new TotalOperationsHeuristic());
 
-    console.log(printExpr(expr, { explicitGrouping: true }));
-
-    const factoringStepsToTry = factoringSteps({ description: "initial", expr });
-
-    factoringStepsToTry.forEach(({ description, expr }) => {
-        console.log("+".repeat(16));
-
-        console.log(description);
-        console.log(printExpr(maxPass(expr), { explicitGrouping: true }));
-
-        const factoringStepsToTry = factoringSteps({ description: "initial", expr });
-
-        factoringStepsToTry.forEach(({ description, expr }) => {
-            console.log(description);
-            console.log(printExpr(maxPass(expr), { explicitGrouping: true }));
-
-            const extractedNegationStepsToTry = negationExtractionSteps({ description: "initial", expr });
-
-            extractedNegationStepsToTry.forEach(({ description, expr }) => {
-                console.log(description);
-                console.log(printExpr(maxPass(expr), { explicitGrouping: true }));
-            });
-        });
-
-        console.log("+".repeat(16));
-    });
+    console.log(steps);
 }
 
 console.clear();

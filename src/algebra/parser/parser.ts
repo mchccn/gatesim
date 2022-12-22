@@ -1,6 +1,5 @@
 import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
-import { Scanner } from "./scanner";
-import { Token, TokenType } from "./token";
+import { Token, TokenType, tokenNestingPairs } from "./token";
 
 export class Parser {
     #current = 0;
@@ -163,7 +162,7 @@ export class Parser {
             ) {
                 const pair = stack.pop();
 
-                if (!pair || token.type !== Scanner.nestingPairs.get(pair)) throw new SyntaxError();
+                if (!pair || token.type !== tokenNestingPairs.get(pair)) throw new SyntaxError();
             }
         }
 

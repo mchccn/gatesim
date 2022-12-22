@@ -1,6 +1,5 @@
 import { BinaryExpr, Expr, ExprPass, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "../expr";
-import { Scanner } from "../scanner";
-import { Token, TokenType } from "../token";
+import { Token, TokenType, lexemeForTokenType } from "../token";
 
 // sole goal is to identify constant expressions and evaluate them beforehand
 export class ConstantExpressionEvaluationPass implements ExprPass {
@@ -56,7 +55,7 @@ export class ConstantExpressionEvaluationPass implements ExprPass {
                         : new UnaryExpr(
                               new Token(
                                   TokenType.Not,
-                                  Scanner.lexemeForKeyword.get(TokenType.Not)!,
+                                  lexemeForTokenType.get(TokenType.Not)!,
                                   expr.operator.line,
                                   expr.operator.col,
                               ),
@@ -71,7 +70,7 @@ export class ConstantExpressionEvaluationPass implements ExprPass {
                         ? new UnaryExpr(
                               new Token(
                                   TokenType.Not,
-                                  Scanner.lexemeForKeyword.get(TokenType.Not)!,
+                                  lexemeForTokenType.get(TokenType.Not)!,
                                   expr.operator.line,
                                   expr.operator.col,
                               ),
@@ -85,7 +84,7 @@ export class ConstantExpressionEvaluationPass implements ExprPass {
                         ? new UnaryExpr(
                               new Token(
                                   TokenType.Not,
-                                  Scanner.lexemeForKeyword.get(TokenType.Not)!,
+                                  lexemeForTokenType.get(TokenType.Not)!,
                                   expr.operator.line,
                                   expr.operator.col,
                               ),
@@ -100,7 +99,7 @@ export class ConstantExpressionEvaluationPass implements ExprPass {
                         : new UnaryExpr(
                               new Token(
                                   TokenType.Not,
-                                  Scanner.lexemeForKeyword.get(TokenType.Not)!,
+                                  lexemeForTokenType.get(TokenType.Not)!,
                                   expr.operator.line,
                                   expr.operator.col,
                               ),

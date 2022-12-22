@@ -1,6 +1,5 @@
 import { BinaryExpr, Expr, ExprPass, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "../expr";
-import { Scanner } from "../scanner";
-import { Token, TokenType } from "../token";
+import { Token, TokenType, lexemeForTokenType } from "../token";
 import { areTreesExactlyEqual } from "../trees/equal";
 import { ExpressionNormalizingPass } from "./normalizer";
 
@@ -112,7 +111,7 @@ export class ExpressionSimplificationPass implements ExprPass {
                             a,
                             new Token(
                                 TokenType.Xor,
-                                Scanner.lexemeForKeyword.get(TokenType.Xor)!,
+                                lexemeForTokenType.get(TokenType.Xor)!,
                                 expr.operator.line,
                                 expr.operator.col,
                             ),
@@ -151,7 +150,7 @@ export class ExpressionSimplificationPass implements ExprPass {
                             a,
                             new Token(
                                 TokenType.Xnor,
-                                Scanner.lexemeForKeyword.get(TokenType.Xnor)!,
+                                lexemeForTokenType.get(TokenType.Xnor)!,
                                 expr.operator.line,
                                 expr.operator.col,
                             ),
@@ -197,7 +196,7 @@ export class ExpressionSimplificationPass implements ExprPass {
                 return new UnaryExpr(
                     new Token(
                         TokenType.Not,
-                        Scanner.lexemeForKeyword.get(TokenType.Not)!,
+                        lexemeForTokenType.get(TokenType.Not)!,
                         expr.operator.line,
                         expr.operator.col,
                     ),
@@ -217,7 +216,7 @@ export class ExpressionSimplificationPass implements ExprPass {
                 return new UnaryExpr(
                     new Token(
                         TokenType.Not,
-                        Scanner.lexemeForKeyword.get(TokenType.Not)!,
+                        lexemeForTokenType.get(TokenType.Not)!,
                         expr.operator.line,
                         expr.operator.col,
                     ),
@@ -283,7 +282,7 @@ export class ExpressionSimplificationPass implements ExprPass {
                                 expr.right.expression.left,
                                 new Token(
                                     normalGate,
-                                    Scanner.lexemeForKeyword.get(normalGate)!,
+                                    lexemeForTokenType.get(normalGate)!,
                                     expr.right.expression.operator.line,
                                     expr.right.expression.operator.col,
                                 ),
