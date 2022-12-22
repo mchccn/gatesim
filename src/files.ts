@@ -7,6 +7,7 @@ import { Display } from "./reified/Display";
 import { Input } from "./reified/Input";
 import { Output } from "./reified/Output";
 import type { Reified } from "./reified/Reified";
+import { SevenSegmentDisplay } from "./reified/SevenSegmentDisplay";
 import { chips } from "./reified/chips";
 
 export type SerializedComponents = SerializedDiagram["components"][number];
@@ -66,6 +67,16 @@ export type SerializedDiagram = {
               inputs: { id: number; activated: boolean }[];
               outputs: { id: number; activated: boolean }[];
               radix: number;
+              x: number;
+              y: number;
+              angle: number;
+          }
+        | {
+              reified: number;
+              permanent: boolean;
+              type: "SEVEN_SEGMENT_DISPLAY";
+              inputs: { id: number; activated: boolean }[];
+              outputs: { id: number; activated: boolean }[];
               x: number;
               y: number;
               angle: number;
@@ -158,6 +169,27 @@ export function saveDiagram(components: Reified[], wires: Wiring[]) {
                 };
             }
 
+            if (component instanceof SevenSegmentDisplay) {
+                return {
+                    reified,
+                    permanent: component.permanence,
+                    type: "SEVEN_SEGMENT_DISPLAY",
+                    inputs: component.inputs.map((i) => {
+                        ids.set(i, id.next().value!);
+
+                        return { id: ids.get(i)!, activated: i.classList.contains("activated") };
+                    }),
+                    outputs: component.outputs.map((o) => {
+                        ids.set(o, id.next().value!);
+
+                        return { id: ids.get(o)!, activated: o.classList.contains("activated") };
+                    }),
+                    x: parseFloat(component.element.style.left),
+                    y: parseFloat(component.element.style.top),
+                    angle: component.angle,
+                };
+            }
+
             ToastManager.toast({
                 message: "Unable to serialize diagram.",
                 color: ACTIVATED_CSS_COLOR,
@@ -212,6 +244,24 @@ export function fromFile(
 
             if (raw.type === "DISPLAY") {
                 const display = new Display(raw, raw.inputs.length, raw.radix).rotate(raw.angle);
+
+                display.inputs.forEach((input, index) => {
+                    input.classList.toggle("activated", raw.inputs[index].activated);
+
+                    elements.set(raw.inputs[index].id, input);
+                });
+
+                display.outputs.forEach((output, index) => {
+                    output.classList.toggle("activated", raw.outputs[index].activated);
+
+                    elements.set(raw.outputs[index].id, output);
+                });
+
+                return raw.permanent ? display.permanent() : display;
+            }
+
+            if (raw.type === "SEVEN_SEGMENT_DISPLAY") {
+                const display = new SevenSegmentDisplay(raw).rotate(raw.angle);
 
                 display.inputs.forEach((input, index) => {
                     input.classList.toggle("activated", raw.inputs[index].activated);
@@ -289,7 +339,10 @@ function validate(data: unknown): asserts data is SerializedDiagram {
 
         if (!("type" in component)) throw new Error("Components data is missing a type.");
 
-        if (typeof component.type !== "string" || !["INPUT", "OUTPUT", "COMPONENT", "DISPLAY"].includes(component.type))
+        if (
+            typeof component.type !== "string" ||
+            !["INPUT", "OUTPUT", "COMPONENT", "DISPLAY", "SEVEN_SEGMENT_DISPLAY"].includes(component.type)
+        )
             throw new Error("Invalid component type.");
 
         if (!("x" in component)) throw new Error("Components data is missing a x coordinate.");
@@ -378,14 +431,18 @@ function validate(data: unknown): asserts data is SerializedDiagram {
 
                 break;
             }
-            case "DISPLAY": {
+            case "DISPLAY":
+            case "SEVEN_SEGMENT_DISPLAY": {
                 if (!("angle" in component)) throw new Error("Display data is missing rotation angle.");
 
                 if (typeof component.angle !== "number") throw new Error("Rotation angle must be a number.");
 
-                if (!("radix" in component)) throw new Error("Display data is missing display radix.");
+                // radix doesn't apply to seven segment displays
+                if (component.type === "DISPLAY") {
+                    if (!("radix" in component)) throw new Error("Display data is missing display radix.");
 
-                if (typeof component.radix !== "number") throw new Error("Display radix must be a number.");
+                    if (typeof component.radix !== "number") throw new Error("Display radix must be a number.");
+                }
 
                 if (!("inputs" in component)) throw new Error("Display data is missing inputs.");
 
@@ -423,7 +480,7 @@ function validate(data: unknown): asserts data is SerializedDiagram {
     }
 
     const ids = data.components.flatMap<number>((component) =>
-        component.type === "COMPONENT" || component.type === "DISPLAY"
+        component.type === "COMPONENT" || component.type === "DISPLAY" || component.type === "SEVEN_SEGMENT_DISPLAY"
             ? [
                   ...component.inputs.map(({ id }: { id: number }) => id),
                   ...component.outputs.map(({ id }: { id: number }) => id),

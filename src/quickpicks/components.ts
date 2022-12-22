@@ -11,6 +11,12 @@ export const quickpickComponents = (e: MouseEvent) =>
             },
         },
         {
+            label: "7 Seg",
+            callback(e) {
+                insert["insert-component"].callback.call(undefined, e, "SEVEN_SEGMENT_DISPLAY");
+            },
+        },
+        {
             label: "Output",
             callback(e) {
                 io["new-output"].callback.call(undefined, e);

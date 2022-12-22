@@ -5,6 +5,7 @@ import { SelectionManager } from "../managers/SelectionManager";
 import { TestingManager } from "../managers/TestingManager";
 import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";
+import { SevenSegmentDisplay } from "../reified/SevenSegmentDisplay";
 
 export const rotate = {
     ...KeybindsManager.assign("Shift+R", () => {
@@ -17,14 +18,22 @@ export const rotate = {
         return SandboxManager.pushHistory(
             () => {
                 selected.forEach((component) => {
-                    if (component instanceof Component || component instanceof Display) {
+                    if (
+                        component instanceof Component ||
+                        component instanceof Display ||
+                        component instanceof SevenSegmentDisplay
+                    ) {
                         component.angle -= 90;
                     }
                 });
             },
             () => {
                 selected.forEach((component) => {
-                    if (component instanceof Component || component instanceof Display) {
+                    if (
+                        component instanceof Component ||
+                        component instanceof Display ||
+                        component instanceof SevenSegmentDisplay
+                    ) {
                         component.angle += 90;
                     }
                 });
@@ -41,14 +50,22 @@ export const rotate = {
         return SandboxManager.pushHistory(
             () => {
                 selected.forEach((component) => {
-                    if (component instanceof Component || component instanceof Display) {
+                    if (
+                        component instanceof Component ||
+                        component instanceof Display ||
+                        component instanceof SevenSegmentDisplay
+                    ) {
                         component.angle += 90;
                     }
                 });
             },
             () => {
                 selected.forEach((component) => {
-                    if (component instanceof Component || component instanceof Display) {
+                    if (
+                        component instanceof Component ||
+                        component instanceof Display ||
+                        component instanceof SevenSegmentDisplay
+                    ) {
                         component.angle -= 90;
                     }
                 });

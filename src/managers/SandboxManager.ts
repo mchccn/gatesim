@@ -6,6 +6,7 @@ import { Display } from "../reified/Display";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
 import { Reified, html } from "../reified/Reified";
+import { SevenSegmentDisplay } from "../reified/SevenSegmentDisplay";
 import { CanvasManager } from "./CanvasManager";
 import { DarkmodeManager } from "./DarkmodeManager";
 import { DraggingManager } from "./DraggingManager";
@@ -54,7 +55,7 @@ const calculateReifiedTotals = (set: Set<Reified>) =>
                 map.chipsTotal++;
 
                 map.chips.set(item.chip.name, (map.chips.get(item.chip.name) ?? 0) + 1);
-            } else if (item instanceof Display) {
+            } else if (item instanceof Display || item instanceof SevenSegmentDisplay) {
             } else {
                 throw new Error("Unknown component type.");
             }

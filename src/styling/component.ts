@@ -96,4 +96,9 @@ export default css`
 
         user-select: none;
     }
+
+    .seven-segment-display {
+        height: 100px;
+        width: 80px;
+    }
 `;

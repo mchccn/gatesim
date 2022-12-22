@@ -7,7 +7,16 @@ import { TestingManager } from "../managers/TestingManager";
 import { Component } from "../reified/Component";
 import { Display } from "../reified/Display";
 import { Reified } from "../reified/Reified";
+import { SevenSegmentDisplay } from "../reified/SevenSegmentDisplay";
 import { chips } from "../reified/chips";
+
+export const componentNameMap = new Map<string, () => Reified>([
+    ["DISPLAY", () => new Display()],
+    ["7SEG", () => new SevenSegmentDisplay()],
+    ["7SD", () => new SevenSegmentDisplay()],
+    ["SEVEN_SEG", () => new SevenSegmentDisplay()],
+    ["SEVEN_SEGMENT_DISPLAY", () => new SevenSegmentDisplay()],
+]);
 
 export const insert = {
     "insert-component": {
@@ -22,11 +31,11 @@ export const insert = {
 
             const chip = chips.get(name.toUpperCase());
 
+            const componentName = name.toUpperCase();
+
             const component = chip
                 ? new Component(Reflect.construct(chip, []), ORIGIN_POINT)
-                : name.toUpperCase() === "DISPLAY"
-                ? new Display()
-                : undefined;
+                : componentNameMap.get(componentName)?.();
 
             if (!component) return ModalManager.alert("No component was found with that name.");
 

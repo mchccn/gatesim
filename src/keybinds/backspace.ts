@@ -10,6 +10,7 @@ import { Display } from "../reified/Display";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
 import { Reified } from "../reified/Reified";
+import { SevenSegmentDisplay } from "../reified/SevenSegmentDisplay";
 
 export const backspace = {
     ...KeybindsManager.assign("Control+X", () => {
@@ -63,7 +64,11 @@ export const backspace = {
                         });
 
                         component.element.classList.remove("activated");
-                    } else if (component instanceof Component || component instanceof Display) {
+                    } else if (
+                        component instanceof Component ||
+                        component instanceof Display ||
+                        component instanceof SevenSegmentDisplay
+                    ) {
                         WiringManager.wires.forEach((wire) => {
                             if (
                                 component.inputs.some((i) => wire.to === i) ||
@@ -125,7 +130,11 @@ export const backspace = {
                         });
 
                         component.element.classList.remove("activated");
-                    } else if (component instanceof Component || component instanceof Display) {
+                    } else if (
+                        component instanceof Component ||
+                        component instanceof Display ||
+                        component instanceof SevenSegmentDisplay
+                    ) {
                         WiringManager.wires.forEach((wire) => {
                             if (
                                 component.inputs.some((i) => wire.to === i) ||

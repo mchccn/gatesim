@@ -7,6 +7,7 @@ import { Display } from "../reified/Display";
 import { Input } from "../reified/Input";
 import { Output } from "../reified/Output";
 import { Reified, overlappedBounds } from "../reified/Reified";
+import { SevenSegmentDisplay } from "../reified/SevenSegmentDisplay";
 import { CanvasManager } from "./CanvasManager";
 import { DraggingManager } from "./DraggingManager";
 import { KeybindsManager } from "./KeybindsManager";
@@ -57,7 +58,11 @@ export class SelectionManager {
 
                             if (component instanceof Output) return false;
 
-                            if (component instanceof Component || component instanceof Display)
+                            if (
+                                component instanceof Component ||
+                                component instanceof Display ||
+                                component instanceof SevenSegmentDisplay
+                            )
                                 return component.outputs.some((output) => wiring.from === output);
 
                             throw new Error("Unknown component type.");
@@ -67,7 +72,11 @@ export class SelectionManager {
 
                             if (component instanceof Output) return wiring.to === component.element;
 
-                            if (component instanceof Component || component instanceof Display)
+                            if (
+                                component instanceof Component ||
+                                component instanceof Display ||
+                                component instanceof SevenSegmentDisplay
+                            )
                                 return component.inputs.some((input) => wiring.to === input);
 
                             throw new Error("Unknown component type.");
@@ -104,7 +113,11 @@ export class SelectionManager {
                     components!.forEach((component) => {
                         component.attach();
 
-                        if (component instanceof Component || component instanceof Display) {
+                        if (
+                            component instanceof Component ||
+                            component instanceof Display ||
+                            component instanceof SevenSegmentDisplay
+                        ) {
                             component.inputs.forEach((input) => input.classList.remove("activated"));
 
                             requestAnimationFrame(() => component.update());
@@ -207,7 +220,11 @@ export class SelectionManager {
 
             if (component instanceof Output) return element === component.element;
 
-            if (component instanceof Component || component instanceof Display)
+            if (
+                component instanceof Component ||
+                component instanceof Display ||
+                component instanceof SevenSegmentDisplay
+            )
                 return (
                     component.inputs.some((input) => element === input) ||
                     component.outputs.some((output) => element === output) ||
