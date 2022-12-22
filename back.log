@@ -6,11 +6,7 @@
 
 -   when you edit a component's inputs/outputs count, it should not delete all the wires
 
--   serialized diagram patcher so old files don't become useless
-
 -   rust wasm instead of web workers
-
--   add more examples/exercises
 
 -   fancier wires
 

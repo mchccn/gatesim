@@ -84,6 +84,12 @@ a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
     .split("\n")
     .filter(Boolean);
 
+// const lines = String.raw`
+// a b \neg c + a \neg b c + \neg a b c + a b c
+// `
+//     .split("\n")
+//     .filter(Boolean);
+
 function show(source: string) {
     const tokens = new Scanner(source).scanTokens();
 

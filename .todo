@@ -1,8 +1,18 @@
 -   boolean algebra
 
--   settings icon
+    -   add more possible steps
 
-    -   option to use gate icons instead of names as text
+        -   distributing
+
+        -   de morgan's laws
+
+    -   refactor some parts into steps instead of static passes
+
+    -   not good enough yet to simplify "abc̄+ab̄c+ābc+abc"
+
+-   tool that turns algebraic expressions into circuits
+
+-   option to draw gates on the component instead of using names as text
 
 -   https://www.youtube.com/watch?v=hEDQpqhY2MA&t=522s
 
