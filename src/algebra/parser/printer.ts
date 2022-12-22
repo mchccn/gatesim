@@ -4,6 +4,7 @@ import { symbolForTokenType } from "./token";
 export interface ExpressionPrinterOptions {
     minimal?: boolean;
     explicitGrouping?: boolean;
+    parenthesizeEverything?: boolean;
     printConstantsAsNumbers?: boolean;
 }
 
@@ -19,6 +20,7 @@ export class ExpressionPrinter implements ExprVisitor<string> {
         this.#options = {
             minimal: false,
             explicitGrouping: false,
+            parenthesizeEverything: false,
             printConstantsAsNumbers: false,
             ...options,
         };
@@ -30,13 +32,17 @@ export class ExpressionPrinter implements ExprVisitor<string> {
 
     visitBinaryExpr(expr: BinaryExpr): string {
         if (this.#options.minimal)
-            return `${this.#options.explicitGrouping ? "<" : ""}${expr.left.accept(this)}${symbolForTokenType.get(
-                expr.operator.type,
-            )!}${expr.right.accept(this)}${this.#options.explicitGrouping ? ">" : ""}`;
+            return `${
+                this.#options.parenthesizeEverything ? "(" : this.#options.explicitGrouping ? "<" : ""
+            }${expr.left.accept(this)}${symbolForTokenType.get(expr.operator.type)!}${expr.right.accept(this)}${
+                this.#options.parenthesizeEverything ? ")" : this.#options.explicitGrouping ? ">" : ""
+            }`;
 
-        return `${this.#options.explicitGrouping ? "<" : ""}${expr.left.accept(this)} ${
-            expr.operator.lexeme
-        } ${expr.right.accept(this)}${this.#options.explicitGrouping ? ">" : ""}`;
+        return `${
+            this.#options.parenthesizeEverything ? "(" : this.#options.explicitGrouping ? "<" : ""
+        }${expr.left.accept(this)} ${expr.operator.lexeme} ${expr.right.accept(this)}${
+            this.#options.parenthesizeEverything ? ")" : this.#options.explicitGrouping ? ">" : ""
+        }`;
     }
 
     visitGroupingExpr(expr: GroupingExpr): string {
@@ -52,8 +58,10 @@ export class ExpressionPrinter implements ExprVisitor<string> {
     visitUnaryExpr(expr: UnaryExpr): string {
         if (this.#options.minimal) return `${symbolForTokenType.get(expr.operator.type)!}${expr.right.accept(this)}`;
 
-        return `${expr.operator.lexeme}${this.#options.explicitGrouping ? "<" : " "}${expr.right.accept(this)}${
-            this.#options.explicitGrouping ? ">" : ""
+        return `${expr.operator.lexeme}${
+            this.#options.parenthesizeEverything ? "(" : this.#options.explicitGrouping ? "<" : " "
+        }${expr.right.accept(this)}${
+            this.#options.parenthesizeEverything ? ")" : this.#options.explicitGrouping ? ">" : ""
         }`;
     }
 

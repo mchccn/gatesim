@@ -19,6 +19,10 @@ export class DeepestNestingHeuristic implements ExprHeuristic<number> {
         }
     }
 
+    compare(a: number, b: number): number {
+        return b - a;
+    }
+
     visitBinaryExpr(expr: BinaryExpr): number {
         if (
             [TokenType.Or, TokenType.Nor, TokenType.And, TokenType.Nand, TokenType.Xor, TokenType.Xnor].includes(

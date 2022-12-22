@@ -1,5 +1,6 @@
 import { TotalOperationsHeuristic } from "./parser/heuristics/operations";
 import { Parser } from "./parser/parser";
+import { printExpr } from "./parser/printer";
 import { Scanner } from "./parser/scanner";
 import { simplifyExpr } from "./solver/solver";
 
@@ -71,17 +72,17 @@ import { simplifyExpr } from "./solver/solver";
 //     .split("\n")
 //     .filter(Boolean);
 
-const lines = String.raw`
-a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
-`
-    .split("\n")
-    .filter(Boolean);
-
 // const lines = String.raw`
 // x(ab + ac + d)
 // `
 //     .split("\n")
 //     .filter(Boolean);
+
+const lines = String.raw`
+a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
+`
+    .split("\n")
+    .filter(Boolean);
 
 function show(source: string) {
     const tokens = new Scanner(source).scanTokens();
@@ -90,7 +91,13 @@ function show(source: string) {
 
     const steps = simplifyExpr(expr, new TotalOperationsHeuristic());
 
-    console.log(steps);
+    steps.forEach(({ description, expr }) => {
+        console.log(description);
+        console.log(printExpr(expr, { minimal: true, parenthesizeEverything: true }));
+        console.log();
+    });
+
+    console.log("final result:", steps.at(-1)!.expr);
 }
 
 console.clear();

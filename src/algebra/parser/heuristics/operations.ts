@@ -6,6 +6,10 @@ export class TotalOperationsHeuristic implements ExprHeuristic<number> {
         return expr.accept(this);
     }
 
+    compare(a: number, b: number): number {
+        return a - b;
+    }
+
     visitBinaryExpr(expr: BinaryExpr): number {
         if (
             [TokenType.Or, TokenType.Nor, TokenType.And, TokenType.Nand, TokenType.Xor, TokenType.Xnor].includes(

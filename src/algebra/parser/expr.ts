@@ -6,6 +6,7 @@ export interface ExprPass extends ExprVisitor<Expr> {
 
 export interface ExprHeuristic<T> extends ExprVisitor<T> {
     score(expr: Expr): T;
+    compare(a: T, b: T): number;
 }
 
 export interface ExprWalker<T> extends ExprVisitor<void> {
