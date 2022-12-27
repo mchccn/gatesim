@@ -13,6 +13,10 @@ export function printExpr(expr: Expr, options?: ExpressionPrinterOptions | numbe
     return new ExpressionPrinter(typeof options === "number" ? undefined : options).print(expr);
 }
 
+export function compareExprLexographically(a: Expr, b: Expr) {
+    return printExpr(a) > printExpr(b) ? 1 : -1;
+}
+
 export class ExpressionPrinter implements ExprVisitor<string> {
     #options: Required<ExpressionPrinterOptions>;
 

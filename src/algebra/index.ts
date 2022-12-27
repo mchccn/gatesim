@@ -79,17 +79,23 @@ import { simplifyExpr } from "./solver/solver";
 //     .split("\n")
 //     .filter(Boolean);
 
+// should reduce to
+// a xor b xor c
+// const lines = String.raw`
+// a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
+// `
+//     .split("\n")
+//     .filter(Boolean);
+
+// should reduce to
+// ((a xor b) and c) or (a and b)
 const lines = String.raw`
-a \neg b \neg c + \neg a b \neg c + \neg a \neg b c + a b c
+a b \neg c + a \neg b c + \neg a b c + a b c
 `
     .split("\n")
     .filter(Boolean);
 
-// const lines = String.raw`
-// a b \neg c + a \neg b c + \neg a b c + a b c
-// `
-//     .split("\n")
-//     .filter(Boolean);
+// TODO: DEBUG COMBINATIONS OF FACTORINGS NOT WORKING
 
 function show(source: string) {
     const tokens = new Scanner(source).scanTokens();
